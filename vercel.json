@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "vite",
+  "env": [
+    "VITE_ADMIN_USERNAME",
+    "VITE_ADMIN_PASSWORD",
+    "VITE_GROQ_API_KEY",
+    "VITE_API_URL",
+    "VITE_CONTACT_EMAIL"
+  ]
+}

@@ -1,0 +1,8 @@
+
+{
+  "name": "NextGen SEO — AI-Powered SEO Agency",
+  "description": "AI-powered SEO agency providing keyword research, technical SEO, link building, and content strategies to boost organic traffic and Google rankings.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

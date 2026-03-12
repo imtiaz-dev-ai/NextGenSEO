@@ -1,0 +1,156 @@
+{
+  "website_info": {
+    "name": "NextGen SEO",
+    "tagline": "Premium search intelligence platform founded by Tayyab Mehmood. We build the future of search visibility.",
+    "founder": "Tayyab Mehmood",
+    "description": "NextGen SEO is a professional SEO agency specializing in AI-powered search engine optimization, digital marketing, and organic growth strategies."
+  },
+  "services": {
+    "on_page_seo": {
+      "title": "On-Page SEO Optimization",
+      "description": "Transform your content into a high-performance ranking machine with professional semantic optimization frameworks. Advanced keyword placement, meta tag optimization, and content strategy for Google dominance.",
+      "features": [
+        "Keyword Optimization Strategy - AI-driven semantic keyword placement and search intent alignment",
+        "Meta Tags & Title Tags - CTR-focused title and meta description optimization for Google",
+        "Internal Linking Strategy - Building powerful site silos to distribute authority and improve rankings",
+        "On-Page SEO Audit - Complete analysis and improvement of page-level SEO factors",
+        "Heading Structure Optimization - H1-H6 hierarchy implementation for better crawling and rankings",
+        "User Experience & SEO - Matching content intent with user behavior for higher rankings and conversions"
+      ]
+    },
+    "off_page_seo": {
+      "title": "Off-Page SEO & Link Building",
+      "description": "Build high-authority digital ecosystems and professional backlink profiles that establish your brand as a market leader. Expert link building from high-authority sites and digital PR strategies.",
+      "features": [
+        "Professional Link Building - Quality-vetted backlinks from Tier 1 industry authoritative websites",
+        "Digital PR & Outreach - Earning brand mentions and backlinks from high-authority news outlets",
+        "Backlink Gap Analysis - Analyzing competitor backlink profiles and reclaiming lost link equity",
+        "Social Media & SEO - Amplifying content reach across social networks for domain authority",
+        "Content Assets for Links - Creating linkable infographics, case studies, and data resources",
+        "Competitor Link Strategy - Reverse-engineering and beating competitor link profiles"
+      ]
+    },
+    "technical_seo": {
+      "title": "Technical SEO & Site Performance",
+      "description": "Fix the foundation with comprehensive technical SEO deep-scans that eliminate barriers between your site and Google's index. Core Web Vitals optimization, schema markup, and crawlability improvements.",
+      "features": [
+        "Core Web Vitals Optimization - LCP, CLS, and FID optimization for Google's ranking factors",
+        "JavaScript & SEO - Ensuring dynamic and React content is properly rendered and indexed by Google",
+        "Crawl Budget & Indexation - Directing search bot crawlers to your most valuable pages efficiently",
+        "HTTPS & Security - SSL certificates and server-side security protocols for trust ranking",
+        "Schema Markup Implementation - Advanced JSON-LD structured data for Rich Snippets and SERP enhancements",
+        "Mobile SEO & Responsiveness - Mobile-first indexing compliance and flawless responsive design"
+      ]
+    },
+    "ai_powered_seo": {
+      "title": "AI-Powered SEO",
+        "description": "The future is now. We use advanced AI models to predict search trends before they happen.",
+      "features": [
+        "Predictive Analytics - Forecasting seasonal search shifts with AI",
+        "Semantic Mapping - Mapping topic clusters using NLP logic",
+        "Automated Insights - Real-time auditing of millions of data points",
+        "AI Content Studio - Generating high-authority drafts for scale",
+        "SERP Simulations - Testing ranking changes in a sandbox environment",
+        "Personalized Outreach - AI-enhanced communication for better link success"
+      ]
+    }
+  },
+  "ai_tools": {
+    "ai_seo_audit": "Comprehensive AI-powered website audit analyzing technical SEO, on-page optimization, and performance metrics",
+    "semantic_keyword_lab": "Advanced keyword research tool using AI to discover high-value search terms and semantic clusters",
+    "ai_content_writer": "AI-powered content generation tool for creating SEO-optimized blog posts and articles",
+    "competitor_intel": "Competitive analysis tool to reverse-engineer competitor SEO strategies and backlink profiles",
+    "ai_expert_chat": "24/7 AI SEO assistant to answer questions and provide optimization recommendations"
+  },
+  "team": [
+    {
+      "name": "Tayyab Mehmood",
+      "role": "Founder & CEO",
+      "linkedin": "https://www.linkedin.com/in/tayyab-mehmood-67101530b/",
+      "description": "Visionary founder who blends human creativity with AI processing power to define search dominance for global brands"
+    },
+    {
+      "name": "Fatima Ahad",
+      "role": "SEO Analyst",
+      "linkedin": "https://www.linkedin.com/in/fatima-ahad-8a7354396/"
+    },
+    {
+      "name": "Mahmood Akhtar",
+      "role": "SEO Consultant",
+      "linkedin": "https://www.linkedin.com/in/mahmood-seo/"
+    },
+    {
+      "name": "Islam Mehmood",
+      "role": "SEO Specialist",
+      "linkedin": "https://www.linkedin.com/in/islam-mehmood-seo/"
+    },
+    {
+      "name": "Muhammad Touheed",
+      "role": "Technical Lead",
+      "linkedin": "https://www.linkedin.com/in/muhammad-touheed-7295093a2"
+    },
+    {
+      "name": "Haroon Hussain",
+      "role": "SEO Specialist",
+      "linkedin": "https://www.linkedin.com/in/haroon-hussain-7a49293a7/"
+    },
+    {
+      "name": "Muhammad Fahad",
+      "role": "Link Building Expert",
+      "linkedin": "https://www.linkedin.com/in/muhammad-fahad-9859823a5/"
+    },
+    {
+      "name": "Imtiaz Hussain",
+      "role": "AI & Full Stack Developer",
+      "linkedin": "https://www.linkedin.com/in/imtiaz-hussain"
+    }
+    ,
+    {
+      "name": "Nabeel Butt",
+      "role": "SEO Specialist",
+      "linkedin": "https://www.linkedin.com/in/nabeel-butt-seo/",
+      "description": "SEO specialist focused on technical SEO and link acquisition."
+    }
+  ],
+  "results": {
+    "average_growth": "300%+",
+    "timeline": "6-12 months",
+    "methodology": "100% White-Hat",
+    "support": "24/7"
+  },
+  "mission": {
+    "results_driven": "We measure success by your growth, not vanity metrics. Every strategy is ROI-focused.",
+    "partnership": "Your success is our success. We work as an extension of your team, not just a vendor.",
+    "innovation": "Combining 10+ years of SEO expertise with cutting-edge AI technology for unmatched results."
+  },
+  "contact": {
+    "email": "hello@nextgenseo.com",
+    "phone": "+1 (234) 567-890",
+    "address": "123 SEO Street, Digital City, New York, NY 10001",
+    "hours": "Mon-Fri, 9AM-6PM EST"
+  },
+  "pages": {
+    "home": "Main landing page with hero section, features, case studies, testimonials, and FAQ",
+    "services": "Four main service pages: On-Page SEO, Off-Page SEO, Technical SEO, and AI-Powered SEO",
+    "ai_tools": "Five AI-powered tools: SEO Audit, Keyword Explorer, Content Writer, Competitor Analysis, and AI Chat",
+    "about": "About page featuring founder Tayyab Mehmood, team members, and company mission",
+    "blog": "Intelligence Hub with expert insights, strategies, and SEO trends",
+    "pricing": "Pricing plans and packages for different business needs",
+    "case_studies": "Success stories and results from client projects",
+    "contact": "Contact form and company contact information"
+  },
+  "footer_links": {
+    "global_services": [
+      "On-Page Strategy",
+      "Off-Page & PR",
+      "Technical Excellence",
+      "AI Search Solutions"
+    ],
+    "ai_innovation": [
+      "AI SEO Audit",
+      "Content Architect",
+      "Intelligence Blog",
+      "Hire Tayyab Mehmood"
+    ]
+  }
+}
