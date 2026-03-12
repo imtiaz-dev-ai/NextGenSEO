@@ -4,11 +4,24 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "vite",
-  "env": [
-    "VITE_ADMIN_USERNAME",
-    "VITE_ADMIN_PASSWORD",
-    "VITE_GROQ_API_KEY",
-    "VITE_API_URL",
-    "VITE_CONTACT_EMAIL"
-  ]
+  "env": {
+    "VITE_API_URL": {
+      "description": "API endpoint URL"
+    },
+    "VITE_CONTACT_EMAIL": {
+      "description": "Contact email address"
+    },
+    "VITE_ENABLE_ANALYTICS": {
+      "description": "Enable analytics tracking"
+    },
+    "VITE_ENABLE_LOGGING": {
+      "description": "Enable logging"
+    },
+    "VITE_ENABLE_ADMIN_PANEL": {
+      "description": "Enable admin panel"
+    },
+    "VITE_ENABLE_BACKLINKS": {
+      "description": "Enable backlinks feature"
+    }
+  }
 }
