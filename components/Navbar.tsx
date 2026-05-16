@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { AppRoute } from '../types';
-import { ThemeToggle } from './ThemeToggle';
 
 interface NavbarProps {
   currentRoute: AppRoute;
@@ -65,7 +64,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
         </div>
 
         <button onClick={() => navAction(AppRoute.BLOG)} aria-label="Navigate to blog page" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.BLOG ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>Blog</button>
-        <ThemeToggle />
         <button onClick={() => navAction(AppRoute.CONTACT)} aria-label="Navigate to contact page" className={`text-xs xl:text-sm font-bold uppercase tracking-wider bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500 hover:to-pink-500 px-6 py-3 rounded-xl transition-all hover:scale-105 border border-purple-500/30 ${currentRoute === AppRoute.CONTACT ? 'text-white from-purple-500 to-pink-500' : 'text-purple-400 hover:text-white'}`}>Contact</button>
       </div>
 

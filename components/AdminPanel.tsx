@@ -47,7 +47,7 @@ const AdminPanel: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [activeTab, setActiveTab] = useState<'blogs' | 'pricing' | 'messages' | 'cases' | 'team' | 'backlinks'>('messages');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'blogs' | 'pricing' | 'messages' | 'cases' | 'team' | 'backlinks'>('dashboard');
   const [lastActivity, setLastActivity] = useState(Date.now());
   const inactivityTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -385,71 +385,107 @@ const AdminPanel: React.FC = () => {
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-4 mb-8">
-        <button
-          onClick={() => setActiveTab('messages')}
-          className={`px-6 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'messages'
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-              : 'glass text-slate-400 hover:text-white'
-          }`}
-        >
-          Chat Messages
-        </button>
-        <button
-          onClick={() => setActiveTab('blogs')}
-          className={`px-6 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'blogs'
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-              : 'glass text-slate-400 hover:text-white'
-          }`}
-        >
-          Manage Blogs
-        </button>
-        <button
-          onClick={() => setActiveTab('cases')}
-          className={`px-6 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'cases'
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-              : 'glass text-slate-400 hover:text-white'
-          }`}
-        >
-          Case Studies
-        </button>
-        <button
-          onClick={() => setActiveTab('team')}
-          className={`px-6 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'team'
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-              : 'glass text-slate-400 hover:text-white'
-          }`}
-        >
-          Our Team
-        </button>
-        <button
-          onClick={() => setActiveTab('backlinks')}
-          className={`px-6 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'backlinks'
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-              : 'glass text-slate-400 hover:text-white'
-          }`}
-        >
-          Backlinks
-        </button>
-        <button
-          onClick={() => setActiveTab('pricing')}
-          className={`px-6 py-3 rounded-xl font-bold transition-all ${
-            activeTab === 'pricing'
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-              : 'glass text-slate-400 hover:text-white'
-          }`}
-        >
-          Manage Pricing
-        </button>
+      <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+        {[
+          { id: 'dashboard', label: '📊 Dashboard' },
+          { id: 'messages', label: '💬 Messages' },
+          { id: 'blogs', label: '📝 Blogs' },
+          { id: 'cases', label: '🎯 Cases' },
+          { id: 'team', label: '👥 Team' },
+          { id: 'backlinks', label: '🔗 Backlinks' },
+          { id: 'pricing', label: '💰 Pricing' }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`px-4 py-2 rounded-xl font-bold transition-all whitespace-nowrap text-sm ${
+              activeTab === tab.id
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                : 'glass text-slate-400 hover:text-white'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Content */}
+      {activeTab === 'dashboard' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="glass p-6 rounded-2xl border border-purple-500/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm font-bold">Total Messages</p>
+                  <p className="text-3xl font-black text-purple-400 mt-2">{chatMessages.length}</p>
+                </div>
+                <div className="text-4xl">💬</div>
+              </div>
+            </div>
+            <div className="glass p-6 rounded-2xl border border-blue-500/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm font-bold">Blog Posts</p>
+                  <p className="text-3xl font-black text-blue-400 mt-2">{blogs.length}</p>
+                </div>
+                <div className="text-4xl">📝</div>
+              </div>
+            </div>
+            <div className="glass p-6 rounded-2xl border border-emerald-500/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm font-bold">Case Studies</p>
+                  <p className="text-3xl font-black text-emerald-400 mt-2">{cases.length}</p>
+                </div>
+                <div className="text-4xl">🎯</div>
+              </div>
+            </div>
+            <div className="glass p-6 rounded-2xl border border-pink-500/20">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm font-bold">Team Members</p>
+                  <p className="text-3xl font-black text-pink-400 mt-2">{teamMembers.length}</p>
+                </div>
+                <div className="text-4xl">👥</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="glass p-6 rounded-2xl border border-white/5">
+              <h3 className="text-xl font-black mb-4">Recent Messages</h3>
+              <div className="space-y-3">
+                {chatMessages.slice(-3).reverse().map((msg) => (
+                  <div key={msg.id} className="p-3 bg-slate-900/30 rounded-lg border border-white/5">
+                    <p className="font-bold text-sm">{msg.name}</p>
+                    <p className="text-xs text-slate-400 truncate">{msg.message}</p>
+                    <p className="text-xs text-slate-500 mt-1">{msg.timestamp}</p>
+                  </div>
+                ))}
+                {chatMessages.length === 0 && <p className="text-slate-400 text-sm">No messages yet</p>}
+              </div>
+            </div>
+
+            <div className="glass p-6 rounded-2xl border border-white/5">
+              <h3 className="text-xl font-black mb-4">Quick Stats</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-slate-900/30 rounded-lg">
+                  <span className="text-sm text-slate-400">Total Backlinks</span>
+                  <span className="font-black text-lg text-cyan-400">{backlinks.length}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-900/30 rounded-lg">
+                  <span className="text-sm text-slate-400">Content Ready</span>
+                  <span className="font-black text-lg text-emerald-400">{blogs.length + cases.length}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-900/30 rounded-lg">
+                  <span className="text-sm text-slate-400">Team Size</span>
+                  <span className="font-black text-lg text-pink-400">{teamMembers.length}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {activeTab === 'messages' && (
         <div className="glass p-8 rounded-3xl">
           <h2 className="text-3xl font-black mb-6">Chatbot Messages</h2>

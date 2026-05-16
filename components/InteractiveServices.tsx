@@ -1,5 +1,5 @@
 import React from 'react';
-import { HiOutlineCpuChip, HiOutlineChartBar, HiOutlineLink, HiOutlineCog, HiOutlineMagnifyingGlass, HiOutlinePencil, HiOutlineTag, HiOutlineShieldCheck, HiOutlineArrowRight } from 'react-icons/hi2';
+import { HiOutlineCpuChip, HiOutlineChartBar, HiOutlineLink, HiOutlineCog, HiOutlineMagnifyingGlass, HiOutlinePencil, HiOutlineTag, HiOutlineShieldCheck, HiOutlineArrowRight, HiOutlineMapPin } from 'react-icons/hi2';
 
 const InteractiveServices: React.FC = () => {
   const services = [
@@ -58,6 +58,13 @@ const InteractiveServices: React.FC = () => {
       desc: '100% ethical search engine optimization practices. No black-hat techniques, no spam, no penalties. Sustainable organic growth through Google-approved strategies.',
       gradient: 'from-green-500 to-emerald-500',
       stats: '100% Ethical',
+    },
+    {
+      icon: <HiOutlineMapPin className="w-8 h-8" />,
+      title: 'Local SEO Mastery',
+      desc: 'Google Business Profile optimization, local citation building, location-based keyword targeting, and map pack domination for maximum local search visibility.',
+      gradient: 'from-amber-500 to-orange-500',
+      stats: 'Local Dominance',
     },
   ];
 
