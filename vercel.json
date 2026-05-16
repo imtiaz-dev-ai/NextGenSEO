@@ -5,23 +5,13 @@
   "installCommand": "npm install",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": {
-      "description": "API endpoint URL"
-    },
-    "VITE_CONTACT_EMAIL": {
-      "description": "Contact email address"
-    },
-    "VITE_ENABLE_ANALYTICS": {
-      "description": "Enable analytics tracking"
-    },
-    "VITE_ENABLE_LOGGING": {
-      "description": "Enable logging"
-    },
-    "VITE_ENABLE_ADMIN_PANEL": {
-      "description": "Enable admin panel"
-    },
-    "VITE_ENABLE_BACKLINKS": {
-      "description": "Enable backlinks feature"
-    }
+    "VITE_API_URL": "https://api.nextgenseo.com",
+    "VITE_CONTACT_EMAIL": "nextgenseotool@gmail.com",
+    "VITE_ENABLE_ANALYTICS": "true",
+    "VITE_ENABLE_LOGGING": "false",
+    "VITE_ENABLE_ADMIN_PANEL": "true",
+    "VITE_ENABLE_BACKLINKS": "true",
+    "VITE_ADMIN_USERNAME": "nextgenadmin",
+    "VITE_ADMIN_PASSWORD": "NextGen@2025"
   }
 }
