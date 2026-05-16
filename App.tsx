@@ -26,6 +26,7 @@ import { HiOutlinePencilSquare, HiOutlineLink, HiOutlineCog6Tooth, HiOutlineSpar
 const SvgIcon = ({ path, className = "w-5 h-5" }: { path: string; className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d={path} /></svg>
 );
+
 const ServicePage = ({ title, description, features, benefits, route, setRoute, icon }: any) => (
   <div className="pt-20 sm:pt-24 pb-12 sm:pb-20 px-4 sm:px-6 max-w-6xl mx-auto">
     <div className="mb-12 sm:mb-20 animate-in fade-in duration-700">
