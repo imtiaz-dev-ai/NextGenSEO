@@ -6,9 +6,11 @@ Allow: /
 Disallow: /admin
 Disallow: /.env
 Disallow: /node_modules
+Disallow: /*.json$
+Disallow: /*.map$
 
 # Sitemaps
-Sitemap: https://nextgenseo.agency/sitemap.xml
+Sitemap: https://nextgenseo.pro/sitemap.xml
 
 # Crawl delay
 Crawl-delay: 1
@@ -19,5 +21,9 @@ Allow: /
 Crawl-delay: 0
 
 User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
 Allow: /
 Crawl-delay: 1

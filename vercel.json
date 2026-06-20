@@ -5,13 +5,8 @@
   "installCommand": "npm install",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": "https://api.nextgenseo.com",
-    "VITE_CONTACT_EMAIL": "nextgenseotool@gmail.com",
     "VITE_ENABLE_ANALYTICS": "true",
     "VITE_ENABLE_LOGGING": "false",
-    "VITE_ENABLE_ADMIN_PANEL": "true",
-    "VITE_ENABLE_BACKLINKS": "true",
-    "VITE_ADMIN_USERNAME": "nextgenadmin",
-    "VITE_ADMIN_PASSWORD": "NextGen@2025"
+    "VITE_ENABLE_BACKLINKS": "true"
   }
 }

@@ -40,7 +40,7 @@ const FAQ: React.FC = () => {
       <div className="max-w-4xl mx-auto px-0">
         <div className="text-center mb-12 sm:mb-16 md:mb-20 px-0">
           <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 sm:mb-6">
-            Frequently Asked <span className="text-sky-500">Questions About SEO</span>
+            Frequently Asked <span className="gradient-text">Questions About SEO</span>
           </h2>
           <p className="text-xs sm:text-base md:text-lg lg:text-xl text-slate-400 leading-relaxed">Everything you need to know about our professional SEO services and keyword ranking strategies</p>
         </div>
@@ -54,7 +54,7 @@ const FAQ: React.FC = () => {
               >
                 <span className="font-bold text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed">{faq.q}</span>
                 <svg
-                  className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-sky-500 shrink-0 transition-transform ${openIndex === i ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-purple-400 shrink-0 transition-transform ${openIndex === i ? 'rotate-180' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

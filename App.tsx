@@ -11,17 +11,23 @@ import FAQ from './components/FAQ';
 import BeforeAfter from './components/BeforeAfter';
 import Team from './components/Team';
 import ParticleBackground from './components/ParticleBackground';
-
 import DashboardPreview from './components/DashboardPreview';
 import ScrollReveal from './components/ScrollReveal';
 import FloatingActionButton from './components/FloatingActionButton';
 import InteractiveServices from './components/InteractiveServices';
 import AdminPanel from './components/AdminPanel';
 import ClientsCarousel from './components/ClientsCarousel';
+import BlogPageNew from './components/BlogPageNew';
 import LinkBuildingServices from './components/LinkBuildingServices';
 import { ThemeProvider } from './components/ThemeToggle';
 import { AppRoute } from './types';
-import { HiOutlinePencilSquare, HiOutlineLink, HiOutlineCog6Tooth, HiOutlineSparkles, HiOutlineTag, HiOutlineDocumentText, HiOutlineArrowsRightLeft, HiOutlineClipboardDocumentCheck, HiOutlineQueueList, HiOutlineCursorArrowRays, HiOutlineMegaphone, HiOutlineChartBarSquare, HiOutlineGlobeAlt, HiOutlinePhoto, HiOutlineUserGroup, HiOutlineBolt, HiOutlineCodeBracket, HiOutlineServerStack, HiOutlineLockClosed, HiOutlineDocumentMagnifyingGlass, HiOutlineDevicePhoneMobile, HiOutlineBeaker, HiOutlineMap, HiOutlineRocketLaunch, HiOutlineCpuChip, HiOutlineLightBulb } from 'react-icons/hi2';
+import {
+  PencilIcon, LinkIcon, CogIcon, SparklesIcon, TagIcon, DocumentIcon,
+  ArrowsIcon, CheckIcon, BoltIcon, CodeIcon, ServerIcon, LockIcon,
+  MagnifyingGlassIcon, BeakerIcon, MapIcon, RocketIcon, ChipIcon,
+  LightbulbIcon, MegaphoneIcon, ChartIcon, GlobeIcon, PhotoIcon,
+  UsersIcon, QueueIcon, CursorIcon
+} from './utils/icons';
 
 const SvgIcon = ({ path, className = "w-5 h-5" }: { path: string; className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d={path} /></svg>
@@ -187,267 +193,6 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
   </div>
 );
 
-const BlogPage = () => {
-  const [customBlogs, setCustomBlogs] = React.useState<any[]>([]);
-  const [selectedCategory, setSelectedCategory] = React.useState<string>('All');
-  const [selectedPost, setSelectedPost] = React.useState<any>(null);
-  
-  React.useEffect(() => {
-    const saved = localStorage.getItem('blogPosts');
-    if (saved) setCustomBlogs(JSON.parse(saved));
-  }, []);
-
-  const defaultPosts = [
-    { 
-      title: "The Impact of Advanced AI on SEO Strategies", 
-      category: "AI & Trends", 
-      date: "June 12, 2025", 
-      excerpt: "Discover how recent advances in AI are reshaping search algorithms and what it means for your SEO strategy.", 
-      readTime: "8 min", 
-      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80", 
-      author: "Tayyab Mehmood", 
-      content: `<h2>How AI is Transforming SEO in 2025</h2>
-<p>Artificial Intelligence has fundamentally changed how search engines understand and rank content. Google's AI algorithms now analyze user intent, content quality, and semantic relationships with unprecedented accuracy.</p>
-
-<h3>Key AI Technologies Impacting SEO:</h3>
-<ul>
-<li><strong>Natural Language Processing (NLP):</strong> Understanding context and meaning beyond keywords</li>
-<li><strong>Machine Learning:</strong> Predicting user behavior and personalizing search results</li>
-<li><strong>RankBrain:</strong> Google's AI system for processing search queries</li>
-<li><strong>BERT:</strong> Understanding conversational queries and long-tail keywords</li>
-</ul>
-
-<h3>What This Means for Your SEO Strategy:</h3>
-<p>Focus on creating comprehensive, user-focused content that answers real questions. Use semantic keywords, optimize for voice search, and ensure your content provides genuine value. AI rewards quality over quantity.</p>
-
-<p><strong>Action Steps:</strong> Conduct thorough keyword research, create topic clusters, optimize for featured snippets, and monitor user engagement metrics closely.</p>` 
-    },
-    { 
-      title: "Mastering Core Web Vitals in 2025", 
-      category: "Technical SEO", 
-      date: "June 08, 2025", 
-      excerpt: "A comprehensive guide to optimizing LCP, FID, and CLS for better rankings and user experience.", 
-      readTime: "12 min", 
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80", 
-      author: "Fatima Ahad", 
-      content: `<h2>Understanding Core Web Vitals</h2>
-<p>Core Web Vitals are Google's official metrics for measuring user experience. These three metrics directly impact your search rankings and user satisfaction.</p>
-
-<h3>The Three Core Web Vitals:</h3>
-<ol>
-<li><strong>Largest Contentful Paint (LCP):</strong> Measures loading performance. Target: under 2.5 seconds</li>
-<li><strong>First Input Delay (FID):</strong> Measures interactivity. Target: under 100 milliseconds</li>
-<li><strong>Cumulative Layout Shift (CLS):</strong> Measures visual stability. Target: under 0.1</li>
-</ol>
-
-<h3>Optimization Techniques:</h3>
-<p><strong>For LCP:</strong> Optimize images, use CDN, implement lazy loading, minimize CSS/JS, and use browser caching.</p>
-<p><strong>For FID:</strong> Reduce JavaScript execution time, break up long tasks, use web workers, and optimize third-party scripts.</p>
-<p><strong>For CLS:</strong> Set size attributes for images/videos, avoid inserting content above existing content, and use transform animations.</p>
-
-<p>Tools like Google PageSpeed Insights, Lighthouse, and Chrome DevTools help monitor and improve these metrics.</p>` 
-    },
-    { 
-      title: "Why Backlinks Still Rule the SERPs", 
-      category: "Off-Page", 
-      date: "June 05, 2025", 
-      excerpt: "Despite algorithm changes, quality backlinks remain the #1 ranking factor. Here's how to build them ethically.", 
-      readTime: "10 min", 
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80", 
-      author: "Mahmood Akhtar", 
-      content: `<h2>The Power of Quality Backlinks</h2>
-<p>Backlinks remain Google's strongest ranking signal. A single high-quality backlink from an authoritative site can boost your rankings more than hundreds of low-quality links.</p>
-
-<h3>White-Hat Link Building Strategies:</h3>
-<ul>
-<li><strong>Guest Blogging:</strong> Write valuable content for industry publications</li>
-<li><strong>Digital PR:</strong> Get featured in news outlets and industry blogs</li>
-<li><strong>Broken Link Building:</strong> Find broken links and offer your content as replacement</li>
-<li><strong>Resource Page Link Building:</strong> Get listed on industry resource pages</li>
-<li><strong>Skyscraper Technique:</strong> Create better content than competitors and reach out</li>
-</ul>
-
-<h3>What Makes a Quality Backlink?</h3>
-<p>Domain authority, relevance to your niche, editorial placement (not footer/sidebar), dofollow attribute, and natural anchor text distribution.</p>
-
-<p><strong>Avoid:</strong> Link farms, PBNs, paid links, reciprocal link schemes, and automated link building tools. Focus on earning links through exceptional content and genuine relationships.</p>` 
-    },
-    { 
-      title: "Voice Search Optimization Essentials", 
-      category: "Future Tech", 
-      date: "May 29, 2025", 
-      excerpt: "With 50% of searches now voice-based, learn how to optimize for conversational queries.", 
-      readTime: "9 min", 
-      image: "https://images.unsplash.com/photo-1589254065878-42c9da997008?w=800&q=80", 
-      author: "Islam Mehmood", 
-      content: `<h2>The Rise of Voice Search</h2>
-<p>Voice search is changing how people find information online. Smart speakers, mobile assistants, and voice-enabled devices are making conversational queries the new normal.</p>
-
-<h3>Voice Search Optimization Strategies:</h3>
-<ul>
-<li><strong>Target Question Keywords:</strong> Who, what, where, when, why, how</li>
-<li><strong>Use Natural Language:</strong> Write conversationally, as people speak</li>
-<li><strong>Optimize for Featured Snippets:</strong> Voice assistants often read from position zero</li>
-<li><strong>Focus on Local SEO:</strong> "Near me" searches are predominantly voice-based</li>
-<li><strong>Improve Page Speed:</strong> Voice search favors fast-loading pages</li>
-</ul>
-
-<h3>Schema Markup for Voice Search:</h3>
-<p>Implement FAQ schema, HowTo schema, and local business schema to help search engines understand your content structure and increase chances of being selected for voice results.</p>
-
-<p>Create content that directly answers common questions in your industry. Use tools like AnswerThePublic and Google's People Also Ask to find voice search opportunities.</p>` 
-    },
-    { 
-      title: "Local SEO: Dominate Your Market", 
-      category: "Strategy", 
-      date: "May 25, 2025", 
-      excerpt: "Complete guide to ranking #1 in local search results and Google Maps for your business.", 
-      readTime: "11 min", 
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80", 
-      author: "Haroon Hussain", 
-      content: `<h2>Local SEO Mastery</h2>
-<p>Local SEO is crucial for businesses serving specific geographic areas. 46% of all Google searches have local intent, making local optimization essential for visibility.</p>
-
-<h3>Google Business Profile Optimization:</h3>
-<ul>
-<li>Complete all profile sections with accurate information</li>
-<li>Choose the most specific business categories</li>
-<li>Add high-quality photos and videos regularly</li>
-<li>Respond to all reviews promptly and professionally</li>
-<li>Post updates, offers, and events weekly</li>
-</ul>
-
-<h3>Local Citation Building:</h3>
-<p>Ensure NAP (Name, Address, Phone) consistency across all directories: Yelp, Yellow Pages, Facebook, industry-specific directories, and local chambers of commerce.</p>
-
-<h3>Local Content Strategy:</h3>
-<p>Create location-specific landing pages, write about local events and news, showcase local customer testimonials, and build relationships with local businesses for backlinks.</p>
-
-<p><strong>Pro Tip:</strong> Encourage satisfied customers to leave Google reviews. Reviews are a major local ranking factor and build trust with potential customers.</p>` 
-    },
-    { 
-      title: "Content Strategy That Converts", 
-      category: "Content", 
-      date: "May 20, 2025", 
-      excerpt: "Learn how to create content that ranks on Google and converts visitors into customers.", 
-      readTime: "13 min", 
-      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80", 
-      author: "Muhammad Fahad", 
-      content: `<h2>Building a Conversion-Focused Content Strategy</h2>
-<p>Great content does two things: ranks well in search engines and converts visitors into customers. Here's how to achieve both.</p>
-
-<h3>Content Research & Planning:</h3>
-<ol>
-<li><strong>Keyword Research:</strong> Find high-intent keywords with commercial value</li>
-<li><strong>Competitor Analysis:</strong> Identify content gaps and opportunities</li>
-<li><strong>Topic Clustering:</strong> Organize content into pillar pages and supporting articles</li>
-<li><strong>User Intent Mapping:</strong> Match content to different stages of buyer journey</li>
-</ol>
-
-<h3>Content Creation Best Practices:</h3>
-<p><strong>Structure:</strong> Use clear headings, short paragraphs, bullet points, and visual elements. Make content scannable.</p>
-<p><strong>Depth:</strong> Cover topics comprehensively. Long-form content (2000+ words) typically ranks better.</p>
-<p><strong>Originality:</strong> Provide unique insights, data, or perspectives. Don't just rehash existing content.</p>
-
-<h3>Conversion Optimization:</h3>
-<ul>
-<li>Include clear CTAs throughout content</li>
-<li>Add lead magnets (ebooks, checklists, templates)</li>
-<li>Use social proof (testimonials, case studies, statistics)</li>
-<li>Implement exit-intent popups</li>
-<li>A/B test headlines, CTAs, and content formats</li>
-</ul>
-
-<p>Track metrics: organic traffic, time on page, bounce rate, conversion rate, and keyword rankings. Continuously optimize based on data.</p>` 
-    },
-  ];
-  
-  const allPosts = [...customBlogs, ...defaultPosts];
-  const categories = ['All', ...Array.from(new Set(allPosts.map(p => p.category)))];
-  const filteredPosts = selectedCategory === 'All' ? allPosts : allPosts.filter(p => p.category === selectedCategory);
-  
-  return (
-    <div className="pt-20 sm:pt-24 pb-12 sm:pb-20 px-4 sm:px-6 max-w-6xl mx-auto">
-      <div className="text-center mb-12 sm:mb-16">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-4 sm:mb-6">Intelligence <span className="gradient-text">Hub</span></h1>
-        <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">Expert insights, strategies, and trends from the NextGen SEO team</p>
-      </div>
-      
-      <div className="flex flex-wrap justify-center gap-3 mb-8 sm:mb-12">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm transition-all ${
-              selectedCategory === cat
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30'
-                : 'glass text-slate-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-        {filteredPosts.map((p, i) => (
-          <div key={i} onClick={() => setSelectedPost(p)} className="glass rounded-2xl sm:rounded-[2rem] overflow-hidden hover:-translate-y-2 transition-all cursor-pointer group hover-lift">
-            <div className="relative h-40 sm:h-48 overflow-hidden">
-              <img src={p.image} alt={`${p.title} - Blog article cover`} width="800" height="400" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
-              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/80 to-pink-500/80 backdrop-blur-sm text-white text-[10px] sm:text-xs font-black uppercase">{p.category}</div>
-            </div>
-            <div className="p-6 sm:p-8">
-              <div className="flex justify-between items-center mb-3 sm:mb-4 text-slate-500 text-[10px] sm:text-xs font-bold">
-                <span>{p.author}</span>
-                <span>{p.readTime} read</span>
-              </div>
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-colors leading-tight">{p.title}</h3>
-              <div className="text-slate-400 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed line-clamp-3">{p.excerpt}</div>
-              <div className="flex justify-between items-center text-slate-500 text-[10px] sm:text-xs font-bold uppercase pt-3 sm:pt-4 border-t border-white/5">
-                <span>{p.date}</span>
-                <span className="text-purple-400 group-hover:translate-x-2 transition-transform">Read More →</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-12 sm:mt-16 text-center">
-        <button className="glass px-8 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-white/10 transition-all w-full sm:w-auto">Load More Articles</button>
-      </div>
-
-      {selectedPost && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[99999] overflow-y-auto pt-24" onClick={() => setSelectedPost(null)}>
-          <div className="max-w-4xl w-full mx-auto my-8 px-4">
-            <div className="glass rounded-3xl p-8 sm:p-12" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/80 to-pink-500/80 text-white text-xs font-black uppercase mb-3">{selectedPost.category}</div>
-                <h1 className="text-3xl sm:text-4xl font-black mb-4">{selectedPost.title}</h1>
-                <div className="flex gap-4 text-sm text-slate-400">
-                  <span>{selectedPost.author}</span>
-                  <span>•</span>
-                  <span>{selectedPost.date}</span>
-                  <span>•</span>
-                  <span>{selectedPost.readTime} read</span>
-                </div>
-              </div>
-              <button onClick={() => setSelectedPost(null)} className="text-slate-400 hover:text-white transition-colors">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-              <img src={selectedPost.image} alt={selectedPost.title} className="w-full h-64 object-cover rounded-2xl mb-8" />
-              <div className="prose prose-invert prose-purple max-w-none" dangerouslySetInnerHTML={{ __html: selectedPost.content }} />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
 const ContactPage = () => {
   const [formData, setFormData] = React.useState({ name: '', email: '', service: '', message: '' });
 
@@ -535,7 +280,7 @@ const ContactPage = () => {
               </div>
               <h3 className="text-xl font-black mb-2">Email Us</h3>
               <p className="text-slate-400 mb-4 text-sm">Get a response within 24 hours</p>
-              <a href="mailto:nextgenseotool@gmail.com" className="text-purple-400 font-bold hover:text-purple-300 transition-colors block mb-3">nextgenseotool@gmail.com</a>
+              <a href="mailto:tayyab@nextgenseo.pro" className="text-purple-400 font-bold hover:text-purple-300 transition-colors block mb-3">tayyab@nextgenseo.pro</a>
               <a 
                 href="https://mail.google.com/mail/?view=cm&fs=1&to=nextgenseotool@gmail.com&su=SEO Inquiry&body=Hi NextGen SEO Team," 
                 target="_blank" 
@@ -606,9 +351,10 @@ const ContactPage = () => {
 
 const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<AppRoute>(() => {
-    // Check URL hash for admin panel
     const hash = window.location.hash.slice(1);
     if (hash === 'admin') return AppRoute.ADMIN;
+    if (hash.startsWith('blog-')) return AppRoute.BLOG; // blog post deep link
+    if (hash && Object.values(AppRoute).includes(hash as AppRoute)) return hash as AppRoute;
     return AppRoute.HOME;
   });
 
@@ -729,7 +475,7 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Update URL when route changes and handle browser back/forward
+  // Handle browser back/forward
   React.useEffect(() => {
     const handlePopState = () => {
       const hash = window.location.hash.slice(1);
@@ -746,15 +492,37 @@ const App: React.FC = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Update URL when route changes
+  // Update URL and title when route changes
   React.useEffect(() => {
+    const routeTitles: Record<string, string> = {
+      [AppRoute.HOME]: 'SEO Services | Best SEO Agency & Link Building Services 2025',
+      [AppRoute.ABOUT]: 'About Us | NextGen SEO Agency',
+      [AppRoute.TEAM]: 'Our Team | NextGen SEO Agency',
+      [AppRoute.BLOG]: 'Blog | SEO Insights & Strategies | NextGen SEO',
+      [AppRoute.CONTACT]: 'Contact Us | NextGen SEO Agency',
+      [AppRoute.PRICING]: 'SEO Pricing Packages | NextGen SEO Agency',
+      [AppRoute.CASE_STUDIES]: 'Case Studies | NextGen SEO Agency',
+      [AppRoute.SERVICE_ONPAGE]: 'On-Page SEO Optimization Services | NextGen SEO',
+      [AppRoute.SERVICE_OFFPAGE]: 'Off-Page SEO & Link Building Services | NextGen SEO',
+      [AppRoute.SERVICE_TECHNICAL]: 'Technical SEO Services | NextGen SEO',
+      [AppRoute.SERVICE_AI]: 'AI-Powered SEO Services | NextGen SEO',
+    };
+
     if (currentRoute === AppRoute.ADMIN) {
       window.history.pushState(null, '', '#admin');
+      document.title = 'Admin Panel | NextGen SEO';
     } else if (currentRoute === AppRoute.HOME) {
       window.history.pushState(null, '', window.location.pathname);
+      document.title = routeTitles[AppRoute.HOME];
     } else {
       window.history.pushState(null, '', `#${currentRoute}`);
+      document.title = routeTitles[currentRoute] || 'NextGen SEO Agency';
     }
+  }, [currentRoute]);
+
+  // Scroll to top when route changes
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
   }, [currentRoute]);
 
   const ToolPage = ({ title, desc }: { title: string; desc: string }) => (
@@ -799,16 +567,16 @@ const App: React.FC = () => {
       // Services
       case AppRoute.SERVICE_ONPAGE: return (
         <ServicePage 
-          icon={<HiOutlinePencilSquare className="w-12 h-12 text-white" />}
+          icon={<PencilIcon className="w-12 h-12 text-white" />}
           title="On-Page SEO Optimization" 
           description="Transform your content into a high-performance ranking machine with our professional semantic optimization frameworks. Advanced keyword placement, meta tag optimization, and content strategy for Google dominance."
           features={[
-            { icon: <HiOutlineTag className="w-8 h-8 text-purple-400" />, title: "Keyword Optimization Strategy", desc: "AI-driven semantic keyword placement and search intent alignment." },
-            { icon: <HiOutlineDocumentText className="w-8 h-8 text-purple-400" />, title: "Meta Tags & Title Tags", desc: "CTR-focused title and meta description optimization for Google." },
-            { icon: <HiOutlineArrowsRightLeft className="w-8 h-8 text-purple-400" />, title: "Internal Linking Strategy", desc: "Building powerful site silos to distribute authority and improve rankings." },
-            { icon: <HiOutlineClipboardDocumentCheck className="w-8 h-8 text-purple-400" />, title: "On-Page SEO Audit", desc: "Complete analysis and improvement of page-level SEO factors." },
-            { icon: <HiOutlineQueueList className="w-8 h-8 text-purple-400" />, title: "Heading Structure Optimization", desc: "H1-H6 hierarchy implementation for better crawling and rankings." },
-            { icon: <HiOutlineCursorArrowRays className="w-8 h-8 text-purple-400" />, title: "User Experience & SEO", desc: "Matching content intent with user behavior for higher rankings and conversions." }
+            { icon: <TagIcon className="w-8 h-8 text-purple-400" />, title: "Keyword Optimization Strategy", desc: "AI-driven semantic keyword placement and search intent alignment." },
+            { icon: <DocumentIcon className="w-8 h-8 text-purple-400" />, title: "Meta Tags & Title Tags", desc: "CTR-focused title and meta description optimization for Google." },
+            { icon: <ArrowsIcon className="w-8 h-8 text-purple-400" />, title: "Internal Linking Strategy", desc: "Building powerful site silos to distribute authority and improve rankings." },
+            { icon: <CheckIcon className="w-8 h-8 text-purple-400" />, title: "On-Page SEO Audit", desc: "Complete analysis and improvement of page-level SEO factors." },
+            { icon: <QueueIcon className="w-8 h-8 text-purple-400" />, title: "Heading Structure Optimization", desc: "H1-H6 hierarchy implementation for better crawling and rankings." },
+            { icon: <CursorIcon className="w-8 h-8 text-purple-400" />, title: "User Experience & SEO", desc: "Matching content intent with user behavior for higher rankings and conversions." }
           ]}
           benefits="Join hundreds of businesses that saw a 300% increase in organic traffic and Google rankings through on-page SEO mastery."
           route={currentRoute}
@@ -817,16 +585,16 @@ const App: React.FC = () => {
       );
       case AppRoute.SERVICE_OFFPAGE: return (
         <ServicePage 
-          icon={<HiOutlineLink className="w-12 h-12 text-white" />}
+          icon={<LinkIcon className="w-12 h-12 text-white" />}
           title="Off-Page SEO & Link Building" 
           description="Build high-authority digital ecosystems and professional backlink profiles that establish your brand as a market leader. Expert link building from high-authority sites and digital PR strategies."
           features={[
-            { icon: <HiOutlineLink className="w-8 h-8 text-purple-400" />, title: "Professional Link Building", desc: "Quality-vetted backlinks from Tier 1 industry authoritative websites." },
-            { icon: <HiOutlineMegaphone className="w-8 h-8 text-purple-400" />, title: "Digital PR & Outreach", desc: "Earning brand mentions and backlinks from high-authority news outlets." },
-            { icon: <HiOutlineChartBarSquare className="w-8 h-8 text-purple-400" />, title: "Backlink Gap Analysis", desc: "Analyzing competitor backlink profiles and reclaiming lost link equity." },
-            { icon: <HiOutlineGlobeAlt className="w-8 h-8 text-purple-400" />, title: "Social Media & SEO", desc: "Amplifying content reach across social networks for domain authority." },
-            { icon: <HiOutlinePhoto className="w-8 h-8 text-purple-400" />, title: "Content Assets for Links", desc: "Creating linkable infographics, case studies, and data resources." },
-            { icon: <HiOutlineUserGroup className="w-8 h-8 text-purple-400" />, title: "Competitor Link Strategy", desc: "Reverse-engineering and beating competitor link profiles." }
+            { icon: <LinkIcon className="w-8 h-8 text-purple-400" />, title: "Professional Link Building", desc: "Quality-vetted backlinks from Tier 1 industry authoritative websites." },
+            { icon: <MegaphoneIcon className="w-8 h-8 text-purple-400" />, title: "Digital PR & Outreach", desc: "Earning brand mentions and backlinks from high-authority news outlets." },
+            { icon: <ChartIcon className="w-8 h-8 text-purple-400" />, title: "Backlink Gap Analysis", desc: "Analyzing competitor backlink profiles and reclaiming lost link equity." },
+            { icon: <GlobeIcon className="w-8 h-8 text-purple-400" />, title: "Social Media & SEO", desc: "Amplifying content reach across social networks for domain authority." },
+            { icon: <PhotoIcon className="w-8 h-8 text-purple-400" />, title: "Content Assets for Links", desc: "Creating linkable infographics, case studies, and data resources." },
+            { icon: <UsersIcon className="w-8 h-8 text-purple-400" />, title: "Competitor Link Strategy", desc: "Reverse-engineering and beating competitor link profiles." }
           ]}
           benefits="NextGen SEO's off-page and link building team secures quality backlinks and placements that your competitors cannot reach."
           route={currentRoute}
@@ -835,16 +603,16 @@ const App: React.FC = () => {
       );
       case AppRoute.SERVICE_TECHNICAL: return (
         <ServicePage 
-          icon={<HiOutlineCog6Tooth className="w-12 h-12 text-white" />}
+          icon={<CogIcon className="w-12 h-12 text-white" />}
           title="Technical SEO & Site Performance" 
           description="Fix the foundation with our comprehensive technical SEO deep-scans that eliminate barriers between your site and Google's index. Core Web Vitals optimization, schema markup, and crawlability improvements."
           features={[
-            { icon: <HiOutlineBolt className="w-8 h-8 text-purple-400" />, title: "Core Web Vitals Optimization", desc: "LCP, CLS, and FID optimization for Google's ranking factors." },
-            { icon: <HiOutlineCodeBracket className="w-8 h-8 text-purple-400" />, title: "JavaScript & SEO", desc: "Ensuring dynamic and React content is properly rendered and indexed by Google." },
-            { icon: <HiOutlineServerStack className="w-8 h-8 text-purple-400" />, title: "Crawl Budget & Indexation", desc: "Directing search bot crawlers to your most valuable pages efficiently." },
-            { icon: <HiOutlineLockClosed className="w-8 h-8 text-purple-400" />, title: "HTTPS & Security", desc: "SSL certificates and server-side security protocols for trust ranking." },
-            { icon: <HiOutlineDocumentMagnifyingGlass className="w-8 h-8 text-purple-400" />, title: "Schema Markup Implementation", desc: "Advanced JSON-LD structured data for Rich Snippets and SERP enhancements." },
-            { icon: <HiOutlineDevicePhoneMobile className="w-8 h-8 text-purple-400" />, title: "Mobile SEO & Responsiveness", desc: "Mobile-first indexing compliance and flawless responsive design." }
+            { icon: <BoltIcon className="w-8 h-8 text-purple-400" />, title: "Core Web Vitals Optimization", desc: "LCP, CLS, and FID optimization for Google's ranking factors." },
+            { icon: <CodeIcon className="w-8 h-8 text-purple-400" />, title: "JavaScript & SEO", desc: "Ensuring dynamic and React content is properly rendered and indexed by Google." },
+            { icon: <ServerIcon className="w-8 h-8 text-purple-400" />, title: "Crawl Budget & Indexation", desc: "Directing search bot crawlers to your most valuable pages efficiently." },
+            { icon: <LockIcon className="w-8 h-8 text-purple-400" />, title: "HTTPS & Security", desc: "SSL certificates and server-side security protocols for trust ranking." },
+            { icon: <MagnifyingGlassIcon className="w-8 h-8 text-purple-400" />, title: "Schema Markup Implementation", desc: "Advanced JSON-LD structured data for Rich Snippets and SERP enhancements." },
+            { icon: <PhoneIcon className="w-8 h-8 text-purple-400" />, title: "Mobile SEO & Responsiveness", desc: "Mobile-first indexing compliance and flawless responsive design." }
           ]}
           benefits="Technical SEO excellence is the minimum requirement for modern Google rankings. We ensure you never fall behind competitors."
           route={currentRoute}
@@ -853,16 +621,16 @@ const App: React.FC = () => {
       );
       case AppRoute.SERVICE_AI: return (
         <ServicePage 
-          icon={<HiOutlineSparkles className="w-12 h-12 text-white" />}
+          icon={<SparklesIcon className="w-12 h-12 text-white" />}
           title="AI-Powered SEO" 
           description="The future is now. We use advanced AI models to predict search trends before they happen."
           features={[
-            { icon: <HiOutlineBeaker className="w-8 h-8 text-purple-400" />, title: "Predictive Analytics", desc: "Forecasting seasonal search shifts with AI." },
-            { icon: <HiOutlineMap className="w-8 h-8 text-purple-400" />, title: "Semantic Mapping", desc: "Mapping topic clusters using NLP logic." },
-            { icon: <HiOutlineRocketLaunch className="w-8 h-8 text-purple-400" />, title: "Automated Insights", desc: "Real-time auditing of millions of data points." },
-            { icon: <HiOutlineCpuChip className="w-8 h-8 text-purple-400" />, title: "AI Content Studio", desc: "Generating high-authority drafts for scale." },
-            { icon: <HiOutlineChartBarSquare className="w-8 h-8 text-purple-400" />, title: "SERP Simulations", desc: "Testing ranking changes in a sandbox environment." },
-            { icon: <HiOutlineLightBulb className="w-8 h-8 text-purple-400" />, title: "Personalized Outreach", desc: "AI-enhanced communication for better link success." }
+            { icon: <BeakerIcon className="w-8 h-8 text-purple-400" />, title: "Predictive Analytics", desc: "Forecasting seasonal search shifts with AI." },
+            { icon: <MapIcon className="w-8 h-8 text-purple-400" />, title: "Semantic Mapping", desc: "Mapping topic clusters using NLP logic." },
+            { icon: <RocketIcon className="w-8 h-8 text-purple-400" />, title: "Automated Insights", desc: "Real-time auditing of millions of data points." },
+            { icon: <ChipIcon className="w-8 h-8 text-purple-400" />, title: "AI Content Studio", desc: "Generating high-authority drafts for scale." },
+            { icon: <ChartIcon className="w-8 h-8 text-purple-400" />, title: "SERP Simulations", desc: "Testing ranking changes in a sandbox environment." },
+            { icon: <LightbulbIcon className="w-8 h-8 text-purple-400" />, title: "Personalized Outreach", desc: "AI-enhanced communication for better link success." }
           ]}
           benefits="Leverage the same technology as Silicon Valley giants with NextGen's AI SEO Suite."
           route={currentRoute}
@@ -894,7 +662,7 @@ const App: React.FC = () => {
           </div>
         </div>
       );
-      case AppRoute.BLOG: return <BlogPage />;
+      case AppRoute.BLOG: return <BlogPageNew />;
       case AppRoute.CONTACT: return <ContactPage />;
       case AppRoute.PRICING: return <Pricing onContact={() => { setCurrentRoute(AppRoute.CONTACT); window.scrollTo(0, 0); }} />;
       case AppRoute.CASE_STUDIES: return <CaseStudies />;
@@ -947,10 +715,10 @@ const App: React.FC = () => {
             <div>
               <h4 className="font-black mb-4 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Services</h4>
               <ul className="space-y-2 text-white text-sm">
-                <li><button onClick={() => { setCurrentRoute(AppRoute.SERVICE_ONPAGE); window.scrollTo(0, 0); }} className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all hover:translate-x-1">On-Page SEO</button></li>
-                <li><button onClick={() => { setCurrentRoute(AppRoute.SERVICE_OFFPAGE); window.scrollTo(0, 0); }} className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all hover:translate-x-1">Off-Page & PR</button></li>
-                <li><button onClick={() => { setCurrentRoute(AppRoute.SERVICE_TECHNICAL); window.scrollTo(0, 0); }} className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all hover:translate-x-1">Technical SEO</button></li>
-                <li><button onClick={() => { setCurrentRoute(AppRoute.SERVICE_AI); window.scrollTo(0, 0); }} className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all hover:translate-x-1">AI Solutions</button></li>
+                <li><a href={`#${AppRoute.SERVICE_ONPAGE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_ONPAGE); window.scrollTo(0,0); }} className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all hover:translate-x-1 inline-block">On-Page SEO</a></li>
+                <li><a href={`#${AppRoute.SERVICE_OFFPAGE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_OFFPAGE); window.scrollTo(0,0); }} className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all hover:translate-x-1 inline-block">Off-Page & PR</a></li>
+                <li><a href={`#${AppRoute.SERVICE_TECHNICAL}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_TECHNICAL); window.scrollTo(0,0); }} className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all hover:translate-x-1 inline-block">Technical SEO</a></li>
+                <li><a href={`#${AppRoute.SERVICE_AI}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_AI); window.scrollTo(0,0); }} className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all hover:translate-x-1 inline-block">AI Solutions</a></li>
               </ul>
             </div>
 
@@ -958,11 +726,11 @@ const App: React.FC = () => {
             <div>
               <h4 className="font-black mb-4 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Company</h4>
               <ul className="space-y-2 text-white text-sm">
-                <li><button onClick={() => { setCurrentRoute(AppRoute.HOME); window.scrollTo(0, 0); }} aria-label="Go to home page" className="hover:text-amber-400 transition-all hover:translate-x-1">Home</button></li>
-                <li><button onClick={() => { setCurrentRoute(AppRoute.ABOUT); window.scrollTo(0, 0); }} aria-label="Go to about page" className="hover:text-amber-400 transition-all hover:translate-x-1">About Us</button></li>
-                <li><button onClick={() => { setCurrentRoute(AppRoute.TEAM); window.scrollTo(0, 0); }} aria-label="Go to team page" className="hover:text-amber-400 transition-all hover:translate-x-1">Our Team</button></li>
-                <li><button onClick={() => { setCurrentRoute(AppRoute.BLOG); window.scrollTo(0, 0); }} aria-label="Go to blog page" className="hover:text-amber-400 transition-all hover:translate-x-1">Blog</button></li>
-                <li><button onClick={() => { setCurrentRoute(AppRoute.CONTACT); window.scrollTo(0, 0); }} aria-label="Go to contact page" className="hover:text-amber-400 transition-all hover:translate-x-1">Contact</button></li>
+                <li><a href="#home" onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.HOME); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-all hover:translate-x-1 inline-block">Home</a></li>
+                <li><a href={`#${AppRoute.ABOUT}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.ABOUT); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-all hover:translate-x-1 inline-block">About Us</a></li>
+                <li><a href={`#${AppRoute.TEAM}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.TEAM); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-all hover:translate-x-1 inline-block">Our Team</a></li>
+                <li><a href={`#${AppRoute.BLOG}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.BLOG); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-all hover:translate-x-1 inline-block">Blog</a></li>
+                <li><a href={`#${AppRoute.CONTACT}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.CONTACT); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-all hover:translate-x-1 inline-block">Contact</a></li>
               </ul>
             </div>
 
@@ -970,8 +738,8 @@ const App: React.FC = () => {
             <div>
               <h4 className="font-black mb-4 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Resources</h4>
               <ul className="space-y-2 text-white text-sm">
-                <li><button onClick={() => { setCurrentRoute(AppRoute.PRICING); window.scrollTo(0, 0); }} aria-label="View pricing" className="hover:text-amber-400 transition-all hover:translate-x-1">Pricing</button></li>
-                <li><button onClick={() => { setCurrentRoute(AppRoute.CASE_STUDIES); window.scrollTo(0, 0); }} aria-label="View case studies" className="hover:text-amber-400 transition-all hover:translate-x-1">Case Studies</button></li>
+                <li><a href={`#${AppRoute.PRICING}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.PRICING); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-all hover:translate-x-1 inline-block">Pricing</a></li>
+                <li><a href={`#${AppRoute.CASE_STUDIES}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.CASE_STUDIES); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-all hover:translate-x-1 inline-block">Case Studies</a></li>
                 <li><a href="mailto:nextgenseotool@gmail.com" className="hover:text-amber-400 transition-all hover:translate-x-1 cursor-pointer">Email Us</a></li>
                 <li><a href="tel:+923480440402" className="hover:text-amber-400 transition-all hover:translate-x-1 cursor-pointer">Call Us</a></li>
                 <li><a href="https://wa.me/923480440402" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 transition-all hover:translate-x-1 cursor-pointer">WhatsApp</a></li>

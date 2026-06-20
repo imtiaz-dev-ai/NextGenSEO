@@ -44,6 +44,13 @@ export interface BlogPost {
   headings: string[];
 }
 
+export interface ChatMessage {
+  id?: string;
+  message: string;
+  sender: string;
+  timestamp?: string | any;
+}
+
 export interface CompetitorComparison {
   metric: string;
   you: string | number;
@@ -68,7 +75,6 @@ export enum AppRoute {
   PRICING = 'pricing',
   CASE_STUDIES = 'case_studies',
   ADMIN = 'admin',
-  // AI Tools (Interactive)
   // AI Tools (Interactive)
   TOOL_AUDIT = 'tool_audit',
   TOOL_KEYWORDS = 'tool_keywords',

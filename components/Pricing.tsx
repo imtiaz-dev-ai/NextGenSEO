@@ -83,6 +83,17 @@ const plans = [
 const Pricing: React.FC<PricingProps> = ({ onContact }) => {
   const [showCustom, setShowCustom] = useState(false);
 
+  React.useEffect(() => {
+    if (showCustom) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showCustom]);
+
   return (
     <div className="pt-16 sm:pt-20 md:pt-24 pb-16 sm:pb-20 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
@@ -139,19 +150,7 @@ const Pricing: React.FC<PricingProps> = ({ onContact }) => {
                     const email = "nextgenseotool@gmail.com";
                     const subject = `Book ${plan.name} Package`;
 
-                    const body = `Hi NextGen SEO Team,
-
-I want to book the following package:
-
-Package: ${plan.name}
-Price: ${plan.price}/${plan.period}
-
-Features:
-${plan.features.map(f => `- ${f}`).join("\n")}
-
-Please contact me to proceed.
-
-Thank you!`;
+                    const body = `Hi NextGen SEO Team,\n\nI want to book the following package:\n\nPackage: ${plan.name}\nPrice: ${plan.price}/${plan.period}\n\nFeatures:\n${plan.features.map(f => `- ${f}`).join("\n")}\n\nPlease contact me to proceed.\n\nThank you!`;
 
                     const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
@@ -167,8 +166,8 @@ Thank you!`;
         </div>
 
         {showCustom && (
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4 pt-24" onClick={() => setShowCustom(false)}>
-            <div className="relative max-w-3xl w-full max-h-[calc(100vh-8rem)] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4 pt-32" onClick={() => setShowCustom(false)}>
+            <div className="relative max-w-4xl w-full max-h-[calc(100vh-150px)] overflow-y-auto rounded-3xl" onClick={(e) => e.stopPropagation()}>
               <CustomPricingContent onContact={() => { setShowCustom(false); onContact(); }} onClose={() => setShowCustom(false)} />
             </div>
           </div>
@@ -195,14 +194,6 @@ const CustomPricingContent: React.FC<{ onContact: () => void; onClose: () => voi
   const trafficOptions = ['10K+', '20K+', '30K+', '40K+', '50K+', '60K+', '70K+', '80K+', '90K+'];
   const drOptions = ['10+', '20+', '30+', '40+', '50+', '60+', '70+', '80+', '90+'];
 
-  const handleSubmit = () => {
-    if (backlinks && traffic && domainRating && price) {
-      const subject = encodeURIComponent('Custom SEO Package Request');
-      const body = encodeURIComponent(`Hi NextGen SEO Team,\n\nI want to build a custom SEO package with the following requirements:\n\nBacklinks: ${backlinks}\nTraffic: ${traffic}\nDomain Rating: ${domainRating}\nBudget: $${price}\n\nPlease contact me with a custom proposal.\n\nThank you!`);
-      window.location.href = `mailto:nextgenseotool@gmail.com?subject=${subject}&body=${body}`;
-    }
-  };
-
   return (
     <div className="glass p-8 rounded-3xl relative">
       <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-900/50 hover:bg-slate-800 flex items-center justify-center transition-all z-10">
@@ -211,7 +202,7 @@ const CustomPricingContent: React.FC<{ onContact: () => void; onClose: () => voi
       <h3 className="text-3xl font-black mb-6 text-center"><span className="gradient-text">Custom SEO Package</span></h3>
       <p className="text-slate-400 text-center mb-8">Build your custom package</p>
 
-      <div className="space-y-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div>
           <label className="block text-sm font-bold mb-3 text-slate-300">Backlinks</label>
           <select value={backlinks} onChange={(e) => setBacklinks(e.target.value)} className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 font-bold focus:border-purple-500 focus:outline-none transition-all">
@@ -243,11 +234,11 @@ const CustomPricingContent: React.FC<{ onContact: () => void; onClose: () => voi
       </div>
 
       <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-6 mb-6">
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between"><span className="text-slate-400">Backlinks:</span><span className="font-bold text-purple-400">{backlinks || '-'}</span></div>
-          <div className="flex justify-between"><span className="text-slate-400">Traffic:</span><span className="font-bold text-cyan-400">{traffic || '-'}</span></div>
-          <div className="flex justify-between"><span className="text-slate-400">Domain Rating:</span><span className="font-bold text-emerald-400">{domainRating || '-'}</span></div>
-          <div className="flex justify-between items-center pt-3 border-t border-white/10"><span className="text-xl font-black">Budget:</span><span className="text-3xl font-black gradient-text">{price ? `$${price}` : '$0'}</span></div>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div><span className="text-slate-400">Backlinks:</span><div className="font-bold text-purple-400">{backlinks || '-'}</div></div>
+          <div><span className="text-slate-400">Traffic:</span><div className="font-bold text-amber-400">{traffic || '-'}</div></div>
+          <div><span className="text-slate-400">Domain Rating:</span><div className="font-bold text-emerald-400">{domainRating || '-'}</div></div>
+          <div><span className="text-slate-400">Budget:</span><div className="text-2xl font-black gradient-text">{price ? `$${price}` : '$0'}</div></div>
         </div>
       </div>
 
@@ -257,18 +248,7 @@ const CustomPricingContent: React.FC<{ onContact: () => void; onClose: () => voi
             const email = "nextgenseotool@gmail.com";
             const subject = 'Custom SEO Package Request';
 
-            const body = `Hi NextGen SEO Team,
-
-I want to build a custom SEO package with the following requirements:
-
-Backlinks: ${backlinks}
-Traffic: ${traffic}
-Domain Rating: ${domainRating}
-Budget: $${price}
-
-Please contact me with a custom proposal.
-
-Thank you!`;
+            const body = `Hi NextGen SEO Team,\n\nI want to build a custom SEO package with the following requirements:\n\nBacklinks: ${backlinks}\nTraffic: ${traffic}\nDomain Rating: ${domainRating}\nBudget: $${price}\n\nPlease contact me with a custom proposal.\n\nThank you!`;
 
             const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 

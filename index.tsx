@@ -4,6 +4,9 @@ import ReactDOM from 'react-dom/client';
 import './src/index.css';
 import App from './App';
 
+// Scroll to top on page load
+window.scrollTo(0, 0);
+
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");

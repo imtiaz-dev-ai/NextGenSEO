@@ -113,7 +113,7 @@ const CaseStudies: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase">Revenue Increase</span>
-                    <span className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">{c.results.revenue}</span>
+                    <span className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">{c.results.revenue}</span>
                   </div>
                 </div>
                 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { saveBlogToFirebase, getBlogsFromFirebase, updateBlogInFirebase, deleteBlogFromFirebase, saveCaseToFirebase, getCasesFromFirebase, updateCaseInFirebase, deleteCaseFromFirebase, saveTeamToFirebase, getTeamFromFirebase, updateTeamInFirebase, deleteTeamFromFirebase, getChatMessagesFromFirebase, deleteChatMessageFromFirebase } from '../utils/firebase';
 
 interface ChatMessage {
   id: string;
@@ -16,7 +17,6 @@ interface BlogPost {
   category: string;
   author: string;
   date: string;
-  readTime: string;
   image: string;
 }
 
@@ -43,29 +43,113 @@ interface TeamMember {
   twitter?: string;
 }
 
+const compressImage = async (base64: string): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const scale = 0.4;
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', 0.6);
+      resolve(compressed);
+    };
+  });
+};
+
+const ImageUploadField = ({ image, onImageChange, onImageRemove, label, aspect = 'landscape' }: { image: string; onImageChange: (img: string) => void; onImageRemove: () => void; label: string; aspect?: string }) => {
+  return (
+    <div>
+      <label className="block text-sm font-bold text-slate-300 mb-2">{label}</label>
+      {image ? (
+        <div className="relative">
+          <img src={image} alt="preview" className={`w-full ${aspect === 'square' ? 'h-48' : 'h-32'} object-cover rounded-lg`} />
+          <button type="button" onClick={onImageRemove} className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-600 px-4 py-2 rounded-lg text-xs font-bold text-white transition-all">
+            Change Image
+          </button>
+        </div>
+      ) : (
+        <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-purple-500/50 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-500/5 transition-all group">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <svg className="w-12 h-12 text-purple-400/60 group-hover:text-purple-400 mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p className="text-sm text-slate-300 font-bold group-hover:text-white transition-colors">Click or drag image here</p>
+            <p className="text-xs text-slate-500">PNG, JPG, GIF (max 10MB)</p>
+          </div>
+          <input type="file" accept="image/*" onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                onImageChange(reader.result as string);
+              };
+              reader.readAsDataURL(file);
+            }
+          }} className="hidden" />
+        </label>
+      )}
+    </div>
+  );
+};
+
+const DashboardIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+  </svg>
+);
+
+const MessageIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+  </svg>
+);
+
+const BlogIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+  </svg>
+);
+
+const CaseIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+
+const TeamIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM15 20h.01" />
+  </svg>
+);
+
 const AdminPanel: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'blogs' | 'pricing' | 'messages' | 'cases' | 'team' | 'backlinks'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'messages' | 'blogs' | 'cases' | 'team'>('dashboard');
   const [lastActivity, setLastActivity] = useState(Date.now());
-  const inactivityTimeout = 5 * 60 * 1000; // 5 minutes in milliseconds
+  const inactivityTimeout = 5 * 60 * 1000;
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [showBlogForm, setShowBlogForm] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
+  const [blogImage, setBlogImage] = useState<string>('');
   const [blogForm, setBlogForm] = useState({
     title: '',
     excerpt: '',
     content: '',
     category: '',
     author: '',
-    readTime: '',
     image: ''
   });
   const [cases, setCases] = useState<CaseStudy[]>([]);
   const [showCaseForm, setShowCaseForm] = useState(false);
   const [editingCase, setEditingCase] = useState<CaseStudy | null>(null);
+  const [caseImage, setCaseImage] = useState<string>('');
   const [caseForm, setCaseForm] = useState({
     client: '',
     industry: '',
@@ -80,6 +164,7 @@ const AdminPanel: React.FC = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [showTeamForm, setShowTeamForm] = useState(false);
   const [editingTeam, setEditingTeam] = useState<TeamMember | null>(null);
+  const [teamImage, setTeamImage] = useState<string>('');
   const [teamForm, setTeamForm] = useState({
     name: '',
     role: '',
@@ -88,22 +173,9 @@ const AdminPanel: React.FC = () => {
     linkedin: '',
     twitter: ''
   });
-  const [backlinks, setBacklinks] = useState<any[]>([]);
-  const [showBacklinkForm, setShowBacklinkForm] = useState(false);
-  const [backlinkForm, setBacklinkForm] = useState({
-    title: '',
-    url: '',
-    location: 'footer' as 'footer' | 'blog',
-    description: ''
-  });
 
   const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || 'nextgenadmin';
   const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'NextGen@2025';
-
-  // Security: Sanitize input to prevent log injection
-  const sanitizeInput = (input: string) => {
-    return input.replace(/[\n\r]/g, '').trim();
-  };
 
   useEffect(() => {
     const loggedIn = localStorage.getItem('adminLoggedIn');
@@ -113,87 +185,65 @@ const AdminPanel: React.FC = () => {
       loadBlogs();
       loadCases();
       loadTeam();
-      loadBacklinks();
     }
   }, []);
 
-  // Auto logout after 5 minutes of inactivity
   useEffect(() => {
     if (!isLoggedIn) return;
-
     const checkInactivity = setInterval(() => {
       const now = Date.now();
       if (now - lastActivity > inactivityTimeout) {
         handleLogout();
         alert('Session expired due to inactivity. Please login again.');
       }
-    }, 30000); // Check every 30 seconds
-
+    }, 30000);
     return () => clearInterval(checkInactivity);
   }, [isLoggedIn, lastActivity]);
 
-  // Track user activity
   useEffect(() => {
     if (!isLoggedIn) return;
-
     const updateActivity = () => setLastActivity(Date.now());
-    
     window.addEventListener('mousedown', updateActivity);
     window.addEventListener('keydown', updateActivity);
-    window.addEventListener('scroll', updateActivity);
-    window.addEventListener('touchstart', updateActivity);
-
     return () => {
       window.removeEventListener('mousedown', updateActivity);
       window.removeEventListener('keydown', updateActivity);
-      window.removeEventListener('scroll', updateActivity);
-      window.removeEventListener('touchstart', updateActivity);
     };
   }, [isLoggedIn]);
 
-  const loadChatMessages = () => {
-    const messages = localStorage.getItem('chatMessages');
-    if (messages) setChatMessages(JSON.parse(messages));
-  };
-
-  const loadBlogs = () => {
-    const savedBlogs = localStorage.getItem('blogPosts');
-    if (savedBlogs) setBlogs(JSON.parse(savedBlogs));
-  };
-
-  const loadCases = () => {
-    const savedCases = localStorage.getItem('caseStudies');
-    if (savedCases) setCases(JSON.parse(savedCases));
-  };
-
-  const loadTeam = () => {
-    const savedTeam = localStorage.getItem('teamMembers');
-    if (savedTeam) setTeamMembers(JSON.parse(savedTeam));
-  };
-
-  const loadBacklinks = () => {
-    const savedBacklinks = localStorage.getItem('siteBacklinks');
-    if (savedBacklinks) setBacklinks(JSON.parse(savedBacklinks));
-  };
-
-  const saveBacklink = () => {
-    if (!backlinkForm.title || !backlinkForm.url) {
-      alert('Title and URL are required!');
-      return;
+  const loadChatMessages = async () => {
+    try {
+      const messages = await getChatMessagesFromFirebase();
+      setChatMessages(messages);
+    } catch (error) {
+      console.error('Error loading messages:', error);
     }
-    const newBacklink = { ...backlinkForm, id: Date.now().toString() };
-    const updated = [...backlinks, newBacklink];
-    setBacklinks(updated);
-    localStorage.setItem('siteBacklinks', JSON.stringify(updated));
-    setBacklinkForm({ title: '', url: '', location: 'footer', description: '' });
-    setShowBacklinkForm(false);
   };
 
-  const deleteBacklink = (id: string) => {
-    if (confirm('Delete this backlink?')) {
-      const updated = backlinks.filter(b => b.id !== id);
-      setBacklinks(updated);
-      localStorage.setItem('siteBacklinks', JSON.stringify(updated));
+  const loadBlogs = async () => {
+    try {
+      const savedBlogs = await getBlogsFromFirebase();
+      setBlogs(savedBlogs);
+    } catch (error) {
+      console.error('Error loading blogs:', error);
+    }
+  };
+
+  const loadCases = async () => {
+    try {
+      const savedCases = await getCasesFromFirebase();
+      setCases(savedCases);
+    } catch (error) {
+      console.error('Error loading cases:', error);
+    }
+  };
+
+  const loadTeam = async () => {
+    try {
+      const savedTeam = await getTeamFromFirebase();
+      setTeamMembers(savedTeam);
+    } catch (error) {
+      console.error('Error loading team:', error);
     }
   };
 
@@ -218,131 +268,160 @@ const AdminPanel: React.FC = () => {
     setPassword('');
   };
 
-  const deleteMessage = (id: string) => {
-    const updated = chatMessages.filter(m => m.id !== id);
-    setChatMessages(updated);
-    localStorage.setItem('chatMessages', JSON.stringify(updated));
+  const deleteMessage = async (id: string) => {
+    try {
+      await deleteChatMessageFromFirebase(id);
+      setChatMessages(chatMessages.filter(m => m.id !== id));
+    } catch (error) {
+      alert('Error deleting message');
+    }
   };
 
-  const saveBlog = () => {
+  const saveBlog = async () => {
     if (!blogForm.title || !blogForm.content) {
-      alert('Title and content are required!');
+      alert('Title and content required!');
       return;
     }
-
-    if (editingBlog) {
-      const updated = blogs.map(b => b.id === editingBlog.id ? { ...blogForm, id: editingBlog.id } : b);
-      setBlogs(updated);
-      localStorage.setItem('blogPosts', JSON.stringify(updated));
-    } else {
-      const newBlog: BlogPost = {
-        ...blogForm,
-        id: Date.now().toString(),
-        date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-      };
-      const updated = [...blogs, newBlog];
-      setBlogs(updated);
-      localStorage.setItem('blogPosts', JSON.stringify(updated));
+    try {
+      let imageData = blogForm.image;
+      if (blogForm.image && blogForm.image.startsWith('data:image')) {
+        imageData = await compressImage(blogForm.image);
+      }
+      const blogData = { ...blogForm, image: imageData, date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) };
+      if (editingBlog) {
+        await updateBlogInFirebase(editingBlog.id, blogData);
+        setBlogs(blogs.map(b => b.id === editingBlog.id ? { ...blogData, id: editingBlog.id } : b));
+      } else {
+        const docId = await saveBlogToFirebase(blogData);
+        setBlogs([...blogs, { ...blogData, id: docId }]);
+      }
+      setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', image: '' });
+      setBlogImage('');
+      setShowBlogForm(false);
+      setEditingBlog(null);
+      alert('Blog saved!');
+    } catch (error: any) {
+      alert('Error: ' + error.message);
     }
-
-    setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', readTime: '', image: '' });
-    setShowBlogForm(false);
-    setEditingBlog(null);
   };
 
   const editBlog = (blog: BlogPost) => {
     setEditingBlog(blog);
     setBlogForm(blog);
+    setBlogImage(blog.image);
     setShowBlogForm(true);
   };
 
-  const deleteBlog = (id: string) => {
+  const deleteBlog = async (id: string) => {
     if (confirm('Delete this blog?')) {
-      const updated = blogs.filter(b => b.id !== id);
-      setBlogs(updated);
-      localStorage.setItem('blogPosts', JSON.stringify(updated));
+      try {
+        await deleteBlogFromFirebase(id);
+        setBlogs(blogs.filter(b => b.id !== id));
+      } catch (error) {
+        alert('Error');
+      }
     }
   };
 
-  const saveCase = () => {
+  const saveCase = async () => {
     if (!caseForm.client || !caseForm.industry) {
-      alert('Client and industry are required!');
+      alert('Client and industry required!');
       return;
     }
-
-    if (editingCase) {
-      const updated = cases.map(c => c.id === editingCase.id ? { ...caseForm, id: editingCase.id } : c);
-      setCases(updated);
-      localStorage.setItem('caseStudies', JSON.stringify(updated));
-    } else {
-      const newCase: CaseStudy = { ...caseForm, id: Date.now().toString() };
-      const updated = [...cases, newCase];
-      setCases(updated);
-      localStorage.setItem('caseStudies', JSON.stringify(updated));
+    try {
+      let imageData = caseForm.image;
+      if (caseForm.image && caseForm.image.startsWith('data:image')) {
+        imageData = await compressImage(caseForm.image);
+      }
+      const caseData = { ...caseForm, image: imageData };
+      if (editingCase) {
+        await updateCaseInFirebase(editingCase.id, caseData);
+        setCases(cases.map(c => c.id === editingCase.id ? { ...caseData, id: editingCase.id } : c));
+      } else {
+        const docId = await saveCaseToFirebase(caseData);
+        setCases([...cases, { ...caseData, id: docId }]);
+      }
+      setCaseForm({ client: '', industry: '', challenge: '', trafficGrowth: '', keywordsRanked: '', revenueIncrease: '', duration: '', image: '', color: 'purple' });
+      setCaseImage('');
+      setShowCaseForm(false);
+      setEditingCase(null);
+      alert('Case saved!');
+    } catch (error: any) {
+      alert('Error: ' + error.message);
     }
-
-    setCaseForm({ client: '', industry: '', challenge: '', trafficGrowth: '', keywordsRanked: '', revenueIncrease: '', duration: '', image: '', color: 'purple' });
-    setShowCaseForm(false);
-    setEditingCase(null);
   };
 
   const editCase = (caseStudy: CaseStudy) => {
     setEditingCase(caseStudy);
     setCaseForm(caseStudy);
+    setCaseImage(caseStudy.image);
     setShowCaseForm(true);
   };
 
-  const deleteCase = (id: string) => {
-    if (confirm('Delete this case study?')) {
-      const updated = cases.filter(c => c.id !== id);
-      setCases(updated);
-      localStorage.setItem('caseStudies', JSON.stringify(updated));
+  const deleteCase = async (id: string) => {
+    if (confirm('Delete this case?')) {
+      try {
+        await deleteCaseFromFirebase(id);
+        setCases(cases.filter(c => c.id !== id));
+      } catch (error) {
+        alert('Error');
+      }
     }
   };
 
-  const saveTeam = () => {
+  const saveTeam = async () => {
     if (!teamForm.name || !teamForm.role) {
-      alert('Name and role are required!');
+      alert('Name and role required!');
       return;
     }
-
-    if (editingTeam) {
-      const updated = teamMembers.map(t => t.id === editingTeam.id ? { ...teamForm, id: editingTeam.id } : t);
-      setTeamMembers(updated);
-      localStorage.setItem('teamMembers', JSON.stringify(updated));
-    } else {
-      const newMember: TeamMember = { ...teamForm, id: Date.now().toString() };
-      const updated = [...teamMembers, newMember];
-      setTeamMembers(updated);
-      localStorage.setItem('teamMembers', JSON.stringify(updated));
+    try {
+      let imageData = teamForm.image;
+      if (teamForm.image && teamForm.image.startsWith('data:image')) {
+        imageData = await compressImage(teamForm.image);
+      }
+      const teamData = { ...teamForm, image: imageData };
+      if (editingTeam) {
+        await updateTeamInFirebase(editingTeam.id, teamData);
+        setTeamMembers(teamMembers.map(t => t.id === editingTeam.id ? { ...teamData, id: editingTeam.id } : t));
+      } else {
+        const docId = await saveTeamToFirebase(teamData);
+        setTeamMembers([...teamMembers, { ...teamData, id: docId }]);
+      }
+      setTeamForm({ name: '', role: '', bio: '', image: '', linkedin: '', twitter: '' });
+      setTeamImage('');
+      setShowTeamForm(false);
+      setEditingTeam(null);
+      alert('Member saved!');
+    } catch (error: any) {
+      alert('Error: ' + error.message);
     }
-
-    setTeamForm({ name: '', role: '', bio: '', image: '', linkedin: '', twitter: '' });
-    setShowTeamForm(false);
-    setEditingTeam(null);
   };
 
   const editTeam = (member: TeamMember) => {
     setEditingTeam(member);
     setTeamForm(member);
+    setTeamImage(member.image);
     setShowTeamForm(true);
   };
 
-  const deleteTeam = (id: string) => {
-    if (confirm('Delete this team member?')) {
-      const updated = teamMembers.filter(t => t.id !== id);
-      setTeamMembers(updated);
-      localStorage.setItem('teamMembers', JSON.stringify(updated));
+  const deleteTeam = async (id: string) => {
+    if (confirm('Delete this member?')) {
+      try {
+        await deleteTeamFromFirebase(id);
+        setTeamMembers(teamMembers.filter(t => t.id !== id));
+      } catch (error) {
+        alert('Error');
+      }
     }
   };
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-6">
-        <div className="glass p-10 rounded-3xl max-w-md w-full">
+      <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+        <div className="glass p-10 rounded-3xl max-w-md w-full border border-purple-500/20">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-black mb-2">Admin <span className="gradient-text">Panel</span></h1>
-            <p className="text-slate-400">Login to access dashboard</p>
+            <p className="text-slate-400">Secure Access</p>
           </div>
           <form onSubmit={handleLogin}>
             <input
@@ -350,7 +429,7 @@ const AdminPanel: React.FC = () => {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 mb-4 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
+              className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-6 py-3 mb-4 focus:ring-2 focus:ring-purple-500/50 focus:outline-none text-white placeholder-slate-500"
               required
             />
             <input
@@ -358,12 +437,12 @@ const AdminPanel: React.FC = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 mb-6 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
+              className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-6 py-3 mb-6 focus:ring-2 focus:ring-purple-500/50 focus:outline-none text-white placeholder-slate-500"
               required
             />
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 py-4 rounded-2xl font-black text-lg shadow-xl shadow-purple-500/40 transition-all"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 py-3 rounded-xl font-black text-lg shadow-lg shadow-purple-500/40 transition-all hover:scale-105"
             >
               Login
             </button>
@@ -374,737 +453,369 @@ const AdminPanel: React.FC = () => {
   }
 
   return (
-    <div className="pt-24 pb-20 px-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-5xl font-black">Admin <span className="gradient-text">Dashboard</span></h1>
-        <button
-          onClick={handleLogout}
-          className="glass px-6 py-3 rounded-xl font-bold hover:bg-red-500/20 transition-all"
-        >
-          Logout
-        </button>
-      </div>
-
-      <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-        {[
-          { id: 'dashboard', label: '📊 Dashboard' },
-          { id: 'messages', label: '💬 Messages' },
-          { id: 'blogs', label: '📝 Blogs' },
-          { id: 'cases', label: '🎯 Cases' },
-          { id: 'team', label: '👥 Team' },
-          { id: 'backlinks', label: '🔗 Backlinks' },
-          { id: 'pricing', label: '💰 Pricing' }
-        ].map((tab) => (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 pt-6 pb-20 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+          <div>
+            <h1 className="text-4xl sm:text-5xl font-black">Admin <span className="gradient-text">Dashboard</span></h1>
+            <p className="text-slate-400 text-sm mt-1">Manage your SEO business</p>
+          </div>
           <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-2 rounded-xl font-bold transition-all whitespace-nowrap text-sm ${
-              activeTab === tab.id
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                : 'glass text-slate-400 hover:text-white'
-            }`}
+            onClick={handleLogout}
+            className="glass px-6 py-3 rounded-xl font-bold hover:bg-red-500/10 transition-all border border-red-500/30 text-red-400 hover:text-red-300"
           >
-            {tab.label}
+            Logout
           </button>
-        ))}
-      </div>
+        </div>
 
-      {activeTab === 'dashboard' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="glass p-6 rounded-2xl border border-purple-500/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm font-bold">Total Messages</p>
-                  <p className="text-3xl font-black text-purple-400 mt-2">{chatMessages.length}</p>
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2 flex-wrap">
+          {[
+            { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
+            { id: 'messages', label: 'Messages', icon: MessageIcon },
+            { id: 'blogs', label: 'Blogs', icon: BlogIcon },
+            { id: 'cases', label: 'Cases', icon: CaseIcon },
+            { id: 'team', label: 'Team', icon: TeamIcon },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all whitespace-nowrap border ${
+                  activeTab === tab.id
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg border-transparent'
+                    : 'glass text-slate-400 hover:text-white border-purple-500/20 hover:border-purple-500/40'
+                }`}
+              >
+                <Icon />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {activeTab === 'dashboard' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="glass p-8 rounded-2xl border border-purple-500/30 hover:border-purple-500/50 transition-all">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                  <MessageIcon />
                 </div>
-                <div className="text-4xl">💬</div>
+                <div>
+                  <p className="text-slate-400 text-sm font-bold">Messages</p>
+                  <p className="text-3xl font-black text-purple-400">{chatMessages.length}</p>
+                </div>
               </div>
             </div>
-            <div className="glass p-6 rounded-2xl border border-blue-500/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm font-bold">Blog Posts</p>
-                  <p className="text-3xl font-black text-blue-400 mt-2">{blogs.length}</p>
+            <div className="glass p-8 rounded-2xl border border-blue-500/30 hover:border-blue-500/50 transition-all">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                  <BlogIcon />
                 </div>
-                <div className="text-4xl">📝</div>
+                <div>
+                  <p className="text-slate-400 text-sm font-bold">Blogs</p>
+                  <p className="text-3xl font-black text-blue-400">{blogs.length}</p>
+                </div>
               </div>
             </div>
-            <div className="glass p-6 rounded-2xl border border-emerald-500/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm font-bold">Case Studies</p>
-                  <p className="text-3xl font-black text-emerald-400 mt-2">{cases.length}</p>
+            <div className="glass p-8 rounded-2xl border border-emerald-500/30 hover:border-emerald-500/50 transition-all">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                  <CaseIcon />
                 </div>
-                <div className="text-4xl">🎯</div>
+                <div>
+                  <p className="text-slate-400 text-sm font-bold">Cases</p>
+                  <p className="text-3xl font-black text-emerald-400">{cases.length}</p>
+                </div>
               </div>
             </div>
-            <div className="glass p-6 rounded-2xl border border-pink-500/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm font-bold">Team Members</p>
-                  <p className="text-3xl font-black text-pink-400 mt-2">{teamMembers.length}</p>
+            <div className="glass p-8 rounded-2xl border border-pink-500/30 hover:border-pink-500/50 transition-all">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
+                  <TeamIcon />
                 </div>
-                <div className="text-4xl">👥</div>
+                <div>
+                  <p className="text-slate-400 text-sm font-bold">Team</p>
+                  <p className="text-3xl font-black text-pink-400">{teamMembers.length}</p>
+                </div>
               </div>
             </div>
           </div>
+        )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="glass p-6 rounded-2xl border border-white/5">
-              <h3 className="text-xl font-black mb-4">Recent Messages</h3>
-              <div className="space-y-3">
-                {chatMessages.slice(-3).reverse().map((msg) => (
-                  <div key={msg.id} className="p-3 bg-slate-900/30 rounded-lg border border-white/5">
-                    <p className="font-bold text-sm">{msg.name}</p>
-                    <p className="text-xs text-slate-400 truncate">{msg.message}</p>
-                    <p className="text-xs text-slate-500 mt-1">{msg.timestamp}</p>
+        {activeTab === 'messages' && (
+          <div className="glass p-8 rounded-2xl border border-white/5">
+            <h2 className="text-3xl font-black mb-6">Messages</h2>
+            {chatMessages.length === 0 ? (
+              <p className="text-slate-400 text-center py-12">No messages yet</p>
+            ) : (
+              <div className="space-y-4">
+                {chatMessages.map((msg) => (
+                  <div key={msg.id} className="p-6 bg-slate-900/30 rounded-xl border border-white/5 hover:border-white/10 transition-all">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <p className="font-bold text-lg">{msg.name}</p>
+                        <p className="text-sm text-slate-400">{msg.email}</p>
+                      </div>
+                      <button onClick={() => deleteMessage(msg.id)} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 px-3 py-1 rounded-lg text-sm font-bold transition-all">Delete</button>
+                    </div>
+                    <p className="text-sm text-slate-300 leading-relaxed">{msg.message}</p>
                   </div>
                 ))}
-                {chatMessages.length === 0 && <p className="text-slate-400 text-sm">No messages yet</p>}
               </div>
-            </div>
-
-            <div className="glass p-6 rounded-2xl border border-white/5">
-              <h3 className="text-xl font-black mb-4">Quick Stats</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-slate-900/30 rounded-lg">
-                  <span className="text-sm text-slate-400">Total Backlinks</span>
-                  <span className="font-black text-lg text-cyan-400">{backlinks.length}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-slate-900/30 rounded-lg">
-                  <span className="text-sm text-slate-400">Content Ready</span>
-                  <span className="font-black text-lg text-emerald-400">{blogs.length + cases.length}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-slate-900/30 rounded-lg">
-                  <span className="text-sm text-slate-400">Team Size</span>
-                  <span className="font-black text-lg text-pink-400">{teamMembers.length}</span>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
 
-      {activeTab === 'messages' && (
-        <div className="glass p-8 rounded-3xl">
-          <h2 className="text-3xl font-black mb-6">Chatbot Messages</h2>
-          {chatMessages.length === 0 ? (
-            <p className="text-slate-400 text-center py-12">No messages yet</p>
-          ) : (
-            <div className="space-y-4">
-              {chatMessages.map((msg) => (
-                <div key={msg.id} className="glass p-6 rounded-2xl border border-white/5">
-                  <div className="flex justify-between items-start mb-3">
+        {activeTab === 'blogs' && (
+          <div className="glass p-8 rounded-2xl border border-white/5">
+            <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+              <h2 className="text-3xl font-black">Blogs</h2>
+              <button
+                onClick={() => {
+                  setShowBlogForm(true);
+                  setEditingBlog(null);
+                  setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', image: '' });
+                  setBlogImage('');
+                }}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                New Blog
+              </button>
+            </div>
+
+            {showBlogForm && (
+              <div className="bg-slate-900/50 p-8 rounded-xl mb-8 border border-purple-500/30">
+                <h3 className="text-xl font-bold mb-6">{editingBlog ? 'Edit Blog' : 'Create New Blog'}</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-300 mb-2">Title</label>
+                    <input type="text" placeholder="Blog title" value={blogForm.title} onChange={(e) => setBlogForm({...blogForm, title: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-300 mb-2">Excerpt</label>
+                    <textarea placeholder="Short description" value={blogForm.excerpt} onChange={(e) => setBlogForm({...blogForm, excerpt: e.target.value})} rows={2} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-300 mb-2">Content (HTML)</label>
+                    <textarea placeholder="Detailed content" value={blogForm.content} onChange={(e) => setBlogForm({...blogForm, content: e.target.value})} rows={5} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <h3 className="font-bold text-lg">{msg.name}</h3>
-                      <p className="text-sm text-slate-400">{msg.email}</p>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Category</label>
+                      <input type="text" placeholder="e.g., AI & Trends" value={blogForm.category} onChange={(e) => setBlogForm({...blogForm, category: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
                     </div>
-                    <div className="flex gap-2 items-center">
-                      <span className="text-xs text-slate-500">{msg.timestamp}</span>
-                      <button
-                        onClick={() => deleteMessage(msg.id)}
-                        className="text-red-400 hover:text-red-300 px-3 py-1 rounded-lg hover:bg-red-500/10 transition-all"
-                      >
-                        Delete
-                      </button>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Author</label>
+                      <input type="text" placeholder="Author name" value={blogForm.author} onChange={(e) => setBlogForm({...blogForm, author: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
                     </div>
                   </div>
-                  <p className="text-slate-300">{msg.message}</p>
+                  <ImageUploadField 
+                    image={blogImage}
+                    onImageChange={(img) => {setBlogImage(img); setBlogForm({...blogForm, image: img});}}
+                    onImageRemove={() => {setBlogImage(''); setBlogForm({...blogForm, image: ''});}}
+                    label="Featured Image"
+                  />
+                  <div className="flex gap-3 pt-4">
+                    <button onClick={saveBlog} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save Blog</button>
+                    <button onClick={() => {setShowBlogForm(false); setBlogImage('');}} className="glass px-8 py-3 rounded-lg font-bold">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {blogs.map((blog) => (
+                <div key={blog.id} className="p-6 bg-slate-900/30 rounded-lg border border-white/5 hover:border-white/10 transition-all flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg">{blog.title}</h3>
+                    <p className="text-sm text-purple-400 mt-1">{blog.category}</p>
+                    <p className="text-sm text-slate-400 mt-2">{blog.author}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => editBlog(blog)} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-4 py-2 rounded-lg text-sm font-bold transition-all">Edit</button>
+                    <button onClick={() => deleteBlog(blog.id)} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-bold transition-all">Delete</button>
+                  </div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
-
-      {activeTab === 'blogs' && (
-        <div className="glass p-8 rounded-3xl">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-black">Manage Blogs</h2>
-            <button 
-              onClick={() => { setShowBlogForm(true); setEditingBlog(null); setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', readTime: '', image: '' }); }}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 py-3 rounded-xl font-bold shadow-xl shadow-purple-500/20 transition-all"
-            >
-              + Add New Blog
-            </button>
           </div>
+        )}
 
-          {showBlogForm && (
-            <div className="glass p-6 rounded-2xl mb-6 border border-purple-500/20">
-              <h3 className="text-xl font-bold mb-4">{editingBlog ? 'Edit Blog' : 'Create New Blog'}</h3>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Blog Title"
-                  value={blogForm.title}
-                  onChange={(e) => setBlogForm({...blogForm, title: e.target.value})}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                />
-                <input
-                  type="text"
-                  placeholder="Excerpt (Short description)"
-                  value={blogForm.excerpt}
-                  onChange={(e) => setBlogForm({...blogForm, excerpt: e.target.value})}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                />
-                <textarea
-                  placeholder="Blog Content (HTML supported for backlinks: <a href='url'>text</a>)"
-                  value={blogForm.content}
-                  onChange={(e) => setBlogForm({...blogForm, content: e.target.value})}
-                  rows={8}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Category"
-                    value={blogForm.category}
-                    onChange={(e) => setBlogForm({...blogForm, category: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Author Name"
-                    value={blogForm.author}
-                    onChange={(e) => setBlogForm({...blogForm, author: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Read Time (e.g., 5 min)"
-                    value={blogForm.readTime}
-                    onChange={(e) => setBlogForm({...blogForm, readTime: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Image URL (or upload below)"
-                    value={blogForm.image}
-                    onChange={(e) => setBlogForm({...blogForm, image: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                </div>
-                <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-6 text-center hover:border-purple-500/50 transition-all">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 10 * 1024 * 1024) {
-                          alert('File size must be less than 10MB');
-                          return;
-                        }
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setBlogForm({...blogForm, image: reader.result as string});
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="hidden"
-                    id="blogImageUpload"
-                  />
-                  <label htmlFor="blogImageUpload" className="cursor-pointer">
-                    <div className="flex flex-col items-center gap-2">
-                      <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                      <span className="text-purple-400 font-bold">Click to upload image or use URL above</span>
-                      <span className="text-slate-500 text-xs">PNG, JPG, GIF up to 10MB</span>
-                    </div>
-                  </label>
-                  {blogForm.image && (
-                    <div className="mt-4 relative">
-                      <img src={blogForm.image} alt="Preview" className="max-h-40 mx-auto rounded-lg" />
-                      <button
-                        onClick={() => setBlogForm({...blogForm, image: ''})}
-                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-3 mt-6">
-                  <button onClick={saveBlog} className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-bold transition-all">Save Blog</button>
-                  <button onClick={() => { setShowBlogForm(false); setEditingBlog(null); }} className="glass px-6 py-3 rounded-xl font-bold hover:bg-white/5 transition-all">Cancel</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {blogs.length === 0 ? (
-              <p className="text-slate-400 text-center py-12">No blogs yet. Create your first blog!</p>
-            ) : (
-              blogs.map((blog) => (
-                <div key={blog.id} className="glass p-6 rounded-2xl border border-white/5">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold mb-2">{blog.title}</h3>
-                      <p className="text-slate-400 text-sm mb-3">{blog.excerpt}</p>
-                      <div className="flex gap-4 text-xs text-slate-500">
-                        <span>{blog.category}</span>
-                        <span>{blog.author}</span>
-                        <span>{blog.readTime}</span>
-                        <span>{blog.date}</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => editBlog(blog)} className="text-blue-400 hover:text-blue-300 px-3 py-1 rounded-lg hover:bg-blue-500/10 transition-all">Edit</button>
-                      <button onClick={() => deleteBlog(blog.id)} className="text-red-400 hover:text-red-300 px-3 py-1 rounded-lg hover:bg-red-500/10 transition-all">Delete</button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'cases' && (
-        <div className="glass p-8 rounded-3xl">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-black">Manage Case Studies</h2>
-            <button 
-              onClick={() => { setShowCaseForm(true); setEditingCase(null); setCaseForm({ client: '', industry: '', challenge: '', trafficGrowth: '', keywordsRanked: '', revenueIncrease: '', duration: '', image: '', color: 'purple' }); }}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 py-3 rounded-xl font-bold shadow-xl shadow-purple-500/20 transition-all"
-            >
-              + Add Case Study
-            </button>
-          </div>
-
-          {showCaseForm && (
-            <div className="glass p-6 rounded-2xl mb-6 border border-purple-500/20">
-              <h3 className="text-xl font-bold mb-4">{editingCase ? 'Edit Case Study' : 'Create New Case Study'}</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Client Name"
-                    value={caseForm.client}
-                    onChange={(e) => setCaseForm({...caseForm, client: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Industry"
-                    value={caseForm.industry}
-                    onChange={(e) => setCaseForm({...caseForm, industry: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                </div>
-                <textarea
-                  placeholder="Challenge Description"
-                  value={caseForm.challenge}
-                  onChange={(e) => setCaseForm({...caseForm, challenge: e.target.value})}
-                  rows={3}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Traffic Growth (e.g., +450%)"
-                    value={caseForm.trafficGrowth}
-                    onChange={(e) => setCaseForm({...caseForm, trafficGrowth: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Keywords Ranked (e.g., +280)"
-                    value={caseForm.keywordsRanked}
-                    onChange={(e) => setCaseForm({...caseForm, keywordsRanked: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Revenue Increase (e.g., +320%)"
-                    value={caseForm.revenueIncrease}
-                    onChange={(e) => setCaseForm({...caseForm, revenueIncrease: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Duration (e.g., 6 months)"
-                    value={caseForm.duration}
-                    onChange={(e) => setCaseForm({...caseForm, duration: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Image URL (or upload below)"
-                    value={caseForm.image}
-                    onChange={(e) => setCaseForm({...caseForm, image: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <select
-                    value={caseForm.color}
-                    onChange={(e) => setCaseForm({...caseForm, color: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  >
-                    <option value="purple">Purple</option>
-                    <option value="emerald">Emerald</option>
-                    <option value="cyan">Cyan</option>
-                    <option value="pink">Pink</option>
-                    <option value="blue">Blue</option>
-                  </select>
-                </div>
-                <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-6 text-center hover:border-purple-500/50 transition-all">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 10 * 1024 * 1024) {
-                          alert('File size must be less than 10MB');
-                          return;
-                        }
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setCaseForm({...caseForm, image: reader.result as string});
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="hidden"
-                    id="caseImageUpload"
-                  />
-                  <label htmlFor="caseImageUpload" className="cursor-pointer">
-                    <div className="flex flex-col items-center gap-2">
-                      <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span className="text-purple-400 font-bold text-sm">Upload Case Image</span>
-                      <span className="text-slate-500 text-xs">PNG, JPG up to 10MB</span>
-                    </div>
-                  </label>
-                  {caseForm.image && (
-                    <div className="mt-4 relative">
-                      <img src={caseForm.image} alt="Preview" className="max-h-32 mx-auto rounded-lg" />
-                      <button
-                        onClick={() => setCaseForm({...caseForm, image: ''})}
-                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-3 mt-6">
-                  <button onClick={saveCase} className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-bold transition-all">Save Case</button>
-                  <button onClick={() => { setShowCaseForm(false); setEditingCase(null); }} className="glass px-6 py-3 rounded-xl font-bold hover:bg-white/5 transition-all">Cancel</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {cases.length === 0 ? (
-              <p className="text-slate-400 text-center py-12">No case studies yet. Create your first case!</p>
-            ) : (
-              cases.map((caseStudy) => (
-                <div key={caseStudy.id} className="glass p-6 rounded-2xl border border-white/5">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold mb-2">{caseStudy.client} - {caseStudy.industry}</h3>
-                      <p className="text-slate-400 text-sm mb-3">{caseStudy.challenge}</p>
-                      <div className="flex gap-4 text-xs text-slate-500">
-                        <span>Traffic: {caseStudy.trafficGrowth}</span>
-                        <span>Keywords: {caseStudy.keywordsRanked}</span>
-                        <span>Revenue: {caseStudy.revenueIncrease}</span>
-                        <span>Duration: {caseStudy.duration}</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => editCase(caseStudy)} className="text-blue-400 hover:text-blue-300 px-3 py-1 rounded-lg hover:bg-blue-500/10 transition-all">Edit</button>
-                      <button onClick={() => deleteCase(caseStudy.id)} className="text-red-400 hover:text-red-300 px-3 py-1 rounded-lg hover:bg-red-500/10 transition-all">Delete</button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'team' && (
-        <div className="glass p-8 rounded-3xl">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-black">Manage Team Members</h2>
-            <button 
-              onClick={() => { setShowTeamForm(true); setEditingTeam(null); setTeamForm({ name: '', role: '', bio: '', image: '', linkedin: '', twitter: '' }); }}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 py-3 rounded-xl font-bold shadow-xl shadow-purple-500/20 transition-all"
-            >
-              + Add Team Member
-            </button>
-          </div>
-
-          {showTeamForm && (
-            <div className="glass p-6 rounded-2xl mb-6 border border-purple-500/20">
-              <h3 className="text-xl font-bold mb-4">{editingTeam ? 'Edit Team Member' : 'Add New Team Member'}</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Full Name"
-                    value={teamForm.name}
-                    onChange={(e) => setTeamForm({...teamForm, name: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Role/Position"
-                    value={teamForm.role}
-                    onChange={(e) => setTeamForm({...teamForm, role: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                </div>
-                <textarea
-                  placeholder="Bio/Description"
-                  value={teamForm.bio}
-                  onChange={(e) => setTeamForm({...teamForm, bio: e.target.value})}
-                  rows={3}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                />
-                <input
-                  type="text"
-                  placeholder="Image URL (or upload below)"
-                  value={teamForm.image}
-                  onChange={(e) => setTeamForm({...teamForm, image: e.target.value})}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                />
-                <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-6 text-center hover:border-purple-500/50 transition-all">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 10 * 1024 * 1024) {
-                          alert('File size must be less than 10MB');
-                          return;
-                        }
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setTeamForm({...teamForm, image: reader.result as string});
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="hidden"
-                    id="teamImageUpload"
-                  />
-                  <label htmlFor="teamImageUpload" className="cursor-pointer">
-                    <div className="flex flex-col items-center gap-2">
-                      <svg className="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span className="text-purple-400 font-bold text-sm">Upload Team Photo</span>
-                      <span className="text-slate-500 text-xs">PNG, JPG up to 10MB</span>
-                    </div>
-                  </label>
-                  {teamForm.image && (
-                    <div className="mt-4 relative">
-                      <img src={teamForm.image} alt="Preview" className="max-h-32 mx-auto rounded-lg" />
-                      <button
-                        onClick={() => setTeamForm({...teamForm, image: ''})}
-                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="LinkedIn URL (optional)"
-                    value={teamForm.linkedin}
-                    onChange={(e) => setTeamForm({...teamForm, linkedin: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Twitter URL (optional)"
-                    value={teamForm.twitter}
-                    onChange={(e) => setTeamForm({...teamForm, twitter: e.target.value})}
-                    className="bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                  />
-                </div>
-                <div className="flex gap-3 mt-6">
-                  <button onClick={saveTeam} className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-bold transition-all">Save Member</button>
-                  <button onClick={() => { setShowTeamForm(false); setEditingTeam(null); }} className="glass px-6 py-3 rounded-xl font-bold hover:bg-white/5 transition-all">Cancel</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {teamMembers.length === 0 ? (
-              <p className="text-slate-400 text-center py-12 col-span-full">No team members yet. Add your first team member!</p>
-            ) : (
-              teamMembers.map((member) => (
-                <div key={member.id} className="glass p-6 rounded-2xl border border-white/5 text-center">
-                  {member.image && (
-                    <img src={member.image} alt={member.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover" />
-                  )}
-                  <h3 className="text-lg font-bold mb-1">{member.name}</h3>
-                  <p className="text-purple-400 text-sm font-bold mb-3">{member.role}</p>
-                  <p className="text-slate-400 text-xs mb-4">{member.bio}</p>
-                  <div className="flex gap-2 justify-center mb-4">
-                    {member.linkedin && (
-                      <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                      </a>
-                    )}
-                    {member.twitter && (
-                      <a href={member.twitter} target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-                      </a>
-                    )}
-                  </div>
-                  <div className="flex gap-2 justify-center">
-                    <button onClick={() => editTeam(member)} className="text-blue-400 hover:text-blue-300 px-3 py-1 rounded-lg hover:bg-blue-500/10 transition-all text-xs">Edit</button>
-                    <button onClick={() => deleteTeam(member.id)} className="text-red-400 hover:text-red-300 px-3 py-1 rounded-lg hover:bg-red-500/10 transition-all text-xs">Delete</button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'backlinks' && (
-        <div className="glass p-8 rounded-3xl">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-black">Manage Backlinks</h2>
-            <button 
-              onClick={() => { setShowBacklinkForm(true); setBacklinkForm({ title: '', url: '', location: 'footer', description: '' }); }}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 py-3 rounded-xl font-bold shadow-xl shadow-purple-500/20 transition-all"
-            >
-              + Add Backlink
-            </button>
-          </div>
-
-          {showBacklinkForm && (
-            <div className="glass p-6 rounded-2xl mb-6 border border-purple-500/20">
-              <h3 className="text-xl font-bold mb-4">Add External Backlink</h3>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Link Title (e.g., Google SEO Guide)"
-                  value={backlinkForm.title}
-                  onChange={(e) => setBacklinkForm({...backlinkForm, title: e.target.value})}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                />
-                <input
-                  type="url"
-                  placeholder="Full URL (e.g., https://developers.google.com/search)"
-                  value={backlinkForm.url}
-                  onChange={(e) => setBacklinkForm({...backlinkForm, url: e.target.value})}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                />
-                <textarea
-                  placeholder="Description (optional)"
-                  value={backlinkForm.description}
-                  onChange={(e) => setBacklinkForm({...backlinkForm, description: e.target.value})}
-                  rows={3}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                />
-                <select
-                  value={backlinkForm.location}
-                  onChange={(e) => setBacklinkForm({...backlinkForm, location: e.target.value as 'footer' | 'blog'})}
-                  className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-                >
-                  <option value="footer">Footer - Resources Section</option>
-                  <option value="blog">Blog Posts</option>
-                </select>
-                <div className="flex gap-3 mt-6">
-                  <button onClick={saveBacklink} className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-bold transition-all">Add Backlink</button>
-                  <button onClick={() => setShowBacklinkForm(false)} className="glass px-6 py-3 rounded-xl font-bold hover:bg-white/5 transition-all">Cancel</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {backlinks.length === 0 ? (
-              <p className="text-slate-400 text-center py-12">No backlinks added yet. Add your first backlink!</p>
-            ) : (
-              backlinks.map((link) => (
-                <div key={link.id} className="glass p-6 rounded-2xl border border-white/5">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold mb-2">{link.title}</h3>
-                      <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-sm mb-2 block break-all">{link.url}</a>
-                      {link.description && <p className="text-slate-400 text-sm mb-2">{link.description}</p>}
-                      <div className="flex gap-4 text-xs text-slate-500">
-                        <span className="bg-purple-500/20 px-3 py-1 rounded-full">{link.location === 'footer' ? '📍 Footer' : '📝 Blog'}</span>
-                      </div>
-                    </div>
-                    <button onClick={() => deleteBacklink(link.id)} className="text-red-400 hover:text-red-300 px-3 py-1 rounded-lg hover:bg-red-500/10 transition-all">Delete</button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'pricing' && (
-        <div className="glass p-8 rounded-3xl">
-          <h2 className="text-3xl font-black mb-6">Manage Pricing</h2>
-          <p className="text-slate-400 mb-6">Update pricing packages and features</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass p-6 rounded-2xl border border-purple-500/20">
-              <h3 className="text-xl font-bold mb-4">Starter Package</h3>
-              <input
-                type="number"
-                placeholder="Price"
-                className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 mb-4 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-              />
-              <button className="w-full bg-purple-500/20 hover:bg-purple-500/30 py-2 rounded-xl font-bold transition-all">
-                Update
+        {activeTab === 'cases' && (
+          <div className="glass p-8 rounded-2xl border border-white/5">
+            <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+              <h2 className="text-3xl font-black">Case Studies</h2>
+              <button
+                onClick={() => {
+                  setShowCaseForm(true);
+                  setEditingCase(null);
+                  setCaseForm({ client: '', industry: '', challenge: '', trafficGrowth: '', keywordsRanked: '', revenueIncrease: '', duration: '', image: '', color: 'purple' });
+                  setCaseImage('');
+                }}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                New Case
               </button>
             </div>
-            <div className="glass p-6 rounded-2xl border border-pink-500/20">
-              <h3 className="text-xl font-bold mb-4">Professional Package</h3>
-              <input
-                type="number"
-                placeholder="Price"
-                className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 mb-4 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-              />
-              <button className="w-full bg-pink-500/20 hover:bg-pink-500/30 py-2 rounded-xl font-bold transition-all">
-                Update
-              </button>
-            </div>
-            <div className="glass p-6 rounded-2xl border border-cyan-500/20">
-              <h3 className="text-xl font-bold mb-4">Enterprise Package</h3>
-              <input
-                type="number"
-                placeholder="Price"
-                className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 mb-4 focus:ring-2 focus:ring-purple-500/50 focus:outline-none"
-              />
-              <button className="w-full bg-cyan-500/20 hover:bg-cyan-500/30 py-2 rounded-xl font-bold transition-all">
-                Update
-              </button>
+
+            {showCaseForm && (
+              <div className="bg-slate-900/50 p-8 rounded-xl mb-8 border border-purple-500/30">
+                <h3 className="text-xl font-bold mb-6">{editingCase ? 'Edit Case' : 'Create New Case'}</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Client</label>
+                      <input type="text" placeholder="Client name" value={caseForm.client} onChange={(e) => setCaseForm({...caseForm, client: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Industry</label>
+                      <input type="text" placeholder="Industry" value={caseForm.industry} onChange={(e) => setCaseForm({...caseForm, industry: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-300 mb-2">Challenge</label>
+                    <textarea placeholder="Describe the challenge" value={caseForm.challenge} onChange={(e) => setCaseForm({...caseForm, challenge: e.target.value})} rows={2} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Traffic Growth</label>
+                      <input type="text" placeholder="+300%" value={caseForm.trafficGrowth} onChange={(e) => setCaseForm({...caseForm, trafficGrowth: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Keywords Ranked</label>
+                      <input type="text" placeholder="+150" value={caseForm.keywordsRanked} onChange={(e) => setCaseForm({...caseForm, keywordsRanked: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Revenue Increase</label>
+                      <input type="text" placeholder="+250%" value={caseForm.revenueIncrease} onChange={(e) => setCaseForm({...caseForm, revenueIncrease: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Duration</label>
+                      <input type="text" placeholder="6 months" value={caseForm.duration} onChange={(e) => setCaseForm({...caseForm, duration: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                  </div>
+                  <ImageUploadField 
+                    image={caseImage}
+                    onImageChange={(img) => {setCaseImage(img); setCaseForm({...caseForm, image: img});}}
+                    onImageRemove={() => {setCaseImage(''); setCaseForm({...caseForm, image: ''});}}
+                    label="Case Image"
+                  />
+                  <div className="flex gap-3 pt-4">
+                    <button onClick={saveCase} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save Case</button>
+                    <button onClick={() => {setShowCaseForm(false); setCaseImage('');}} className="glass px-8 py-3 rounded-lg font-bold">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {cases.map((c) => (
+                <div key={c.id} className="p-6 bg-slate-900/30 rounded-lg border border-white/5 hover:border-white/10 transition-all flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg">{c.client} - {c.industry}</h3>
+                    <p className="text-sm text-slate-400 mt-2">{c.challenge}</p>
+                    <div className="flex gap-4 mt-3 text-sm">
+                      <span className="text-emerald-400 font-bold">{c.trafficGrowth} traffic</span>
+                      <span className="text-blue-400 font-bold">{c.keywordsRanked} keywords</span>
+                      <span className="text-pink-400 font-bold">{c.duration}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => editCase(c)} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-4 py-2 rounded-lg text-sm font-bold transition-all">Edit</button>
+                    <button onClick={() => deleteCase(c.id)} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-bold transition-all">Delete</button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Admin Info Box */}
-      <div className="mt-8 glass p-6 rounded-2xl border border-green-500/20">
-        <h3 className="text-xl font-bold mb-3 text-green-400">🔐 Admin Credentials</h3>
-        <div className="space-y-2 text-sm">
-          <p><span className="text-slate-400">Username:</span> <span className="font-mono font-bold text-white">{ADMIN_USERNAME}</span></p>
-          <p><span className="text-slate-400">Password:</span> <span className="font-mono font-bold text-white">{ADMIN_PASSWORD}</span></p>
-        </div>
+        {activeTab === 'team' && (
+          <div className="glass p-8 rounded-2xl border border-white/5">
+            <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+              <h2 className="text-3xl font-black">Team Members</h2>
+              <button
+                onClick={() => {
+                  setShowTeamForm(true);
+                  setEditingTeam(null);
+                  setTeamForm({ name: '', role: '', bio: '', image: '', linkedin: '', twitter: '' });
+                  setTeamImage('');
+                }}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                New Member
+              </button>
+            </div>
+
+            {showTeamForm && (
+              <div className="bg-slate-900/50 p-8 rounded-xl mb-8 border border-purple-500/30">
+                <h3 className="text-xl font-bold mb-6">{editingTeam ? 'Edit Member' : 'Add Team Member'}</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Name</label>
+                      <input type="text" placeholder="Full name" value={teamForm.name} onChange={(e) => setTeamForm({...teamForm, name: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Role</label>
+                      <input type="text" placeholder="Job title" value={teamForm.role} onChange={(e) => setTeamForm({...teamForm, role: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-300 mb-2">Bio</label>
+                    <textarea placeholder="Team member bio" value={teamForm.bio} onChange={(e) => setTeamForm({...teamForm, bio: e.target.value})} rows={3} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                  </div>
+                  <ImageUploadField 
+                    image={teamImage}
+                    onImageChange={(img) => {setTeamImage(img); setTeamForm({...teamForm, image: img});}}
+                    onImageRemove={() => {setTeamImage(''); setTeamForm({...teamForm, image: ''});}}
+                    label="Profile Image"
+                    aspect="square"
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">LinkedIn</label>
+                      <input type="text" placeholder="LinkedIn URL" value={teamForm.linkedin} onChange={(e) => setTeamForm({...teamForm, linkedin: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Twitter</label>
+                      <input type="text" placeholder="Twitter URL" value={teamForm.twitter} onChange={(e) => setTeamForm({...teamForm, twitter: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button onClick={saveTeam} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save Member</button>
+                    <button onClick={() => {setShowTeamForm(false); setTeamImage('');}} className="glass px-8 py-3 rounded-lg font-bold">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {teamMembers.map((m) => (
+                <div key={m.id} className="p-6 bg-slate-900/30 rounded-lg border border-white/5 hover:border-white/10 transition-all text-center">
+                  {m.image && <img src={m.image} alt={m.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-purple-500/30" />}
+                  <h3 className="font-bold text-lg">{m.name}</h3>
+                  <p className="text-sm text-purple-400 font-bold mt-1">{m.role}</p>
+                  <p className="text-xs text-slate-400 mt-3 leading-relaxed">{m.bio}</p>
+                  <div className="flex gap-2 justify-center mt-4">
+                    <button onClick={() => editTeam(m)} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Edit</button>
+                    <button onClick={() => deleteTeam(m.id)} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
