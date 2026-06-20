@@ -1,6 +1,72 @@
 import React from 'react';
 import { getBlogsFromFirebase } from '../utils/firebase';
 
+const getPostSlug = (title: string) =>
+  title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+const defaultPosts = [
+  { 
+    title: "The Impact of Advanced AI on SEO Strategies", 
+    category: "AI & Trends", 
+    date: "June 12, 2025", 
+    excerpt: "Discover how recent advances in AI are reshaping search algorithms and what it means for your SEO strategy.", 
+    readTime: "8 min", 
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80&auto=format&fit=crop", 
+    author: "Tayyab Mehmood", 
+    content: `<h2>How AI is Transforming SEO in 2025</h2><p>Artificial Intelligence has fundamentally changed how search engines understand and rank content. Machine learning algorithms now power Google's ranking system, with RankBrain being one of the top three ranking factors.</p><h3>Key AI Applications in SEO</h3><ul><li>Natural Language Processing for better content understanding</li><li>Predictive analytics for search trend forecasting</li><li>Automated content optimization using AI tools</li><li>AI-driven link building and outreach</li></ul><p>Businesses leveraging AI-powered SEO strategies are seeing 40-60% improvements in organic visibility within 6 months.</p>` 
+  },
+  { 
+    title: "Mastering Core Web Vitals in 2025", 
+    category: "Technical SEO", 
+    date: "June 08, 2025", 
+    excerpt: "A comprehensive guide to optimizing LCP, FID, and CLS for better rankings and user experience.", 
+    readTime: "12 min", 
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&auto=format&fit=crop", 
+    author: "Fatima Ahad", 
+    content: `<h2>Understanding Core Web Vitals</h2><p>Core Web Vitals are Google's official metrics for measuring user experience and are now confirmed ranking factors. These three metrics are essential for every website owner.</p><h3>The Three Core Web Vitals</h3><p><strong>Largest Contentful Paint (LCP):</strong> Should be under 2.5 seconds. This measures loading performance.</p><p><strong>First Input Delay (FID):</strong> Should be under 100 milliseconds. This measures interactivity.</p><p><strong>Cumulative Layout Shift (CLS):</strong> Should be under 0.1. This measures visual stability.</p><h3>Quick Optimization Tips</h3><ul><li>Minimize CSS and JavaScript</li><li>Use lazy loading for images</li><li>Optimize server response time</li><li>Use CDN for faster content delivery</li></ul>` 
+  },
+  { 
+    title: "Link Building Strategies That Actually Work in 2025", 
+    category: "Link Building", 
+    date: "June 05, 2025", 
+    excerpt: "Proven white-hat link building techniques that generate high-quality backlinks and boost domain authority.", 
+    readTime: "10 min", 
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80&auto=format&fit=crop", 
+    author: "Tayyab Mehmood", 
+    content: `<h2>The New Era of Link Building</h2><p>Link building has evolved significantly. Google now prioritizes quality over quantity, and spammy backlinks can harm your site.</p><h3>Top White-Hat Link Building Methods</h3><ul><li><strong>Broken Link Building:</strong> Find broken links on relevant sites and suggest your content as replacement</li><li><strong>Resource Page Links:</strong> Get listed on industry resource pages</li><li><strong>Guest Posting:</strong> Write high-quality content for authoritative blogs in your niche</li><li><strong>Skyscraper Technique:</strong> Create better version of existing content and reach out for links</li><li><strong>Press Coverage:</strong> Get featured in news outlets and industry publications</li></ul><h3>Results from Our Clients</h3><p>Our link building campaigns average 15-25 high-quality backlinks per month, resulting in 50-100% domain authority improvement within 6 months.</p>` 
+  },
+  { 
+    title: "Local SEO Domination: How Small Businesses Win Google Maps", 
+    category: "Local SEO", 
+    date: "June 01, 2025", 
+    excerpt: "Complete guide to ranking #1 in Google Maps and local search results for your business.", 
+    readTime: "11 min", 
+    image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80&auto=format&fit=crop", 
+    author: "Fatima Ahad", 
+    content: `<h2>Why Local SEO Matters</h2><p>76% of people who search for local services visit or call the business within 24 hours. Local SEO is critical for brick-and-mortar businesses.</p><h3>Essential Local SEO Factors</h3><ul><li>Google Business Profile optimization</li><li>Local citations and NAP consistency</li><li>Local keyword optimization</li><li>Customer reviews and ratings</li><li>Local link building</li></ul><h3>Step-by-Step Local SEO Strategy</h3><ol><li>Claim and optimize Google Business Profile</li><li>Ensure NAP consistency across all platforms</li><li>Get verified on local directories</li><li>Generate customer reviews</li><li>Build local citations</li><li>Target location-specific keywords</li></ol><p>Small businesses implementing our local SEO strategy see average 300% increase in local search visibility within 3 months.</p>` 
+  },
+  { 
+    title: "E-commerce SEO: Ranking Products and Categories", 
+    category: "E-commerce", 
+    date: "May 28, 2025", 
+    excerpt: "Advanced SEO strategies specifically designed for e-commerce websites to increase product visibility and sales.", 
+    readTime: "9 min", 
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&q=80&auto=format&fit=crop", 
+    author: "Tayyab Mehmood", 
+    content: `<h2>E-commerce SEO Challenges</h2><p>E-commerce sites face unique SEO challenges including duplicate content, poor site structure, and thin product descriptions.</p><h3>Critical E-commerce SEO Elements</h3><ul><li>Unique product descriptions (minimum 200 words)</li><li>High-quality product images with alt text</li><li>Proper URL structure for categories</li><li>Internal linking strategy</li><li>Schema markup for products</li><li>Customer reviews and ratings</li></ul><h3>Category Page Optimization</h3><p>Category pages should include unique content, target category-level keywords, and have clear internal linking to product pages.</p><h3>Product Page Optimization</h3><ul><li>Target long-tail keywords specific to product</li><li>Use buyer intent keywords</li><li>Include rich snippets and schema markup</li><li>Optimize for voice search</li></ul><p>E-commerce clients see 45% increase in organic traffic and 25% increase in conversion rates after implementing our SEO strategy.</p>` 
+  },
+  { 
+    title: "Content Marketing Strategy: Creating Content That Ranks", 
+    category: "Content Marketing", 
+    date: "May 24, 2025", 
+    excerpt: "How to create SEO-optimized content that ranks on Google and drives organic traffic consistently.", 
+    readTime: "13 min", 
+    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80&auto=format&fit=crop", 
+    author: "Fatima Ahad", 
+    content: `<h2>Content is Still King</h2><p>But it's no longer enough to just create content. Your content must be strategically optimized for search engines and user intent.</p><h3>The Content Creation Process</h3><ol><li><strong>Keyword Research:</strong> Find keywords your audience is searching for</li><li><strong>Search Intent Analysis:</strong> Understand what searchers want</li><li><strong>Content Outline:</strong> Create comprehensive, well-structured outline</li><li><strong>High-Quality Writing:</strong> Write engaging, valuable content</li><li><strong>On-Page SEO:</strong> Optimize title, meta, headers, and keywords</li><li><strong>Publishing:</strong> Format properly and publish</li></ol><h3>Content Types That Rank</h3><ul><li>Comprehensive guides (2000+ words)</li><li>Case studies with real results</li><li>How-to tutorials</li><li>Industry reports</li><li>Comparison articles</li><li>Infographics and visual content</li></ul><p>Content-focused SEez strategies generate 6x more conversions than non-optimized content.</p>` 
+  },
+];
+
 const BlogPage = () => {
   const [customBlogs, setCustomBlogs] = React.useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = React.useState<string>('All');
@@ -44,69 +110,6 @@ const BlogPage = () => {
     }
   }, []);
 
-  const defaultPosts = [
-    { 
-      title: "The Impact of Advanced AI on SEO Strategies", 
-      category: "AI & Trends", 
-      date: "June 12, 2025", 
-      excerpt: "Discover how recent advances in AI are reshaping search algorithms and what it means for your SEO strategy.", 
-      readTime: "8 min", 
-      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80&auto=format&fit=crop", 
-      author: "Tayyab Mehmood", 
-      content: `<h2>How AI is Transforming SEO in 2025</h2><p>Artificial Intelligence has fundamentally changed how search engines understand and rank content. Machine learning algorithms now power Google's ranking system, with RankBrain being one of the top three ranking factors.</p><h3>Key AI Applications in SEO</h3><ul><li>Natural Language Processing for better content understanding</li><li>Predictive analytics for search trend forecasting</li><li>Automated content optimization using AI tools</li><li>AI-driven link building and outreach</li></ul><p>Businesses leveraging AI-powered SEO strategies are seeing 40-60% improvements in organic visibility within 6 months.</p>` 
-    },
-    { 
-      title: "Mastering Core Web Vitals in 2025", 
-      category: "Technical SEO", 
-      date: "June 08, 2025", 
-      excerpt: "A comprehensive guide to optimizing LCP, FID, and CLS for better rankings and user experience.", 
-      readTime: "12 min", 
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&auto=format&fit=crop", 
-      author: "Fatima Ahad", 
-      content: `<h2>Understanding Core Web Vitals</h2><p>Core Web Vitals are Google's official metrics for measuring user experience and are now confirmed ranking factors. These three metrics are essential for every website owner.</p><h3>The Three Core Web Vitals</h3><p><strong>Largest Contentful Paint (LCP):</strong> Should be under 2.5 seconds. This measures loading performance.</p><p><strong>First Input Delay (FID):</strong> Should be under 100 milliseconds. This measures interactivity.</p><p><strong>Cumulative Layout Shift (CLS):</strong> Should be under 0.1. This measures visual stability.</p><h3>Quick Optimization Tips</h3><ul><li>Minimize CSS and JavaScript</li><li>Use lazy loading for images</li><li>Optimize server response time</li><li>Use CDN for faster content delivery</li></ul>` 
-    },
-    { 
-      title: "Link Building Strategies That Actually Work in 2025", 
-      category: "Link Building", 
-      date: "June 05, 2025", 
-      excerpt: "Proven white-hat link building techniques that generate high-quality backlinks and boost domain authority.", 
-      readTime: "10 min", 
-      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80&auto=format&fit=crop", 
-      author: "Tayyab Mehmood", 
-      content: `<h2>The New Era of Link Building</h2><p>Link building has evolved significantly. Google now prioritizes quality over quantity, and spammy backlinks can harm your site.</p><h3>Top White-Hat Link Building Methods</h3><ul><li><strong>Broken Link Building:</strong> Find broken links on relevant sites and suggest your content as replacement</li><li><strong>Resource Page Links:</strong> Get listed on industry resource pages</li><li><strong>Guest Posting:</strong> Write high-quality content for authoritative blogs in your niche</li><li><strong>Skyscraper Technique:</strong> Create better version of existing content and reach out for links</li><li><strong>Press Coverage:</strong> Get featured in news outlets and industry publications</li></ul><h3>Results from Our Clients</h3><p>Our link building campaigns average 15-25 high-quality backlinks per month, resulting in 50-100% domain authority improvement within 6 months.</p>` 
-    },
-    { 
-      title: "Local SEO Domination: How Small Businesses Win Google Maps", 
-      category: "Local SEO", 
-      date: "June 01, 2025", 
-      excerpt: "Complete guide to ranking #1 in Google Maps and local search results for your business.", 
-      readTime: "11 min", 
-      image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80&auto=format&fit=crop", 
-      author: "Fatima Ahad", 
-      content: `<h2>Why Local SEO Matters</h2><p>76% of people who search for local services visit or call the business within 24 hours. Local SEO is critical for brick-and-mortar businesses.</p><h3>Essential Local SEO Factors</h3><ul><li>Google Business Profile optimization</li><li>Local citations and NAP consistency</li><li>Local keyword optimization</li><li>Customer reviews and ratings</li><li>Local link building</li></ul><h3>Step-by-Step Local SEO Strategy</h3><ol><li>Claim and optimize Google Business Profile</li><li>Ensure NAP consistency across all platforms</li><li>Get verified on local directories</li><li>Generate customer reviews</li><li>Build local citations</li><li>Target location-specific keywords</li></ol><p>Small businesses implementing our local SEO strategy see average 300% increase in local search visibility within 3 months.</p>` 
-    },
-    { 
-      title: "E-commerce SEO: Ranking Products and Categories", 
-      category: "E-commerce", 
-      date: "May 28, 2025", 
-      excerpt: "Advanced SEO strategies specifically designed for e-commerce websites to increase product visibility and sales.", 
-      readTime: "9 min", 
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&q=80&auto=format&fit=crop", 
-      author: "Tayyab Mehmood", 
-      content: `<h2>E-commerce SEO Challenges</h2><p>E-commerce sites face unique SEO challenges including duplicate content, poor site structure, and thin product descriptions.</p><h3>Critical E-commerce SEO Elements</h3><ul><li>Unique product descriptions (minimum 200 words)</li><li>High-quality product images with alt text</li><li>Proper URL structure for categories</li><li>Internal linking strategy</li><li>Schema markup for products</li><li>Customer reviews and ratings</li></ul><h3>Category Page Optimization</h3><p>Category pages should include unique content, target category-level keywords, and have clear internal linking to product pages.</p><h3>Product Page Optimization</h3><ul><li>Target long-tail keywords specific to product</li><li>Use buyer intent keywords</li><li>Include rich snippets and schema markup</li><li>Optimize for voice search</li></ul><p>E-commerce clients see 45% increase in organic traffic and 25% increase in conversion rates after implementing our SEO strategy.</p>` 
-    },
-    { 
-      title: "Content Marketing Strategy: Creating Content That Ranks", 
-      category: "Content Marketing", 
-      date: "May 24, 2025", 
-      excerpt: "How to create SEO-optimized content that ranks on Google and drives organic traffic consistently.", 
-      readTime: "13 min", 
-      image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80&auto=format&fit=crop", 
-      author: "Fatima Ahad", 
-      content: `<h2>Content is Still King</h2><p>But it's no longer enough to just create content. Your content must be strategically optimized for search engines and user intent.</p><h3>The Content Creation Process</h3><ol><li><strong>Keyword Research:</strong> Find keywords your audience is searching for</li><li><strong>Search Intent Analysis:</strong> Understand what searchers want</li><li><strong>Content Outline:</strong> Create comprehensive, well-structured outline</li><li><strong>High-Quality Writing:</strong> Write engaging, valuable content</li><li><strong>On-Page SEO:</strong> Optimize title, meta, headers, and keywords</li><li><strong>Publishing:</strong> Format properly and publish</li></ol><h3>Content Types That Rank</h3><ul><li>Comprehensive guides (2000+ words)</li><li>Case studies with real results</li><li>How-to tutorials</li><li>Industry reports</li><li>Comparison articles</li><li>Infographics and visual content</li></ul><p>Content-focused SEO strategies generate 6x more conversions than non-optimized content.</p>` 
-    },
-  ];
-  
   const allPosts = [...customBlogs, ...defaultPosts];
   const categories = ['All', ...Array.from(new Set(allPosts.map(p => p.category)))];
   let filteredPosts = selectedCategory === 'All' ? allPosts : allPosts.filter(p => p.category === selectedCategory);
@@ -119,9 +122,6 @@ const BlogPage = () => {
     );
   }
   
-  const getPostSlug = (title: string) => 
-    title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
   return (
     <div className="pb-12 sm:pb-20 px-4 sm:px-6 max-w-6xl mx-auto">
       <div className="text-center mb-12 sm:mb-16">
@@ -177,7 +177,11 @@ const BlogPage = () => {
           <a
             key={i}
             href={`#blog-${getPostSlug(p.title)}`}
-            onClick={(e) => { e.preventDefault(); setSelectedPost(p); }}
+            onClick={(e) => { 
+              if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+              e.preventDefault(); 
+              setSelectedPost(p); 
+            }}
             className="glass rounded-2xl sm:rounded-[2rem] overflow-hidden hover:-translate-y-2 transition-all cursor-pointer group hover-lift block"
           >
             <div className="relative h-40 sm:h-48 overflow-hidden bg-slate-800">
