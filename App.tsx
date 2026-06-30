@@ -353,7 +353,8 @@ const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<AppRoute>(() => {
     const hash = window.location.hash.slice(1);
     if (hash === 'admin') return AppRoute.ADMIN;
-    if (hash.startsWith('blog-')) return AppRoute.BLOG; // blog post deep link
+    if (hash.startsWith('blog-')) return AppRoute.BLOG;
+    if (hash === 'blog') return AppRoute.BLOG;
     if (hash && Object.values(AppRoute).includes(hash as AppRoute)) return hash as AppRoute;
     return AppRoute.HOME;
   });
@@ -678,7 +679,7 @@ const App: React.FC = () => {
         <ParticleBackground />
         <ScrollProgress />
         <Navbar currentRoute={currentRoute} setRoute={setCurrentRoute} />
-        <main className="pt-20 sm:pt-24 min-h-[80vh] relative z-10">{renderContent()}</main>
+        <main className="pt-20 sm:pt-24 min-h-screen relative z-10">{renderContent()}</main>
         <LiveChat />
         <FloatingActionButton />
 
