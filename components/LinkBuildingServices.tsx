@@ -50,31 +50,32 @@ const LinkBuildingServices: React.FC = () => {
   ];
 
   return (
-    <div className="py-20 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 mb-12">
+    <div className="py-12 sm:py-16 md:py-20 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-8 sm:mb-12">
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl font-black mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4">
             Explore More <span className="gradient-text">Link Building Services</span>
           </h2>
-          <p className="text-slate-400 text-lg">
+          <p className="text-slate-400 text-sm sm:text-base md:text-lg">
             Professional white-hat link building strategies for maximum SEO impact
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mt-12 flex-wrap justify-center">
+        <div className="flex gap-2 sm:gap-4 mt-8 sm:mt-12 flex-wrap justify-center">
           {services.map((service, i) => (
             <button
               key={i}
               onClick={() => setActiveTab(i)}
-              className={`px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${
+              className={`px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold transition-all flex items-center gap-2 text-xs sm:text-sm ${
                 activeTab === i
                   ? 'bg-gradient-to-r from-cyan-400 to-cyan-500 text-white shadow-lg shadow-cyan-400/30'
                   : 'glass text-slate-300 hover:text-white hover:border-cyan-400/50'
               }`}
             >
-              <span className="text-xl flex items-center">{service.icon}</span>
-              {service.title}
+              <span className="flex items-center">{service.icon}</span>
+              <span className="hidden sm:inline">{service.title}</span>
+              <span className="sm:hidden">{service.title.split(' ')[0]}</span>
             </button>
           ))}
         </div>

@@ -34,19 +34,19 @@ const DashboardPreview: React.FC = () => {
   }, []);
 
   return (
-    <div className="py-20 px-6">
+    <div className="py-12 sm:py-16 md:py-20 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-black mb-6">
+        <div className="text-center mb-10 sm:mb-14 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6">
             Real-Time <span className="gradient-text">SEO Dashboard</span>
           </h2>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-xl text-slate-400 max-w-2xl mx-auto">
             Track your rankings, traffic, and conversions in one powerful interface
           </p>
         </div>
 
-        <div className="glass p-8 rounded-[3rem] border-purple-500/20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="glass p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl md:rounded-[3rem] border-purple-500/20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {/* Organic Traffic Card */}
             <div className={`bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/20 group cursor-pointer`}>
               <div className="flex items-center justify-between mb-4">

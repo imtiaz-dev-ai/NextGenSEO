@@ -50,43 +50,70 @@ const compressImage = async (base64: string): Promise<string> => {
     img.onload = () => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const scale = 0.4;
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
+      const maxW = 800;
+      const ratio = Math.min(1, maxW / img.width);
+      canvas.width = Math.round(img.width * ratio);
+      canvas.height = Math.round(img.height * ratio);
       ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const compressed = canvas.toDataURL('image/jpeg', 0.6);
-      resolve(compressed);
+      // Keep reducing quality until under 500KB
+      let quality = 0.85;
+      let result = canvas.toDataURL('image/jpeg', quality);
+      while (result.length > 500000 && quality > 0.3) {
+        quality -= 0.1;
+        result = canvas.toDataURL('image/jpeg', quality);
+      }
+      resolve(result);
     };
+    img.onerror = () => resolve(base64);
   });
 };
 
 const ImageUploadField = ({ image, onImageChange, onImageRemove, label, aspect = 'landscape' }: { image: string; onImageChange: (img: string) => void; onImageRemove: () => void; label: string; aspect?: string }) => {
+  const [urlInput, setUrlInput] = React.useState('');
+  const [mode, setMode] = React.useState<'upload' | 'url'>('upload');
+
+  const handleUrl = () => {
+    if (urlInput.trim()) { onImageChange(urlInput.trim()); setUrlInput(''); }
+  };
+
   return (
     <div>
       <label className="block text-sm font-bold text-slate-300 mb-2">{label}</label>
+      <div className="flex gap-2 mb-3">
+        <button type="button" onClick={() => setMode('upload')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${mode === 'upload' ? 'bg-purple-500 text-white' : 'glass text-slate-400'}`}>Upload File</button>
+        <button type="button" onClick={() => setMode('url')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${mode === 'url' ? 'bg-purple-500 text-white' : 'glass text-slate-400'}`}>Image URL</button>
+      </div>
       {image ? (
         <div className="relative">
-          <img src={image} alt="preview" className={`w-full ${aspect === 'square' ? 'h-48' : 'h-32'} object-cover rounded-lg`} />
-          <button type="button" onClick={onImageRemove} className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-600 px-4 py-2 rounded-lg text-xs font-bold text-white transition-all">
-            Change Image
-          </button>
+          <img src={image} alt="preview" className={`w-full ${aspect === 'square' ? 'h-48' : 'h-40'} object-contain bg-slate-900 rounded-lg`} />
+          <button type="button" onClick={onImageRemove} className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-600 px-3 py-1 rounded-lg text-xs font-bold text-white transition-all">Remove</button>
+        </div>
+      ) : mode === 'url' ? (
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="https://images.unsplash.com/..."
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleUrl()}
+            className="flex-1 bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none text-sm"
+          />
+          <button type="button" onClick={handleUrl} className="bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded-lg font-bold text-sm transition-all">Add</button>
         </div>
       ) : (
-        <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-purple-500/50 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-500/5 transition-all group">
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg className="w-12 h-12 text-purple-400/60 group-hover:text-purple-400 mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-purple-500/50 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-500/5 transition-all group">
+          <div className="flex flex-col items-center justify-center">
+            <svg className="w-10 h-10 text-purple-400/60 group-hover:text-purple-400 mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <p className="text-sm text-slate-300 font-bold group-hover:text-white transition-colors">Click or drag image here</p>
-            <p className="text-xs text-slate-500">PNG, JPG, GIF (max 10MB)</p>
+            <p className="text-sm text-slate-300 font-bold">Click to upload image</p>
+            <p className="text-xs text-slate-500 mt-1">PNG, JPG (max 5MB) — will be compressed</p>
           </div>
           <input type="file" accept="image/*" onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) {
               const reader = new FileReader();
-              reader.onloadend = () => {
-                onImageChange(reader.result as string);
-              };
+              reader.onloadend = () => onImageChange(reader.result as string);
               reader.readAsDataURL(file);
             }
           }} className="hidden" />

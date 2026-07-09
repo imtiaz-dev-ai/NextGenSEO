@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Testimonials from './components/Testimonials';
@@ -17,7 +18,7 @@ import FloatingActionButton from './components/FloatingActionButton';
 import InteractiveServices from './components/InteractiveServices';
 import AdminPanel from './components/AdminPanel';
 import ClientsCarousel from './components/ClientsCarousel';
-import BlogPageNew from './components/BlogPageNew';
+import BlogPageNew, { BlogPostBySlug } from './components/BlogPageNew';
 import LinkBuildingServices from './components/LinkBuildingServices';
 import { ThemeProvider } from './components/ThemeToggle';
 import { AppRoute } from './types';
@@ -26,7 +27,7 @@ import {
   ArrowsIcon, CheckIcon, BoltIcon, CodeIcon, ServerIcon, LockIcon,
   MagnifyingGlassIcon, BeakerIcon, MapIcon, RocketIcon, ChipIcon,
   LightbulbIcon, MegaphoneIcon, ChartIcon, GlobeIcon, PhotoIcon,
-  UsersIcon, QueueIcon, CursorIcon
+  UsersIcon, QueueIcon, CursorIcon, PhoneIcon
 } from './utils/icons';
 
 const SvgIcon = ({ path, className = "w-5 h-5" }: { path: string; className?: string }) => (
@@ -350,14 +351,22 @@ const ContactPage = () => {
 };
 
 const App: React.FC = () => {
-  const [currentRoute, setCurrentRoute] = useState<AppRoute>(() => {
-    const hash = window.location.hash.slice(1);
-    if (hash === 'admin') return AppRoute.ADMIN;
-    if (hash.startsWith('blog-')) return AppRoute.BLOG;
-    if (hash === 'blog') return AppRoute.BLOG;
-    if (hash && Object.values(AppRoute).includes(hash as AppRoute)) return hash as AppRoute;
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const pathToRoute = (path: string): AppRoute => {
+    const p = path.replace('/', '') || 'home';
+    if (Object.values(AppRoute).includes(p as AppRoute)) return p as AppRoute;
     return AppRoute.HOME;
-  });
+  };
+
+  const [currentRoute, setCurrentRouteState] = useState<AppRoute>(() => pathToRoute(location.pathname));
+
+  const setCurrentRoute = (route: AppRoute) => {
+    setCurrentRouteState(route);
+    navigate(route === AppRoute.HOME ? '/' : `/${route}`);
+    window.scrollTo(0, 0);
+  };
 
   // Initialize sample data on first load
   React.useEffect(() => {
@@ -476,54 +485,51 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Handle browser back/forward
+  // Sync route when browser back/forward is used
   React.useEffect(() => {
-    const handlePopState = () => {
-      const hash = window.location.hash.slice(1);
-      if (hash === 'admin') {
-        setCurrentRoute(AppRoute.ADMIN);
-      } else if (hash) {
-        setCurrentRoute(hash as AppRoute);
-      } else {
-        setCurrentRoute(AppRoute.HOME);
-      }
-    };
+    setCurrentRouteState(pathToRoute(location.pathname));
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  // Update URL and title when route changes
+  // Update page title when route changes
   React.useEffect(() => {
     const routeTitles: Record<string, string> = {
       [AppRoute.HOME]: 'SEO Services | Best SEO Agency & Link Building Services 2025',
-      [AppRoute.ABOUT]: 'About Us | NextGen SEO Agency',
-      [AppRoute.TEAM]: 'Our Team | NextGen SEO Agency',
+      [AppRoute.ABOUT]: 'About Us | NextGen SEO Agency - Tayyab Mehmood',
+      [AppRoute.TEAM]: 'Our Team | SEO Experts | NextGen SEO Agency',
       [AppRoute.BLOG]: 'Blog | SEO Insights & Strategies | NextGen SEO',
-      [AppRoute.CONTACT]: 'Contact Us | NextGen SEO Agency',
-      [AppRoute.PRICING]: 'SEO Pricing Packages | NextGen SEO Agency',
-      [AppRoute.CASE_STUDIES]: 'Case Studies | NextGen SEO Agency',
+      [AppRoute.CONTACT]: 'Contact Us | Get Free SEO Audit | NextGen SEO',
+      [AppRoute.PRICING]: 'SEO Pricing Packages | Affordable SEO | NextGen SEO',
+      [AppRoute.CASE_STUDIES]: 'SEO Case Studies | 300%+ Traffic Growth | NextGen SEO',
       [AppRoute.SERVICE_ONPAGE]: 'On-Page SEO Optimization Services | NextGen SEO',
       [AppRoute.SERVICE_OFFPAGE]: 'Off-Page SEO & Link Building Services | NextGen SEO',
-      [AppRoute.SERVICE_TECHNICAL]: 'Technical SEO Services | NextGen SEO',
+      [AppRoute.SERVICE_TECHNICAL]: 'Technical SEO Services | Core Web Vitals | NextGen SEO',
       [AppRoute.SERVICE_AI]: 'AI-Powered SEO Services | NextGen SEO',
+      [AppRoute.ADMIN]: 'Admin Panel | NextGen SEO',
     };
-
-    if (currentRoute === AppRoute.ADMIN) {
-      window.history.pushState(null, '', '#admin');
-      document.title = 'Admin Panel | NextGen SEO';
-    } else if (currentRoute === AppRoute.HOME) {
-      window.history.pushState(null, '', window.location.pathname);
-      document.title = routeTitles[AppRoute.HOME];
-    } else {
-      window.history.pushState(null, '', `#${currentRoute}`);
-      document.title = routeTitles[currentRoute] || 'NextGen SEO Agency';
+    const routeDescriptions: Record<string, string> = {
+      [AppRoute.HOME]: 'NextGen SEO Agency by Tayyab Mehmood. Professional SEO services, expert link building, affordable SEO packages. Get 300%+ organic traffic growth.',
+      [AppRoute.ABOUT]: 'Learn about NextGen SEO Agency founded by Tayyab Mehmood. 10+ years of SEO expertise, 200+ happy clients, proven results.',
+      [AppRoute.BLOG]: 'Expert SEO insights, link building strategies, and digital marketing tips from the NextGen SEO team.',
+      [AppRoute.CONTACT]: 'Contact NextGen SEO Agency for a free SEO audit. Get expert SEO consultation from Tayyab Mehmood.',
+      [AppRoute.PRICING]: 'Affordable SEO packages starting from $499/month. Transparent pricing with guaranteed results.',
+      [AppRoute.CASE_STUDIES]: 'Real SEO case studies showing 300-890% traffic growth. See how NextGen SEO transforms businesses.',
+      [AppRoute.SERVICE_ONPAGE]: 'Professional on-page SEO optimization. Keyword strategy, meta tags, content optimization for Google rankings.',
+      [AppRoute.SERVICE_OFFPAGE]: 'Expert link building and off-page SEO. High-authority backlinks, digital PR, and brand mentions.',
+      [AppRoute.SERVICE_TECHNICAL]: 'Technical SEO services. Core Web Vitals, schema markup, crawlability, and site speed optimization.',
+      [AppRoute.SERVICE_AI]: 'AI-powered SEO strategies. Predictive analytics, semantic mapping, and automated SEO insights.',
+    };
+    document.title = routeTitles[currentRoute] || 'NextGen SEO Agency';
+    // Update meta description
+    const desc = routeDescriptions[currentRoute];
+    if (desc) {
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', desc);
     }
-  }, [currentRoute]);
-
-  // Scroll to top when route changes
-  React.useEffect(() => {
-    window.scrollTo(0, 0);
+    // Update canonical URL
+    const path = currentRoute === AppRoute.HOME ? '/' : `/${currentRoute}`;
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', `https://nextgenseo.pro${path}`);
   }, [currentRoute]);
 
   const ToolPage = ({ title, desc }: { title: string; desc: string }) => (
@@ -679,7 +685,16 @@ const App: React.FC = () => {
         <ParticleBackground />
         <ScrollProgress />
         <Navbar currentRoute={currentRoute} setRoute={setCurrentRoute} />
-        <main className="pt-20 sm:pt-24 min-h-screen relative z-10">{renderContent()}</main>
+        <main className="pt-20 sm:pt-24 min-h-screen relative z-10">
+          <Routes>
+            <Route path="/" element={renderContent()} />
+            {Object.values(AppRoute).filter(r => r !== AppRoute.HOME).map(route => (
+              <Route path={`/${route}`} element={renderContent()} key={route} />
+            ))}
+            <Route path="/blog/:slug" element={<BlogPostBySlug />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
         <LiveChat />
         <FloatingActionButton />
 

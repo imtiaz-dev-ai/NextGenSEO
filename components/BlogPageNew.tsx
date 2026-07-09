@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { getBlogsFromFirebase } from '../utils/firebase';
 
 export const getPostSlug = (title: string) =>
@@ -88,12 +89,13 @@ const BlogPostPage = ({ post, onBack }: { post: any; onBack: () => void }) => {
       </button>
 
       {/* Hero image */}
-      <div className="rounded-2xl overflow-hidden mb-8 bg-slate-800 h-64 sm:h-80">
+      <div className="rounded-2xl overflow-hidden mb-8" style={{ contain: 'paint' }}>
         <img
           src={post.image}
           alt={post.title}
-          className="w-full h-full object-cover"
-          onError={(e: any) => { e.target.style.display = 'none'; }}
+          className="w-full h-auto block"
+          style={{ filter: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' }}
+          onError={(e: any) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
         />
       </div>
 
@@ -134,8 +136,52 @@ const BlogPostPage = ({ post, onBack }: { post: any; onBack: () => void }) => {
   );
 };
 
+// ─── Blog Post by Slug (for direct URL / new tab) ──────────────────────────
+export const BlogPostBySlug = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const [post, setPost] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+    // First check defaultPosts immediately
+    const defaultMatch = defaultPosts.find(p => getPostSlug(p.title) === slug);
+    if (defaultMatch) {
+      setPost(defaultMatch);
+      setLoading(false);
+      return;
+    }
+    // Then check firebase blogs
+    getBlogsFromFirebase()
+      .then(blogs => {
+        const match = blogs.find((p: any) => getPostSlug(p.title) === slug);
+        if (match) setPost(match);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
+  if (!post) return (
+    <div className="text-center py-20">
+      <p className="text-slate-400 text-xl mb-6">Blog post not found.</p>
+      <button onClick={() => navigate('/blog')} className="bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-3 rounded-xl font-bold">Back to Blog</button>
+    </div>
+  );
+
+  return <BlogPostPage post={post} onBack={() => navigate('/blog')} />;
+};
+
 // ─── Blog List Page ───────────────────────────────────────────────────────────
 const BlogPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [customBlogs, setCustomBlogs] = React.useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = React.useState<string>('All');
   const [selectedPost, setSelectedPost] = React.useState<any>(null);
@@ -145,10 +191,10 @@ const BlogPage = () => {
   React.useEffect(() => {
     window.scrollTo(0, 0);
 
-    // Check deep link immediately with defaultPosts (no wait for firebase)
-    const hash = window.location.hash.slice(1);
-    if (hash.startsWith('blog-')) {
-      const slug = hash.replace('blog-', '');
+    // Check deep link immediately with defaultPosts
+    const path = location.pathname;
+    if (path.startsWith('/blog/')) {
+      const slug = path.replace('/blog/', '');
       const match = defaultPosts.find(p => getPostSlug(p.title) === slug);
       if (match) setSelectedPost(match);
     }
@@ -156,10 +202,9 @@ const BlogPage = () => {
     getBlogsFromFirebase()
       .then(blogs => {
         setCustomBlogs(blogs);
-        // If a firebase blog matches the slug, override with firebase version
-        const currentHash = window.location.hash.slice(1);
-        if (currentHash.startsWith('blog-')) {
-          const slug = currentHash.replace('blog-', '');
+        const currentPath = location.pathname;
+        if (currentPath.startsWith('/blog/')) {
+          const slug = currentPath.replace('/blog/', '');
           const firebaseMatch = blogs.find((p: any) => getPostSlug(p.title) === slug);
           if (firebaseMatch) setSelectedPost(firebaseMatch);
         }
@@ -171,11 +216,11 @@ const BlogPage = () => {
   React.useEffect(() => {
     if (selectedPost) {
       document.title = `${selectedPost.title} | NextGen SEO Blog`;
-      window.history.pushState(null, '', `#blog-${getPostSlug(selectedPost.title)}`);
+      navigate(`/blog/${getPostSlug(selectedPost.title)}`);
       window.scrollTo(0, 0);
     } else {
       document.title = 'Blog | SEO Insights & Strategies | NextGen SEO';
-      window.history.pushState(null, '', '#blog');
+      if (location.pathname !== '/blog') navigate('/blog');
     }
   }, [selectedPost]);
 
@@ -251,9 +296,7 @@ const BlogPage = () => {
         {filteredPosts.map((p, i) => (
           <a
             key={i}
-            href={`#blog-${getPostSlug(p.title)}`}
-            target="_self"
-            rel="noopener"
+            href={`/blog/${getPostSlug(p.title)}`}
             onClick={(e) => {
               if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
               e.preventDefault();
@@ -261,15 +304,15 @@ const BlogPage = () => {
             }}
             className="glass rounded-2xl sm:rounded-[2rem] overflow-hidden hover:-translate-y-2 transition-all cursor-pointer group hover-lift block"
           >
-            <div className="relative h-40 sm:h-48 overflow-hidden bg-slate-800">
+            <div className="relative w-full overflow-hidden bg-slate-900" style={{ aspectRatio: '16/9' }}>
               <img
                 src={p.image}
                 alt={p.title}
                 width="800"
-                height="400"
+                height="450"
                 loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                onError={(e: any) => { e.target.style.display = 'none'; }}
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                onError={(e: any) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
               <div className="absolute top-3 left-3 sm:top-4 sm:left-4 px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/80 to-pink-500/80 backdrop-blur-sm text-white text-[10px] sm:text-xs font-black uppercase">

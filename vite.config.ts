@@ -32,6 +32,7 @@ export default defineConfig(({ mode }) => {
           compress: {
             drop_console: isProduction,
             drop_debugger: isProduction,
+            passes: 2,
           },
           mangle: true,
           output: {
@@ -49,6 +50,8 @@ export default defineConfig(({ mode }) => {
         sourcemap: !isProduction,
         chunkSizeWarningLimit: 1000,
         reportCompressedSize: false,
+        cssCodeSplit: true,
+        assetsInlineLimit: 4096,
       },
     };
 });

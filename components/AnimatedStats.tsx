@@ -44,13 +44,13 @@ const AnimatedStats: React.FC<AnimatedStatsProps> = ({ stats }) => {
   }, []);
 
   return (
-    <div className={`grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+    <div className={`grid grid-cols-3 sm:grid-cols-5 gap-3 sm:gap-4 md:gap-6 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
       {stats.map((stat, index) => (
         <div key={index} className="text-center group hover:scale-110 transition-transform duration-300">
-          <div className="text-3xl md:text-4xl lg:text-5xl font-black gradient-text mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-300 group-hover:to-pink-300 transition-all">
+          <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black gradient-text mb-1 sm:mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-300 group-hover:to-pink-300 transition-all">
             <CountUp end={stat.value} suffix={stat.suffix} />
           </div>
-          <div className="text-slate-400 text-xs md:text-sm font-bold uppercase tracking-wider group-hover:text-slate-300 transition-colors">
+          <div className="text-slate-400 text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-wider group-hover:text-slate-300 transition-colors">
             {stat.label}
           </div>
         </div>

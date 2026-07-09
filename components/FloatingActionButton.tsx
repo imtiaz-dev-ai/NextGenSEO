@@ -44,17 +44,17 @@ const FloatingActionButton: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-8 right-8 z-50">
+      <div className="fixed bottom-24 sm:bottom-28 right-4 sm:right-8 z-40">
         <button
           onClick={() => setShowChat(!showChat)}
-          className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-2xl hover:scale-110 transition-all"
+          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-2xl hover:scale-110 transition-all"
         >
           {showChat ? (
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
           )}
@@ -62,7 +62,7 @@ const FloatingActionButton: React.FC = () => {
       </div>
 
       {showChat && (
-        <div className="fixed bottom-28 right-8 w-96 h-[500px] glass rounded-3xl shadow-2xl z-50 flex flex-col border border-purple-500/20">
+        <div className="fixed bottom-44 sm:bottom-48 right-4 left-4 sm:left-auto sm:right-8 sm:w-80 md:w-96 h-[420px] sm:h-[500px] max-h-[calc(100vh-12rem)] glass rounded-2xl sm:rounded-3xl shadow-2xl z-40 flex flex-col border border-purple-500/20">
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4 rounded-t-3xl">
             <h3 className="font-black text-lg">SEO Expert Assistant</h3>
             <p className="text-xs opacity-90">Ask about our SEO services, pricing & packages</p>

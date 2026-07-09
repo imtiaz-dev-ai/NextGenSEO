@@ -69,46 +69,46 @@ const InteractiveServices: React.FC = () => {
   ];
 
   return (
-    <div className="py-20 px-6">
+    <div className="py-12 sm:py-16 md:py-20 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-black mb-6">
+        <div className="text-center mb-10 sm:mb-14 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6">
             Our <span className="gradient-text">SEO Services</span>
           </h2>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-xl text-slate-400 max-w-2xl mx-auto">
             Comprehensive SEO solutions powered by AI and 10+ years of expertise
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {services.map((service, i) => (
             <div
               key={i}
-              className="group relative glass p-8 rounded-3xl hover-lift cursor-pointer overflow-hidden"
+              className="group relative glass p-5 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl hover-lift cursor-pointer overflow-hidden"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
               
               <div className="relative z-10">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center text-white mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
                   {service.icon}
                 </div>
 
-                <h3 className="text-2xl font-black mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-black mb-2 sm:mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">
                   {service.title}
                 </h3>
 
-                <p className="text-slate-400 mb-6 leading-relaxed">
+                <p className="text-slate-400 text-sm mb-4 sm:mb-6 leading-relaxed">
                   {service.desc}
                 </p>
 
-                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r ${service.gradient} bg-opacity-10 border border-white/10`}>
-                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-white to-white/50 animate-pulse" />
-                  <span className="text-xs font-black uppercase">{service.stats}</span>
+                <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-r ${service.gradient} bg-opacity-10 border border-white/10`}>
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gradient-to-r from-white to-white/50 animate-pulse" />
+                  <span className="text-[10px] sm:text-xs font-black uppercase">{service.stats}</span>
                 </div>
 
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <HiOutlineArrowRight className="w-6 h-6 text-white" />
+                <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <HiOutlineArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
             </div>

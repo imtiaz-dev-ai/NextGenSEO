@@ -19,7 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
 
   const NavLink = ({ route, label, className }: { route: AppRoute; label: string; className?: string }) => (
     <a
-      href={`#${route}`}
+      href={route === AppRoute.HOME ? '/' : `/${route}`}
       onClick={(e) => navAction(route, e)}
       className={className}
     >
@@ -30,7 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 h-20 sm:h-24 flex items-center px-3 sm:px-6 md:px-12 justify-between backdrop-blur-xl" role="navigation" aria-label="Main navigation">
       <a
-        href="#home"
+        href="/"
         onClick={(e) => navAction(AppRoute.HOME, e)}
         className="flex items-center gap-1 sm:gap-2 cursor-pointer group shrink-0"
       >
