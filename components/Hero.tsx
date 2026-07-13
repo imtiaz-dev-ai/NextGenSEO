@@ -60,6 +60,22 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
             { label: 'Experience', value: 10, suffix: '+' }
           ]} />
         </div>
+
+        {/* 3D Floating badges */}
+        <div className="hidden lg:block">
+          <div className="fixed top-36 right-8 glass-premium px-4 py-2 rounded-2xl border border-purple-500/20 animate-float-3d shadow-3d" style={{ animationDelay: '0s' }}>
+            <div className="flex items-center gap-2 text-xs font-bold">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-slate-300">300%+ Avg Growth</span>
+            </div>
+          </div>
+          <div className="fixed top-52 right-8 glass-premium px-4 py-2 rounded-2xl border border-pink-500/20 animate-float-3d shadow-3d" style={{ animationDelay: '1s' }}>
+            <div className="flex items-center gap-2 text-xs font-bold">
+              <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+              <span className="text-slate-300">200+ Happy Clients</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

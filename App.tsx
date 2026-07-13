@@ -1,27 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import Testimonials from './components/Testimonials';
-import CaseStudies from './components/CaseStudies';
-import Pricing from './components/Pricing';
-import Newsletter from './components/Newsletter';
-import LiveChat from './components/LiveChat';
 import ScrollProgress from './components/ScrollProgress';
-import FAQ from './components/FAQ';
-import BeforeAfter from './components/BeforeAfter';
-import Team from './components/Team';
 import ParticleBackground from './components/ParticleBackground';
-import DashboardPreview from './components/DashboardPreview';
 import ScrollReveal from './components/ScrollReveal';
 import FloatingActionButton from './components/FloatingActionButton';
-import InteractiveServices from './components/InteractiveServices';
-import AdminPanel from './components/AdminPanel';
-import ClientsCarousel from './components/ClientsCarousel';
 import BlogPageNew, { BlogPostBySlug } from './components/BlogPageNew';
-import LinkBuildingServices from './components/LinkBuildingServices';
 import { ThemeProvider } from './components/ThemeToggle';
 import { AppRoute } from './types';
+
+const Testimonials = lazy(() => import('./components/Testimonials'));
+const CaseStudies = lazy(() => import('./components/CaseStudies'));
+const Pricing = lazy(() => import('./components/Pricing'));
+const Newsletter = lazy(() => import('./components/Newsletter'));
+const FAQ = lazy(() => import('./components/FAQ'));
+const BeforeAfter = lazy(() => import('./components/BeforeAfter'));
+const Team = lazy(() => import('./components/Team'));
+const DashboardPreview = lazy(() => import('./components/DashboardPreview'));
+const InteractiveServices = lazy(() => import('./components/InteractiveServices'));
+const AdminPanel = lazy(() => import('./components/AdminPanel'));
+const ClientsCarousel = lazy(() => import('./components/ClientsCarousel'));
+const LinkBuildingServices = lazy(() => import('./components/LinkBuildingServices'));
+const AnimatedStats = lazy(() => import('./components/AnimatedStats'));
+
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[40vh]">
+    <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 import {
   PencilIcon, LinkIcon, CogIcon, SparklesIcon, TagIcon, DocumentIcon,
   ArrowsIcon, CheckIcon, BoltIcon, CodeIcon, ServerIcon, LockIcon,
@@ -29,7 +36,6 @@ import {
   LightbulbIcon, MegaphoneIcon, ChartIcon, GlobeIcon, PhotoIcon,
   UsersIcon, QueueIcon, CursorIcon, PhoneIcon
 } from './utils/icons';
-
 const SvgIcon = ({ path, className = "w-5 h-5" }: { path: string; className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d={path} /></svg>
 );
@@ -92,11 +98,12 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-3xl blur-2xl" />
           <img 
-            src="/pics/New folder/Tayyab.png" 
+            src="/pics/New%20folder/Tayyab.png" 
             alt="Tayyab Mehmood - Founder and CEO of NextGen SEO Agency"
             width="400"
             height="400"
             loading="lazy"
+            decoding="async"
             className="relative w-full h-auto rounded-3xl border-2 border-purple-500/30"
           />
         </div>
@@ -686,6 +693,7 @@ const App: React.FC = () => {
         <ScrollProgress />
         <Navbar currentRoute={currentRoute} setRoute={setCurrentRoute} />
         <main className="pt-20 sm:pt-24 min-h-screen relative z-10">
+          <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={renderContent()} />
             {Object.values(AppRoute).filter(r => r !== AppRoute.HOME).map(route => (
@@ -694,8 +702,8 @@ const App: React.FC = () => {
             <Route path="/blog/:slug" element={<BlogPostBySlug />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          </Suspense>
         </main>
-        <LiveChat />
         <FloatingActionButton />
 
       <footer className="border-t border-white/5 py-12 px-6 mt-20 relative overflow-hidden bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-900 dark:from-[#010410] dark:to-[#020617]">

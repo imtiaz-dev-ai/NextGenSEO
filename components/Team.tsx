@@ -1,4 +1,17 @@
-import React from 'react';
+import React, { useRef } from 'react';
+
+const Card3D: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current; if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.transform = `perspective(800px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(8px) scale(1.02)`;
+  };
+  const handleMouseLeave = () => { if (ref.current) ref.current.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) translateZ(0) scale(1)'; };
+  return <div ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className={className} style={{ transition: 'transform 0.15s ease-out', willChange: 'transform', transformStyle: 'preserve-3d' }}>{children}</div>;
+};
 
 const Team = () => {
   const [customMembers, setCustomMembers] = React.useState<any[]>([]);
@@ -9,11 +22,11 @@ const Team = () => {
   }, []);
 
   const defaultMembers = [
-    { name: "Tayyab Mehmood", role: "Founder & CEO", img: "/pics/New%20folder/Tayyab 2.png", linkedin: "https://www.linkedin.com/in/tayyab-mehmood-67101530b/", instagram: "https://www.instagram.com/tayyab_backlinks?igsh=cnQ1cXF0OGV0cnBt", facebook: "https://www.facebook.com/share/182MuBD7pM/", bio: "Founder of NextGen SEO with 10+ years of industry expertise. Visionary leader driving innovation in AI-powered SEO solutions." },
+    { name: "Tayyab Mehmood", role: "Founder & CEO", img: "/pics/New%20folder/Tayyab%202.png", linkedin: "https://www.linkedin.com/in/tayyab-mehmood-seo/", instagram: "https://www.instagram.com/tayyab_backlinks?igsh=cnQ1cXF0OGV0cnBt", facebook: "https://www.facebook.com/share/182MuBD7pM/", bio: "Founder of NextGen SEO with 10+ years of industry expertise. Visionary leader driving innovation in AI-powered SEO solutions." },
     { name: "Fatima Ahad", role: "Senior Link Builder", img: "/pics/New%20folder/Fatima%20Ahad.png", linkedin: "https://www.linkedin.com/in/fatima-ahad-8a7354396/", bio: "Expert in white-hat link building with 8+ years of experience. Specializes in high-authority backlink acquisition and digital PR strategies." },
     { name: "Mahmood Akhtar", role: "Senior Link Builder", img: "/pics/New%20folder/Mahmood%20Akthar.png", linkedin: "https://www.linkedin.com/in/mahmood-seo/", bio: "Proven track record of building 10,000+ quality backlinks for Fortune 500 companies. Master of outreach and relationship building." },
     { name: "Islam Mehmood", role: "Outreach Manager", img: "/pics/New%20folder/Islam%20Mehmood.png", linkedin: "https://www.linkedin.com/in/islam-mehmood-seo/", bio: "Strategic outreach specialist managing relationships with 500+ high-authority publishers. Drives organic link placements and brand mentions." },
-    { name: "Muhammad Touheed", role: "Junior Outreach Manager", img: "/pics/New%20folder/Muhammad Touheed.png", linkedin: "https://www.linkedin.com/in/muhammad-touheed-7295093a2", bio: "Rising talent in outreach and relationship management. Passionate about building meaningful connections with industry leaders." },
+    { name: "Muhammad Touheed", role: "Junior Outreach Manager", img: "/pics/New%20folder/Muhammad%20Touheed.png", linkedin: "https://www.linkedin.com/in/muhammad-touheed-7295093a2", bio: "Rising talent in outreach and relationship management. Passionate about building meaningful connections with industry leaders." },
     { name: "Haroon Hussain", role: "SEO Specialist", img: "/pics/New%20folder/Haroon%20Hussain.png", linkedin: "https://www.linkedin.com/in/haroon-hussain-7a49293a7/", bio: "Technical SEO expert with deep knowledge of Core Web Vitals, schema markup, and site architecture optimization." },
     { name: "Muhammad Fahad", role: "SEO Analyst", img: "/pics/New%20folder/M%20fahad.png", linkedin: "https://www.linkedin.com/in/muhammad-fahad-9859823a5/", bio: "Data-driven SEO analyst specializing in keyword research, competitor analysis, and performance tracking." },
     { name: "Nabeel Butt", role: "SEO Intern", img: "/pics/New%20folder/Nabeel%20Butt.png", linkedin: "https://www.linkedin.com/in/nabeel-butt-seo/", bio: "Enthusiastic SEO professional learning the ropes of organic search optimization and content strategy." },
@@ -36,7 +49,7 @@ const Team = () => {
       <p className="text-center text-slate-400 mb-16 max-w-2xl mx-auto">Dedicated professionals with 10+ years of combined SEO expertise</p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {allMembers.map((member, i) => (
-          <div key={i} className="glass p-6 rounded-3xl hover-lift group relative overflow-hidden">
+          <Card3D key={i} className="glass shine-3d glow-border-3d p-6 rounded-3xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10">
               {member.img || member.image ? (
@@ -45,9 +58,10 @@ const Team = () => {
                     src={member.img || member.image} 
                     alt={`${member.name} - ${member.role} at NextGen SEO Agency`}
                     loading="lazy"
+                    decoding="async"
                     width="256"
                     height="320"
-                    className="w-full h-full object-cover object-center" 
+                    className="w-full h-full object-cover object-top" 
                   />
                 </div>
               ) : null}
@@ -75,7 +89,7 @@ const Team = () => {
                 </div>
               )}
             </div>
-          </div>
+          </Card3D>
         ))}
       </div>
     </div>

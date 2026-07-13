@@ -33,10 +33,11 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({ children, delay = 0 }) => {
   return (
     <div
       ref={ref}
-      className={`transition-all duration-1000 ${
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`transition-all duration-[900ms] ${
         isVisible
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-12'
+          ? 'opacity-100 translate-y-0 scale-100 [transform:perspective(1000px)_translateY(0)_rotateX(0deg)_scale(1)]'
+          : 'opacity-0 [transform:perspective(1000px)_translateY(50px)_rotateX(8deg)_scale(0.96)]'
       }`}
     >
       {children}

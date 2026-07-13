@@ -1,8 +1,18 @@
-// Pricing Component - SEO Service Packages & Link Building Plans
-// Keywords: affordable SEO packages, SEO services pricing, link building services cost
-// Long-tail: professional SEO services for small business, enterprise SEO agency pricing
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { AppRoute } from '../types';
+
+const Card3D: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current; if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.transform = `perspective(900px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(8px) scale(1.02)`;
+  };
+  const handleMouseLeave = () => { if (ref.current) ref.current.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) translateZ(0) scale(1)'; };
+  return <div ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className={className} style={{ transition: 'transform 0.15s ease-out', willChange: 'transform', transformStyle: 'preserve-3d' }}>{children}</div>;
+};
 
 interface PricingProps {
   onContact: () => void;
@@ -104,9 +114,9 @@ const Pricing: React.FC<PricingProps> = ({ onContact }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-12">
           {plans.map((plan, i) => (
-            <div
+            <Card3D
               key={i}
-              className={`glass p-6 sm:p-8 rounded-2xl relative ${plan.popular ? 'border-2 border-purple-500 md:scale-105' : 'border border-white/5'} hover:-translate-y-2 transition-all`}
+              className={`glass shine-3d p-6 sm:p-8 rounded-2xl relative ${plan.popular ? 'border-2 border-purple-500 md:scale-105' : 'border border-white/5'} transition-all`}
             >
               {plan.badge && (
                 <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-emerald-500 px-3 sm:px-6 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase">
@@ -161,7 +171,7 @@ const Pricing: React.FC<PricingProps> = ({ onContact }) => {
               >
                 {plan.isCustom ? 'Build Custom Package' : 'Book Now'}
               </button>
-            </div>
+            </Card3D>
           ))}
         </div>
 

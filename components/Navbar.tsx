@@ -28,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 h-20 sm:h-24 flex items-center px-3 sm:px-6 md:px-12 justify-between backdrop-blur-xl" role="navigation" aria-label="Main navigation">
+    <nav className="fixed top-0 left-0 right-0 z-[60] glass border-b border-white/5 h-20 sm:h-24 flex items-center px-3 sm:px-6 md:px-12 justify-between backdrop-blur-xl" role="navigation" aria-label="Main navigation">
       <a
         href="/"
         onClick={(e) => navAction(AppRoute.HOME, e)}

@@ -1,5 +1,34 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { HiOutlineCpuChip, HiOutlineChartBar, HiOutlineLink, HiOutlineCog, HiOutlineMagnifyingGlass, HiOutlinePencil, HiOutlineTag, HiOutlineShieldCheck, HiOutlineArrowRight, HiOutlineMapPin } from 'react-icons/hi2';
+
+const Card3D: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.transform = `perspective(1000px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg) translateZ(10px) scale(1.02)`;
+  };
+
+  const handleMouseLeave = () => {
+    if (ref.current) ref.current.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) translateZ(0) scale(1)';
+  };
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={className}
+      style={{ transition: 'transform 0.15s ease-out', willChange: 'transform', transformStyle: 'preserve-3d' }}
+    >
+      {children}
+    </div>
+  );
+};
 
 const InteractiveServices: React.FC = () => {
   const services = [
@@ -82,15 +111,14 @@ const InteractiveServices: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {services.map((service, i) => (
-            <div
+            <Card3D
               key={i}
-              className="group relative glass p-5 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl hover-lift cursor-pointer overflow-hidden"
-              style={{ animationDelay: `${i * 100}ms` }}
+              className="group relative glass shine-3d glow-border-3d p-5 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl cursor-pointer overflow-hidden"
             >
               <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
               
               <div className="relative z-10">
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 icon-3d shadow-3d`}>
                   {service.icon}
                 </div>
 
@@ -111,7 +139,7 @@ const InteractiveServices: React.FC = () => {
                   <HiOutlineArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-            </div>
+            </Card3D>
           ))}
         </div>
       </div>

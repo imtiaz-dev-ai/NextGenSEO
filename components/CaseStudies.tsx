@@ -1,5 +1,18 @@
 // Case Studies Component - SEO Success Stories & Results Portfolio
-import React from 'react';
+import React, { useRef } from 'react';
+
+const Card3D: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current; if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.transform = `perspective(900px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) translateZ(6px) scale(1.02)`;
+  };
+  const handleMouseLeave = () => { if (ref.current) ref.current.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) translateZ(0) scale(1)'; };
+  return <div ref={ref} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className={className} style={{ transition: 'transform 0.15s ease-out', willChange: 'transform', transformStyle: 'preserve-3d' }}>{children}</div>;
+};
 
 const CaseStudies: React.FC = () => {
   const [customCases, setCustomCases] = React.useState<any[]>([]);
@@ -90,7 +103,7 @@ const CaseStudies: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 px-0">
           {allCases.map((c, i) => (
-            <div key={i} className="glass rounded-2xl overflow-hidden hover:-translate-y-2 transition-all group cursor-pointer border-white/5 hover:border-purple-500/30 hover-lift">
+            <Card3D key={i} className="glass shine-3d glow-border-3d rounded-2xl overflow-hidden group cursor-pointer">
               <div className="relative h-48 overflow-hidden">
                 <img src={c.image} alt={c.client} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent" />
@@ -122,7 +135,7 @@ const CaseStudies: React.FC = () => {
                   <span className="text-slate-300 font-bold text-xs sm:text-sm">{c.duration}</span>
                 </div>
               </div>
-            </div>
+            </Card3D>
           ))}
         </div>
       </div>

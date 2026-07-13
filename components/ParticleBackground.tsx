@@ -74,7 +74,8 @@ const ParticleBackground: React.FC = () => {
     animate();
 
     const handleResize = () => {
-      setCanvasSize();
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     };
 
     window.addEventListener('resize', handleResize, { passive: true });

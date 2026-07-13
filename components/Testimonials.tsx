@@ -25,7 +25,7 @@ const Testimonials: React.FC = () => {
         </div>
         
         <div className="relative px-0">
-          <div className="glass p-6 sm:p-10 md:p-12 lg:p-16 rounded-2xl md:rounded-[3rem] border-purple-500/20">
+          <div className="glass p-6 sm:p-10 md:p-12 lg:p-16 rounded-2xl md:rounded-[3rem] border-purple-500/20 shadow-3d shine-3d">
             <div className="flex gap-1 sm:gap-2 mb-6 sm:mb-8 justify-center">
               {[...Array(testimonials[current].rating)].map((_, i) => (
                 <svg key={i} className="w-4 sm:w-5 md:w-6 h-4 sm:h-5 md:h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">

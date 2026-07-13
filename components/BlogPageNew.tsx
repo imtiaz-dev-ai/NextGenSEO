@@ -12,7 +12,7 @@ export const defaultPosts = [
     date: "June 12, 2025",
     excerpt: "Discover how recent advances in AI are reshaping search algorithms and what it means for your SEO strategy.",
     readTime: "8 min",
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1600&h=900&fit=crop&q=85&auto=format",
     author: "Tayyab Mehmood",
     content: `<h2>How AI is Transforming SEO in 2025</h2><p>Artificial Intelligence has fundamentally changed how search engines understand and rank content. Machine learning algorithms now power Google's ranking system, with RankBrain being one of the top three ranking factors.</p><h3>Key AI Applications in SEO</h3><ul><li>Natural Language Processing for better content understanding</li><li>Predictive analytics for search trend forecasting</li><li>Automated content optimization using AI tools</li><li>AI-driven link building and outreach</li></ul><p>Businesses leveraging AI-powered SEO strategies are seeing 40-60% improvements in organic visibility within 6 months.</p>`
   },
@@ -22,7 +22,7 @@ export const defaultPosts = [
     date: "June 08, 2025",
     excerpt: "A comprehensive guide to optimizing LCP, FID, and CLS for better rankings and user experience.",
     readTime: "12 min",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&h=900&fit=crop&q=85&auto=format",
     author: "Fatima Ahad",
     content: `<h2>Understanding Core Web Vitals</h2><p>Core Web Vitals are Google's official metrics for measuring user experience and are now confirmed ranking factors.</p><h3>The Three Core Web Vitals</h3><p><strong>Largest Contentful Paint (LCP):</strong> Should be under 2.5 seconds.</p><p><strong>First Input Delay (FID):</strong> Should be under 100 milliseconds.</p><p><strong>Cumulative Layout Shift (CLS):</strong> Should be under 0.1.</p><h3>Quick Optimization Tips</h3><ul><li>Minimize CSS and JavaScript</li><li>Use lazy loading for images</li><li>Optimize server response time</li><li>Use CDN for faster content delivery</li></ul>`
   },
@@ -32,7 +32,7 @@ export const defaultPosts = [
     date: "June 05, 2025",
     excerpt: "Proven white-hat link building techniques that generate high-quality backlinks and boost domain authority.",
     readTime: "10 min",
-    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1600&h=900&fit=crop&q=85&auto=format",
     author: "Tayyab Mehmood",
     content: `<h2>The New Era of Link Building</h2><p>Link building has evolved significantly. Google now prioritizes quality over quantity.</p><h3>Top White-Hat Link Building Methods</h3><ul><li><strong>Broken Link Building:</strong> Find broken links on relevant sites and suggest your content as replacement</li><li><strong>Resource Page Links:</strong> Get listed on industry resource pages</li><li><strong>Guest Posting:</strong> Write high-quality content for authoritative blogs</li><li><strong>Skyscraper Technique:</strong> Create better version of existing content and reach out for links</li><li><strong>Press Coverage:</strong> Get featured in news outlets and industry publications</li></ul>`
   },
@@ -42,7 +42,7 @@ export const defaultPosts = [
     date: "June 01, 2025",
     excerpt: "Complete guide to ranking #1 in Google Maps and local search results for your business.",
     readTime: "11 min",
-    image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1600&h=900&fit=crop&q=85&auto=format",
     author: "Fatima Ahad",
     content: `<h2>Why Local SEO Matters</h2><p>76% of people who search for local services visit or call the business within 24 hours.</p><h3>Essential Local SEO Factors</h3><ul><li>Google Business Profile optimization</li><li>Local citations and NAP consistency</li><li>Local keyword optimization</li><li>Customer reviews and ratings</li><li>Local link building</li></ul><h3>Step-by-Step Local SEO Strategy</h3><ol><li>Claim and optimize Google Business Profile</li><li>Ensure NAP consistency across all platforms</li><li>Get verified on local directories</li><li>Generate customer reviews</li><li>Build local citations</li><li>Target location-specific keywords</li></ol>`
   },
@@ -52,7 +52,7 @@ export const defaultPosts = [
     date: "May 28, 2025",
     excerpt: "Advanced SEO strategies specifically designed for e-commerce websites to increase product visibility and sales.",
     readTime: "9 min",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=1600&h=900&fit=crop&q=85&auto=format",
     author: "Tayyab Mehmood",
     content: `<h2>E-commerce SEO Challenges</h2><p>E-commerce sites face unique SEO challenges including duplicate content, poor site structure, and thin product descriptions.</p><h3>Critical E-commerce SEO Elements</h3><ul><li>Unique product descriptions (minimum 200 words)</li><li>High-quality product images with alt text</li><li>Proper URL structure for categories</li><li>Schema markup for products</li><li>Customer reviews and ratings</li></ul>`
   },
@@ -62,7 +62,7 @@ export const defaultPosts = [
     date: "May 24, 2025",
     excerpt: "How to create SEO-optimized content that ranks on Google and drives organic traffic consistently.",
     readTime: "13 min",
-    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1600&h=900&fit=crop&q=85&auto=format",
     author: "Fatima Ahad",
     content: `<h2>Content is Still King</h2><p>Your content must be strategically optimized for search engines and user intent.</p><h3>The Content Creation Process</h3><ol><li><strong>Keyword Research:</strong> Find keywords your audience is searching for</li><li><strong>Search Intent Analysis:</strong> Understand what searchers want</li><li><strong>Content Outline:</strong> Create comprehensive, well-structured outline</li><li><strong>High-Quality Writing:</strong> Write engaging, valuable content</li><li><strong>On-Page SEO:</strong> Optimize title, meta, headers, and keywords</li></ol><h3>Content Types That Rank</h3><ul><li>Comprehensive guides (2000+ words)</li><li>Case studies with real results</li><li>How-to tutorials</li><li>Industry reports</li><li>Comparison articles</li></ul>`
   },
@@ -93,7 +93,10 @@ const BlogPostPage = ({ post, onBack }: { post: any; onBack: () => void }) => {
         <img
           src={post.image}
           alt={post.title}
-          className="w-full h-auto block"
+          width="1600"
+          height="900"
+          decoding="async"
+          className="w-full object-cover block" style={{ aspectRatio: '16/9' }}
           style={{ filter: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' }}
           onError={(e: any) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
         />
@@ -308,10 +311,10 @@ const BlogPage = () => {
               <img
                 src={p.image}
                 alt={p.title}
-                width="800"
-                height="450"
+                width="1600"
+                height="900"
                 loading="lazy"
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e: any) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
