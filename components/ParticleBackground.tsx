@@ -7,6 +7,12 @@ const ParticleBackground: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // Disable on mobile for performance
+    if (window.innerWidth < 768) {
+      canvas.style.display = 'none';
+      return;
+    }
+
     const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
     if (!ctx) return;
 
@@ -16,22 +22,15 @@ const ParticleBackground: React.FC = () => {
     };
     setCanvasSize();
 
-    const particles: Array<{
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      size: number;
-    }> = [];
-
-    const particleCount = window.innerWidth < 768 ? 40 : 80;
+    const particles: Array<{ x: number; y: number; vx: number; vy: number; size: number; }> = [];
+    const particleCount = 40;
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: Math.random() * 1.5 + 0.5,
       });
     }
 

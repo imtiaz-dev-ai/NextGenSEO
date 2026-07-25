@@ -501,42 +501,66 @@ const App: React.FC = () => {
   // Update page title when route changes
   React.useEffect(() => {
     const routeTitles: Record<string, string> = {
-      [AppRoute.HOME]: 'SEO Services | Best SEO Agency & Link Building Services 2025',
+      [AppRoute.HOME]: 'SEO Services | Best SEO Agency & Link Building Services 2026',
       [AppRoute.ABOUT]: 'About Us | NextGen SEO Agency - Tayyab Mehmood',
       [AppRoute.TEAM]: 'Our Team | SEO Experts | NextGen SEO Agency',
       [AppRoute.BLOG]: 'Blog | SEO Insights & Strategies | NextGen SEO',
       [AppRoute.CONTACT]: 'Contact Us | Get Free SEO Audit | NextGen SEO',
-      [AppRoute.PRICING]: 'SEO Pricing Packages | Affordable SEO | NextGen SEO',
+      [AppRoute.PRICING]: 'SEO Pricing Packages | Affordable SEO Services 2026 | NextGen SEO',
       [AppRoute.CASE_STUDIES]: 'SEO Case Studies | 300%+ Traffic Growth | NextGen SEO',
-      [AppRoute.SERVICE_ONPAGE]: 'On-Page SEO Optimization Services | NextGen SEO',
-      [AppRoute.SERVICE_OFFPAGE]: 'Off-Page SEO & Link Building Services | NextGen SEO',
+      [AppRoute.SERVICE_ONPAGE]: 'On-Page SEO Optimization Services 2026 | NextGen SEO',
+      [AppRoute.SERVICE_OFFPAGE]: 'Off-Page SEO & Link Building Services 2026 | NextGen SEO',
       [AppRoute.SERVICE_TECHNICAL]: 'Technical SEO Services | Core Web Vitals | NextGen SEO',
-      [AppRoute.SERVICE_AI]: 'AI-Powered SEO Services | NextGen SEO',
+      [AppRoute.SERVICE_AI]: 'AI-Powered SEO Services 2026 | NextGen SEO',
       [AppRoute.ADMIN]: 'Admin Panel | NextGen SEO',
     };
     const routeDescriptions: Record<string, string> = {
       [AppRoute.HOME]: 'NextGen SEO Agency by Tayyab Mehmood. Professional SEO services, expert link building, affordable SEO packages. Get 300%+ organic traffic growth.',
       [AppRoute.ABOUT]: 'Learn about NextGen SEO Agency founded by Tayyab Mehmood. 10+ years of SEO expertise, 200+ happy clients, proven results.',
+      [AppRoute.TEAM]: 'Meet the NextGen SEO expert team — link builders, SEO specialists, content strategists, and technical SEO experts.',
       [AppRoute.BLOG]: 'Expert SEO insights, link building strategies, and digital marketing tips from the NextGen SEO team.',
       [AppRoute.CONTACT]: 'Contact NextGen SEO Agency for a free SEO audit. Get expert SEO consultation from Tayyab Mehmood.',
-      [AppRoute.PRICING]: 'Affordable SEO packages starting from $499/month. Transparent pricing with guaranteed results.',
+      [AppRoute.PRICING]: 'Affordable SEO packages from $1200/month. Basic, Standard, Premium & Custom plans. Transparent pricing with guaranteed results.',
       [AppRoute.CASE_STUDIES]: 'Real SEO case studies showing 300-890% traffic growth. See how NextGen SEO transforms businesses.',
       [AppRoute.SERVICE_ONPAGE]: 'Professional on-page SEO optimization. Keyword strategy, meta tags, content optimization for Google rankings.',
       [AppRoute.SERVICE_OFFPAGE]: 'Expert link building and off-page SEO. High-authority backlinks, digital PR, and brand mentions.',
       [AppRoute.SERVICE_TECHNICAL]: 'Technical SEO services. Core Web Vitals, schema markup, crawlability, and site speed optimization.',
       [AppRoute.SERVICE_AI]: 'AI-powered SEO strategies. Predictive analytics, semantic mapping, and automated SEO insights.',
     };
+    const routeCanonicals: Record<string, string> = {
+      [AppRoute.HOME]: 'https://nextgenseo.pro/',
+      [AppRoute.ABOUT]: 'https://nextgenseo.pro/about',
+      [AppRoute.TEAM]: 'https://nextgenseo.pro/team',
+      [AppRoute.BLOG]: 'https://nextgenseo.pro/blog',
+      [AppRoute.CONTACT]: 'https://nextgenseo.pro/contact',
+      [AppRoute.PRICING]: 'https://nextgenseo.pro/pricing',
+      [AppRoute.CASE_STUDIES]: 'https://nextgenseo.pro/case_studies',
+      [AppRoute.SERVICE_ONPAGE]: 'https://nextgenseo.pro/service_onpage',
+      [AppRoute.SERVICE_OFFPAGE]: 'https://nextgenseo.pro/service_offpage',
+      [AppRoute.SERVICE_TECHNICAL]: 'https://nextgenseo.pro/service_technical',
+      [AppRoute.SERVICE_AI]: 'https://nextgenseo.pro/service_ai',
+    };
     document.title = routeTitles[currentRoute] || 'NextGen SEO Agency';
-    // Update meta description
     const desc = routeDescriptions[currentRoute];
     if (desc) {
       let metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc) metaDesc.setAttribute('content', desc);
+      // OG tags bhi update karo
+      let ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute('content', desc);
+      let ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', routeTitles[currentRoute] || 'NextGen SEO Agency');
+      let twTitle = document.querySelector('meta[name="twitter:title"]');
+      if (twTitle) twTitle.setAttribute('content', routeTitles[currentRoute] || 'NextGen SEO Agency');
+      let twDesc = document.querySelector('meta[name="twitter:description"]');
+      if (twDesc) twDesc.setAttribute('content', desc);
     }
-    // Update canonical URL
-    const path = currentRoute === AppRoute.HOME ? '/' : `/${currentRoute}`;
+    // Canonical URL update
+    const canonicalUrl = routeCanonicals[currentRoute] || `https://nextgenseo.pro/${currentRoute}`;
     let canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) canonical.setAttribute('href', `https://nextgenseo.pro${path}`);
+    if (canonical) canonical.setAttribute('href', canonicalUrl);
+    let ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', canonicalUrl);
   }, [currentRoute]);
 
   const ToolPage = ({ title, desc }: { title: string; desc: string }) => (

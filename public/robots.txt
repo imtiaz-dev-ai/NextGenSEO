@@ -1,29 +1,21 @@
-# Robots.txt for NextGen SEO Agency
-# Allow search engines to crawl all content
+# Robots.txt — NextGen SEO Agency
+# https://nextgenseo.pro
 
 User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /.env
-Disallow: /node_modules
-Disallow: /*.json$
-Disallow: /*.map$
+Disallow: /node_modules/
 
-# Sitemaps
+# Sitemap
 Sitemap: https://nextgenseo.pro/sitemap.xml
 
-# Crawl delay
-Crawl-delay: 1
-
-# User agents
+# Googlebot — no crawl delay
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 0
+Disallow: /admin
 
+# Bingbot
 User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
-
-User-agent: Slurp
 Allow: /
 Crawl-delay: 1
