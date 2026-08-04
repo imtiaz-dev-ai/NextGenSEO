@@ -15,6 +15,7 @@ const Card3D: React.FC<{ children: React.ReactNode; className?: string }> = ({ c
 
 const Team = () => {
   const [customMembers, setCustomMembers] = React.useState<any[]>([]);
+  const [visibleCount, setVisibleCount] = React.useState(6);
   
   React.useEffect(() => {
     const saved = localStorage.getItem('teamMembers');
@@ -35,6 +36,7 @@ const Team = () => {
   ];
 
   const allMembers = [...defaultMembers, ...customMembers];
+  const visible = allMembers.slice(0, visibleCount);
   
   const socialLinks = [
     { key: 'linkedin', icon: 'M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z' },
@@ -47,17 +49,17 @@ const Team = () => {
     <div className="mb-32">
       <h2 className="text-5xl font-black mb-6 text-center">Meet Our <span className="gradient-text">Expert Team</span></h2>
       <p className="text-center text-slate-400 mb-16 max-w-2xl mx-auto">Dedicated professionals with 10+ years of combined SEO expertise</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {allMembers.map((member, i) => (
-          <Card3D key={i} className="glass shine-3d glow-border-3d p-6 rounded-3xl relative overflow-hidden">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        {visible.map((member, i) => (
+          <Card3D key={i} className="glass shine-3d glow-border-3d p-4 sm:p-6 rounded-2xl sm:rounded-3xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10">
               {member.img || member.image ? (
-                <div className="w-64 h-80 mx-auto mb-4 rounded-2xl overflow-hidden border-2 border-purple-500/30 group-hover:border-purple-500/60 transition-all">
+                <div className="w-full aspect-[3/4] mx-auto mb-3 sm:mb-4 rounded-xl sm:rounded-2xl overflow-hidden border-2 border-purple-500/30 group-hover:border-purple-500/60 transition-all">
                   <img 
                     src={member.img || member.image} 
                     alt={`${member.name} - ${member.role} at NextGen SEO Agency`}
-                    loading="lazy"
+                    loading={i < 4 ? 'eager' : 'lazy'}
                     decoding="async"
                     width="256"
                     height="320"
@@ -65,13 +67,13 @@ const Team = () => {
                   />
                 </div>
               ) : null}
-              <h3 className="text-xl font-black mb-2 text-center">{member.name}</h3>
-              <p className="text-purple-400 text-sm font-bold mb-4 text-center">{member.role}</p>
+              <h3 className="text-sm sm:text-xl font-black mb-1 sm:mb-2 text-center">{member.name}</h3>
+              <p className="text-purple-400 text-xs sm:text-sm font-bold mb-2 sm:mb-4 text-center">{member.role}</p>
               {member.bio && (
-                <p className="text-slate-400 text-xs mb-4 text-center leading-relaxed">{member.bio}</p>
+                <p className="text-slate-400 text-[10px] sm:text-xs mb-2 sm:mb-4 text-center leading-relaxed hidden sm:block">{member.bio}</p>
               )}
               {(member.linkedin || member.instagram || member.facebook || member.twitter) && (
-                <div className="flex justify-center gap-3">
+                <div className="flex justify-center gap-2 sm:gap-3">
                   {socialLinks.map(social => member[social.key] && (
                     <a 
                       key={social.key}
@@ -79,9 +81,9 @@ const Team = () => {
                       target="_blank" 
                       rel="noopener noreferrer" 
                       aria-label={`${member.name} ${social.key} Profile`} 
-                      className="w-10 h-10 rounded-xl bg-white/5 hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-500 transition-all flex items-center justify-center group/icon"
+                      className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-500 transition-all flex items-center justify-center group/icon"
                     >
-                      <svg className="w-5 h-5 group-hover/icon:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg className="w-3 h-3 sm:w-5 sm:h-5 group-hover/icon:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path d={social.icon}/>
                       </svg>
                     </a>
@@ -92,6 +94,16 @@ const Team = () => {
           </Card3D>
         ))}
       </div>
+      {visibleCount < allMembers.length && (
+        <div className="text-center mt-8">
+          <button
+            onClick={() => setVisibleCount(v => v + 6)}
+            className="px-8 py-3 rounded-2xl glass border border-purple-500/30 text-purple-400 font-bold hover:bg-purple-500/10 transition-all"
+          >
+            Load More
+          </button>
+        </div>
+      )}
     </div>
   );
 };

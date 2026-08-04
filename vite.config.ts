@@ -33,25 +33,28 @@ export default defineConfig(({ mode }) => {
             pure_funcs: isProduction ? ['console.log', 'console.info', 'console.warn'] : [],
           },
           mangle: true,
-          output: {
-            comments: false,
-          },
+          output: { comments: false },
         },
         rollupOptions: {
           output: {
-            manualChunks: {
-              'vendor': ['react', 'react-dom', 'react-router-dom'],
-              'firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/storage'],
+            manualChunks(id) {
+              if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) return 'vendor';
+              if (id.includes('node_modules/firebase')) return 'firebase';
+              if (id.includes('node_modules/react-icons')) return 'icons';
+              if (id.includes('components/Admin')) return 'admin';
+              if (id.includes('components/Blog')) return 'blog';
+              if (id.includes('components/Testimonials') || id.includes('components/CaseStudies') || id.includes('components/Team')) return 'social-proof';
+              if (id.includes('components/Pricing') || id.includes('components/FAQ') || id.includes('components/Newsletter')) return 'secondary';
             },
           },
-          external: [],
         },
         sourcemap: false,
         chunkSizeWarningLimit: 1000,
         reportCompressedSize: false,
         cssCodeSplit: true,
         assetsInlineLimit: 4096,
-        target: 'es2015',
+        target: 'es2020',
+        cssMinify: true,
       },
     };
 });
