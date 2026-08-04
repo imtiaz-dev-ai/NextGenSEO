@@ -42,12 +42,14 @@ const Testimonials: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex justify-center gap-2 mt-6 sm:mt-8 md:mt-10 px-0">
+          <div className="flex justify-center items-center gap-1.5 mt-4">
             {testimonials.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className={`h-1.5 sm:h-2 rounded-full transition-all ${i === current ? 'w-8 sm:w-12 bg-gradient-to-r from-purple-500 to-pink-500' : 'w-1.5 sm:w-2 bg-slate-700 hover:bg-slate-600'}`}
+                aria-label={`Go to testimonial ${i + 1}`}
+                style={{ width: i === current ? '16px' : '6px', height: '6px' }}
+                className={`rounded-full transition-all duration-300 ${i === current ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-slate-600'}`}
               />
             ))}
           </div>
