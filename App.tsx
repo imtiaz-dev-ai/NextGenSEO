@@ -94,8 +94,8 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
     </div>
 
     <div className="mb-10 sm:mb-16">
-        <div className="flex flex-row gap-4 sm:gap-8 items-start mb-4">
-          <div className="relative shrink-0 w-[130px] h-[160px] sm:w-[240px] sm:h-[300px] md:w-[340px] md:h-[420px]">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start mb-4">
+          <div className="relative shrink-0 w-full sm:w-[240px] sm:h-[300px] md:w-[340px] md:h-[420px] h-[220px]">
             <img
               src="/pics/New%20folder/Tayyab.png"
               alt="Tayyab Mehmood - Founder and CEO of NextGen SEO Agency"
@@ -105,14 +105,14 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
               className="w-full h-full object-cover object-top rounded-2xl border-2 border-purple-500/30"
             />
           </div>
-          <div className="flex-1 min-w-0 pt-2">
+          <div className="flex-1 min-w-0">
             <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-[10px] sm:text-xs font-black uppercase mb-3">Founder &amp; CEO</div>
-            <h2 className="text-xl sm:text-3xl md:text-5xl font-black mb-3"><span className="gradient-text">Tayyab Mehmood</span></h2>
-            <p className="text-xs sm:text-base md:text-xl text-slate-400 leading-relaxed">Tayyab Mehmood is a seasoned <strong className="text-slate-200">SEO expert and consultant</strong> with 10+ years of hands-on experience in <strong className="text-slate-200">search engine optimization</strong>, <strong className="text-slate-200">professional link building</strong>, and <strong className="text-slate-200">technical SEO</strong>. He founded NextGen SEO Agency to deliver <strong className="text-slate-200">affordable SEO services</strong> that help small businesses and startups dominate Google search results.</p>
-            <p className="text-xs sm:text-sm md:text-base text-slate-400 leading-relaxed mt-3">His expertise covers <strong className="text-slate-200">on-page SEO optimization</strong>, <strong className="text-slate-200">white-hat link building</strong>, <strong className="text-slate-200">local SEO</strong>, <strong className="text-slate-200">keyword research</strong>, and <strong className="text-slate-200">content marketing strategies</strong>. Under his leadership, NextGen SEO has helped 200+ businesses achieve 300%+ organic traffic growth, higher Google rankings, and measurable ROI — making it one of the most trusted <strong className="text-slate-200">SEO agencies</strong> worldwide.</p>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black mb-3"><span className="gradient-text">Tayyab Mehmood</span></h2>
+            <p className="text-sm sm:text-base md:text-xl text-slate-400 leading-relaxed">Tayyab Mehmood is a seasoned <strong className="text-slate-200">SEO expert and consultant</strong> with 10+ years of hands-on experience in <strong className="text-slate-200">search engine optimization</strong>, <strong className="text-slate-200">professional link building</strong>, and <strong className="text-slate-200">technical SEO</strong>. He founded NextGen SEO Agency to deliver <strong className="text-slate-200">affordable SEO services</strong> that help small businesses and startups dominate Google search results.</p>
+            <p className="text-xs sm:text-sm md:text-base text-slate-400 leading-relaxed mt-3 hidden sm:block">His expertise covers <strong className="text-slate-200">on-page SEO optimization</strong>, <strong className="text-slate-200">white-hat link building</strong>, <strong className="text-slate-200">local SEO</strong>, <strong className="text-slate-200">keyword research</strong>, and <strong className="text-slate-200">content marketing strategies</strong>. Under his leadership, NextGen SEO has helped 200+ businesses achieve 300%+ organic traffic growth, higher Google rankings, and measurable ROI — making it one of the most trusted <strong className="text-slate-200">SEO agencies</strong> worldwide.</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-2">
           {[{ href: 'https://www.linkedin.com/company/nextgenseo-official/', label: 'LinkedIn', hover: 'hover:bg-blue-600', path: 'M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z' },
             { href: 'https://x.com/next_genseo', label: 'Twitter', hover: 'hover:bg-sky-500', path: 'M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z' },
             { href: 'https://www.instagram.com/tayyab_backlinks?igsh=cnQ1cXF0OGV0cnBt', label: 'Instagram', hover: 'hover:bg-pink-600', path: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z' }].map((social, i) => (
@@ -733,23 +733,21 @@ const App: React.FC = () => {
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] opacity-30" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-[120px] opacity-30" />
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
             {/* Logo & About */}
-            <div className="col-span-1 sm:col-span-2 lg:col-span-1">
+            <div className="lg:col-span-1">
               <button className="flex items-center gap-2 mb-4 group cursor-pointer" onClick={() => { setCurrentRoute(AppRoute.HOME); window.scrollTo(0, 0); }}>
-                <img src="/pics/logo.png" alt="NextGen SEO" className="w-20 h-20 object-contain group-hover:scale-110 transition-transform" />
+                <img src="/pics/logo.png" alt="NextGen SEO" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform" />
                 <span className="text-lg font-black tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
               </button>
-              <p className="text-white text-sm leading-relaxed mb-6 max-w-xs">
-                Premium search intelligence platform founded by <span className="text-white font-semibold">Tayyab Mehmood</span>. We build the future of search visibility.
-              </p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xs">Premium SEO agency founded by <span className="text-white font-semibold">Tayyab Mehmood</span>. Building the future of search visibility.</p>
               <div className="flex gap-2">
-                {[{ href: 'https://www.linkedin.com/company/nextgenseo-official/', label: 'LinkedIn', hover: 'hover:bg-amber-600' },
-                  { href: 'https://x.com/next_genseo', label: 'Twitter', hover: 'hover:bg-amber-500' },
-                  { href: 'https://www.instagram.com/next.genseo/', label: 'Instagram', hover: 'bg-pink-600' }].map((social, i) => {
+                {[{ href: 'https://www.linkedin.com/company/nextgenseo-official/', label: 'LinkedIn', hover: 'hover:bg-blue-600' },
+                  { href: 'https://x.com/next_genseo', label: 'Twitter', hover: 'hover:bg-sky-500' },
+                  { href: 'https://www.instagram.com/next.genseo/', label: 'Instagram', hover: 'hover:bg-pink-600' }].map((social, i) => {
                   const paths = ['M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z', 'M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z', 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z'];
                   return (
-                    <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className={`w-9 h-9 min-w-[44px] min-h-[44px] rounded-lg bg-white/5 flex items-center justify-center hover:${social.hover} hover:text-white transition-all border border-white/10 text-slate-400 hover:scale-110`}>
+                    <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className={`w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center ${social.hover} transition-all border border-white/10 text-slate-400`}>
                       <SvgIcon path={paths[i]} className="w-4 h-4" />
                     </a>
                   );
@@ -757,8 +755,8 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Services + Company + Resources — merged on mobile, 3 cols on desktop */}
-            <div className="col-span-1 sm:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {/* Links — 3 cols on all screens */}
+            <div className="lg:col-span-3 grid grid-cols-3 gap-4">
               {/* Services */}
               <div>
                 <h4 className="font-black mb-3 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Services</h4>
