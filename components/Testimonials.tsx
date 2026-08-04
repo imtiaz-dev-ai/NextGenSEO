@@ -42,16 +42,22 @@ const Testimonials: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex justify-center items-center gap-1.5 mt-4">
-            {testimonials.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                aria-label={`Go to testimonial ${i + 1}`}
-                style={{ width: i === current ? '16px' : '6px', height: '6px' }}
-                className={`rounded-full transition-all duration-300 ${i === current ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-slate-600'}`}
-              />
-            ))}
+          <div className="flex justify-center items-center gap-4 mt-6">
+            <button
+              onClick={() => setCurrent(i => (i - 1 + testimonials.length) % testimonials.length)}
+              className="w-10 h-10 rounded-full glass border border-white/10 hover:border-purple-500/50 flex items-center justify-center text-slate-400 hover:text-white transition-all"
+              aria-label="Previous"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <span className="text-slate-500 text-xs font-bold">{current + 1} / {testimonials.length}</span>
+            <button
+              onClick={() => setCurrent(i => (i + 1) % testimonials.length)}
+              className="w-10 h-10 rounded-full glass border border-white/10 hover:border-purple-500/50 flex items-center justify-center text-slate-400 hover:text-white transition-all"
+              aria-label="Next"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </button>
           </div>
         </div>
       </div>
