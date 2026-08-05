@@ -94,6 +94,7 @@ const Team = () => {
           </Card3D>
         ))}
       </div>
+    </div>
   );
 };
 
