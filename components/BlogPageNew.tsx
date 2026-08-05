@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { getBlogsFromFirebase } from '../utils/firebase';
+// Firebase lazily loaded — only when blog page actually needs custom blogs
+const getFirebaseBlogs = () => import('../utils/firebase').then(m => m.getBlogsFromFirebase());
 
 export const getPostSlug = (title: string) =>
   title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -156,7 +157,7 @@ export const BlogPostBySlug = () => {
       return;
     }
     // Then check firebase blogs
-    getBlogsFromFirebase()
+    getFirebaseBlogs()
       .then(blogs => {
         const match = blogs.find((p: any) => getPostSlug(p.title) === slug);
         if (match) setPost(match);
@@ -185,9 +186,7 @@ export const BlogPostBySlug = () => {
 const BlogPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [customBlogs, setCustomBlogs] = React.useState<any[]>(() => {
-    try { const c = sessionStorage.getItem('ng_blogs'); return c ? JSON.parse(c) : []; } catch { return []; }
-  });
+  const [customBlogs, setCustomBlogs] = React.useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = React.useState<string>('All');
   const [selectedPost, setSelectedPost] = React.useState<any>(null);
   const [searchQuery, setSearchQuery] = React.useState<string>('');
@@ -204,20 +203,17 @@ const BlogPage = () => {
       if (match) setSelectedPost(match);
     }
 
-    if (!sessionStorage.getItem('ng_blogs')) {
-      getBlogsFromFirebase()
-        .then(blogs => {
-          setCustomBlogs(blogs);
-          try { sessionStorage.setItem('ng_blogs', JSON.stringify(blogs)); } catch {}
-          const currentPath = location.pathname;
-          if (currentPath.startsWith('/blog/')) {
-            const slug = currentPath.replace('/blog/', '');
-            const firebaseMatch = blogs.find((p: any) => getPostSlug(p.title) === slug);
-            if (firebaseMatch) setSelectedPost(firebaseMatch);
-          }
-        })
-        .catch(() => {});
-    }
+    getFirebaseBlogs()
+      .then(blogs => {
+        setCustomBlogs(blogs);
+        const currentPath = location.pathname;
+        if (currentPath.startsWith('/blog/')) {
+          const slug = currentPath.replace('/blog/', '');
+          const firebaseMatch = blogs.find((p: any) => getPostSlug(p.title) === slug);
+          if (firebaseMatch) setSelectedPost(firebaseMatch);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Update URL & title when post changes
@@ -300,7 +296,7 @@ const BlogPage = () => {
       </div>
 
       {/* Blog Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+      <div className="grid grid-cols-2 gap-3 sm:gap-8">
         {filteredPosts.map((p, i) => (
           <a
             key={i}

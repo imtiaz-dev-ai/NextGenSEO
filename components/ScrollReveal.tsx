@@ -13,31 +13,23 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({ children, delay = 0 }) => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => setIsVisible(true), delay);
+          if (delay) setTimeout(() => setIsVisible(true), delay);
+          else setIsVisible(true);
+          observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.05, rootMargin: '0px 0px -40px 0px' }
     );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
-    };
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
   }, [delay]);
 
   return (
     <div
       ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-[900ms] ${
-        isVisible
-          ? 'opacity-100 translate-y-0 scale-100 [transform:perspective(1000px)_translateY(0)_rotateX(0deg)_scale(1)]'
-          : 'opacity-0 [transform:perspective(1000px)_translateY(50px)_rotateX(8deg)_scale(0.96)]'
+      style={{ willChange: isVisible ? 'auto' : 'opacity' }}
+      className={`transition-opacity duration-700 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
       {children}

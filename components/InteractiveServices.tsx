@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { HiOutlineCpuChip, HiOutlineChartBar, HiOutlineLink, HiOutlineCog, HiOutlineMagnifyingGlass, HiOutlinePencil, HiOutlineTag, HiOutlineShieldCheck, HiOutlineArrowRight, HiOutlineMapPin } from 'react-icons/hi2';
+import { HiOutlineCpuChip, HiOutlineChartBar, HiOutlineLink, HiOutlineCog, HiOutlineMagnifyingGlass, HiOutlinePencil, HiOutlineTag, HiOutlineShieldCheck, HiOutlineArrowRight, HiOutlineMapPin, HiOutlineClipboardDocumentList } from 'react-icons/hi2';
 
 const Card3D: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -95,6 +95,13 @@ const InteractiveServices: React.FC = () => {
       gradient: 'from-amber-500 to-orange-500',
       stats: 'Local Dominance',
     },
+    {
+      icon: <HiOutlineClipboardDocumentList className="w-8 h-8" />,
+      title: 'Complete SEO Audit',
+      desc: 'In-depth website SEO audit covering on-page issues, technical errors, backlink profile analysis, Core Web Vitals, duplicate content, and a prioritized action plan for rapid ranking improvements.',
+      gradient: 'from-sky-500 to-cyan-500',
+      stats: '200+ Checks',
+    },
   ];
 
   return (
@@ -109,34 +116,30 @@ const InteractiveServices: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
           {services.map((service, i) => (
             <Card3D
               key={i}
-              className="group relative glass shine-3d glow-border-3d p-5 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl cursor-pointer overflow-hidden"
+              className="group relative glass shine-3d glow-border-3d p-3 sm:p-6 md:p-8 rounded-xl sm:rounded-3xl cursor-pointer overflow-hidden"
             >
               <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
               
               <div className="relative z-10">
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 icon-3d shadow-3d`}>
-                  {service.icon}
+                <div className={`w-9 h-9 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg sm:rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center text-white mb-2 sm:mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 icon-3d shadow-3d`}>
+                  <span className="scale-75 sm:scale-100">{service.icon}</span>
                 </div>
 
-                <h3 className="text-lg sm:text-xl md:text-2xl font-black mb-2 sm:mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">
+                <h3 className="text-xs sm:text-xl md:text-2xl font-black mb-1 sm:mb-3 leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">
                   {service.title}
                 </h3>
 
-                <p className="text-slate-400 text-sm mb-4 sm:mb-6 leading-relaxed">
+                <p className="text-slate-400 text-xs sm:text-sm mb-2 sm:mb-6 leading-relaxed hidden sm:block">
                   {service.desc}
                 </p>
 
-                <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-r ${service.gradient} bg-opacity-10 border border-white/10`}>
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gradient-to-r from-white to-white/50 animate-pulse" />
-                  <span className="text-[10px] sm:text-xs font-black uppercase">{service.stats}</span>
-                </div>
-
-                <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <HiOutlineArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <div className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 rounded-md sm:rounded-xl bg-gradient-to-r ${service.gradient} bg-opacity-10 border border-white/10`}>
+                  <div className="w-1 h-1 sm:w-2 sm:h-2 rounded-full bg-white animate-pulse" />
+                  <span className="text-[9px] sm:text-xs font-black uppercase">{service.stats}</span>
                 </div>
               </div>
             </Card3D>

@@ -101,7 +101,7 @@ const CaseStudies: React.FC = () => {
           <p className="text-xs sm:text-base md:text-lg lg:text-xl text-slate-400 leading-relaxed">Real organic search growth, keyword rankings, and traffic increases from our professional SEO agency client portfolio.</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 px-0">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 px-0">
           {allCases.map((c, i) => (
             <Card3D key={i} className="glass shine-3d glow-border-3d rounded-2xl overflow-hidden group cursor-pointer">
               <div className="relative h-48 overflow-hidden">

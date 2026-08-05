@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { AppRoute } from '../types';
-import AnimatedStats from './AnimatedStats';
+const AnimatedStats = lazy(() => import('./AnimatedStats'));
 
 interface HeroProps {
   onStart: (route: AppRoute) => void;
@@ -11,18 +11,13 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
     <div className="relative pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 overflow-hidden min-h-[85vh] sm:min-h-[95vh] flex flex-col justify-center">
       {/* Background */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">
-        <div className="absolute top-0 left-0 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-purple-500/20 rounded-full blur-[120px] sm:blur-[160px] opacity-60 animate-pulse" />
-        <div className="absolute bottom-0 right-0 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-pink-600/20 rounded-full blur-[120px] sm:blur-[160px] opacity-60 animate-float" />
-        <div className="absolute top-1/2 left-1/4 w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-cyan-500/10 rounded-full blur-[100px] opacity-40" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+        <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-purple-500/10 rounded-full blur-[80px]" />
+        <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-pink-600/10 rounded-full blur-[80px]" />
       </div>
 
       <div className="max-w-6xl mx-auto text-center relative z-10 w-full px-0">
-        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 text-purple-400 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-6 sm:mb-12 animate-glow">
-          <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-purple-500"></span>
-          </span>
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 text-purple-400 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-6 sm:mb-12">
+          <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-purple-500"></span>
           Next-Generation SEO Agency
         </div>
         
@@ -52,24 +47,26 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
         </div>
 
         <div className="pt-8 sm:pt-10 md:pt-12 border-t border-white/5 max-w-6xl mx-auto opacity-60 transition-all hover:opacity-100 duration-500">
-          <AnimatedStats stats={[
-            { label: 'Growth', value: 450, suffix: '%+' },
-            { label: 'Clients', value: 200, suffix: '+' },
-            { label: 'Links', value: 50, suffix: 'K+' },
-            { label: 'Authority', value: 99, suffix: '+' },
-            { label: 'Experience', value: 10, suffix: '+' }
-          ]} />
+          <Suspense fallback={null}>
+            <AnimatedStats stats={[
+              { label: 'Growth', value: 450, suffix: '%+' },
+              { label: 'Clients', value: 200, suffix: '+' },
+              { label: 'Links', value: 50, suffix: 'K+' },
+              { label: 'Authority', value: 99, suffix: '+' },
+              { label: 'Experience', value: 10, suffix: '+' }
+            ]} />
+          </Suspense>
         </div>
 
-        {/* 3D Floating badges */}
+        {/* Floating badges - desktop only */}
         <div className="hidden lg:block">
-          <div className="fixed top-36 right-8 glass-premium px-4 py-2 rounded-2xl border border-purple-500/20 animate-float-3d shadow-3d" style={{ animationDelay: '0s' }}>
+          <div className="absolute top-8 right-0 glass-premium px-4 py-2 rounded-2xl border border-purple-500/20 animate-float-3d shadow-3d" style={{ animationDelay: '0s' }}>
             <div className="flex items-center gap-2 text-xs font-bold">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               <span className="text-slate-300">300%+ Avg Growth</span>
             </div>
           </div>
-          <div className="fixed top-52 right-8 glass-premium px-4 py-2 rounded-2xl border border-pink-500/20 animate-float-3d shadow-3d" style={{ animationDelay: '1s' }}>
+          <div className="absolute top-24 right-0 glass-premium px-4 py-2 rounded-2xl border border-pink-500/20 animate-float-3d shadow-3d" style={{ animationDelay: '1s' }}>
             <div className="flex items-center gap-2 text-xs font-bold">
               <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
               <span className="text-slate-300">200+ Happy Clients</span>

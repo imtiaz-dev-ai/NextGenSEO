@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Base Styles */
 
 body {
@@ -8,17 +12,25 @@ body {
 }
 
 .glass {
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(20px);
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+  .glass { backdrop-filter: none; background: rgba(15, 23, 42, 0.92); }
+  .glass-premium { backdrop-filter: none; background: rgba(15, 23, 42, 0.95); }
+  .animate-float-3d { animation: none; }
+  .animate-morph { animation: none; }
+  .holographic { animation: none; }
+  .whatsapp-pulse { animation: none; box-shadow: 0 0 0 2px rgba(34,197,94,0.4); }
 }
 
 .gradient-text {
     background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #06b6d4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: gradient-shift 3s ease infinite;
     background-size: 200% 200%;
 }
 
@@ -201,6 +213,16 @@ body {
   color: #a855f7;
 }
 
+/* Clients carousel scroll */
+@keyframes scroll-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-scroll {
+  animation: scroll-left 25s linear infinite;
+}
+.animate-scroll:hover { animation-play-state: paused; }
+
 /* Scroll indicator */
 @keyframes scroll-bounce {
   0%, 100% { transform: translateY(0); opacity: 1; }
@@ -354,12 +376,10 @@ body {
 /* Glassmorphism enhanced */
 .glass-premium {
   background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255,255,255,0.1);
-  box-shadow:
-    0 8px 32px rgba(0,0,0,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
 /* Magnetic hover effect */
@@ -458,10 +478,9 @@ body {
 
 /* Hover-lift enhanced with 3D */
 .hover-lift {
-  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease;
 }
 .hover-lift:hover {
-  transform: translateY(-8px) translateZ(20px) scale(1.02);
   box-shadow: 0 20px 60px rgba(168, 85, 247, 0.3), 0 0 0 1px rgba(168,85,247,0.1);
 }
 
@@ -521,13 +540,7 @@ html.light-mode footer .text-slate-400, html.light-mode footer .text-slate-500 {
 
 /* 3D card hover tilt — applied globally to .glass cards */
 .glass, .glass-premium {
-  transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), box-shadow 0.4s ease;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-.glass:hover, .glass-premium:hover {
-  transform: perspective(800px) translateY(-6px) rotateX(2deg) rotateY(-1deg) scale(1.01);
-  box-shadow: 0 24px 60px rgba(168,85,247,0.25), 0 0 0 1px rgba(168,85,247,0.1);
+  transition: box-shadow 0.2s ease;
 }
 
 /* Floating 3D orbs background animation */
@@ -549,52 +562,23 @@ html.light-mode footer .text-slate-400, html.light-mode footer .text-slate-500 {
   to   { opacity: 1; transform: perspective(800px) translateY(0) rotateX(0deg) scale(1); }
 }
 
-/* Apply section-enter to main content sections */
-main > div > div,
-main section {
-  animation: section-enter 0.8s cubic-bezier(0.23,1,0.32,1) both;
-}
+/* Apply section-enter to main content sections — removed for performance */
 
-/* Stagger children cards */
-.grid > *:nth-child(1) { animation: card-3d-enter 0.6s 0.05s cubic-bezier(0.23,1,0.32,1) both; }
-.grid > *:nth-child(2) { animation: card-3d-enter 0.6s 0.12s cubic-bezier(0.23,1,0.32,1) both; }
-.grid > *:nth-child(3) { animation: card-3d-enter 0.6s 0.19s cubic-bezier(0.23,1,0.32,1) both; }
-.grid > *:nth-child(4) { animation: card-3d-enter 0.6s 0.26s cubic-bezier(0.23,1,0.32,1) both; }
-.grid > *:nth-child(5) { animation: card-3d-enter 0.6s 0.33s cubic-bezier(0.23,1,0.32,1) both; }
-.grid > *:nth-child(6) { animation: card-3d-enter 0.6s 0.40s cubic-bezier(0.23,1,0.32,1) both; }
+/* Stagger children cards — removed for performance */
 
-/* 3D heading entrance */
-h1, h2 {
-  animation: title-3d-enter 0.9s cubic-bezier(0.23,1,0.32,1) both;
-}
+/* 3D heading entrance — removed for performance */
 
 /* 3D button hover lift */
-button:not(.back-to-top):not([aria-label="Toggle SEO assistant chat"]):not([aria-label="Toggle chat support"]),
-a.btn, a[class*="bg-gradient"] {
-  transition: transform 0.25s cubic-bezier(0.23,1,0.32,1), box-shadow 0.25s ease;
-}
-button:not(.back-to-top):not([aria-label="Toggle SEO assistant chat"]):not([aria-label="Toggle chat support"]):hover {
-  transform: perspective(400px) translateY(-3px) translateZ(8px);
-}
 
-/* 3D image depth on hover */
-img:not([class*="logo"]):not([class*="h-16"]):not([class*="h-20"]):not([class*="h-24"]) {
-  transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), box-shadow 0.4s ease;
-}
-img:not([class*="logo"]):not([class*="h-16"]):not([class*="h-20"]):not([class*="h-24"]):hover {
-  transform: perspective(600px) scale(1.03) translateZ(20px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
+
+/* img hover — removed for performance */
 
 /* Glowing 3D navbar */
 nav {
   box-shadow: 0 4px 30px rgba(168,85,247,0.08), 0 1px 0 rgba(255,255,255,0.04);
 }
 
-/* 3D footer entrance */
-footer {
-  animation: section-enter 0.8s 0.1s cubic-bezier(0.23,1,0.32,1) both;
-}
+/* footer entrance — removed for performance */
 
 /* Responsive Design */
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
@@ -613,15 +597,15 @@ footer {
 
 @media (max-width: 640px) {
     body { font-size: 14px; line-height: 1.6; }
-    .hover-lift:hover { transform: translateY(-4px) scale(1.01); }
+    .hover-lift:hover { box-shadow: 0 8px 24px rgba(168,85,247,0.2); }
     button, a { min-height: 44px; }
     input, textarea, select { font-size: 16px !important; }
     .prose h2 { font-size: 1.4rem !important; }
     .prose h3 { font-size: 1.15rem !important; }
     /* Fix overflow on mobile */
     .max-w-6xl, .max-w-7xl, .max-w-4xl { padding-left: 1rem !important; padding-right: 1rem !important; }
-    /* Fix grid on mobile */
-    .grid-cols-2 { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+    /* Fix grid on mobile - keep 2 columns */
+    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     /* Fix large text on mobile */
     .text-7xl { font-size: 2.5rem !important; line-height: 1.1 !important; }
     .text-6xl { font-size: 2.25rem !important; line-height: 1.1 !important; }
@@ -630,7 +614,7 @@ footer {
     .px-12 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
     .py-5 { padding-top: 0.875rem !important; padding-bottom: 0.875rem !important; }
     /* Fix glass cards on mobile */
-    .glass { backdrop-filter: blur(10px); }
+    .glass { backdrop-filter: blur(4px); }
     /* Fix rounded corners on mobile */
     .rounded-\[3rem\] { border-radius: 1.5rem !important; }
     /* Prevent horizontal scroll */

@@ -15,28 +15,28 @@ const Card3D: React.FC<{ children: React.ReactNode; className?: string }> = ({ c
 
 const Team = () => {
   const [customMembers, setCustomMembers] = React.useState<any[]>([]);
-  const [visibleCount, setVisibleCount] = React.useState(6);
   
   React.useEffect(() => {
-    const saved = localStorage.getItem('teamMembers');
-    if (saved) setCustomMembers(JSON.parse(saved));
+    import('../utils/firebase').then(m => m.getTeamFromFirebase()).then(setCustomMembers).catch(() => {
+      const saved = localStorage.getItem('teamMembers');
+      if (saved) setCustomMembers(JSON.parse(saved));
+    });
   }, []);
 
   const defaultMembers = [
-    { name: "Tayyab Mehmood", role: "Founder & CEO", img: "/pics/New%20folder/Tayyab%202.png", linkedin: "https://www.linkedin.com/in/tayyab-mehmood-seo/", instagram: "https://www.instagram.com/tayyab_backlinks?igsh=cnQ1cXF0OGV0cnBt", facebook: "https://www.facebook.com/share/182MuBD7pM/", bio: "Founder of NextGen SEO with 10+ years of industry expertise. Visionary leader driving innovation in AI-powered SEO solutions." },
-    { name: "Fatima Ahad", role: "Senior Link Builder", img: "/pics/New%20folder/Fatima%20Ahad.png", linkedin: "https://www.linkedin.com/in/fatima-ahad-8a7354396/", bio: "Expert in white-hat link building with 8+ years of experience. Specializes in high-authority backlink acquisition and digital PR strategies." },
-    { name: "Mahmood Akhtar", role: "Senior Link Builder", img: "/pics/New%20folder/Mahmood%20Akthar.png", linkedin: "https://www.linkedin.com/in/mahmood-seo/", bio: "Proven track record of building 10,000+ quality backlinks for Fortune 500 companies. Master of outreach and relationship building." },
-    { name: "Islam Mehmood", role: "Outreach Manager", img: "/pics/New%20folder/Islam%20Mehmood.png", linkedin: "https://www.linkedin.com/in/islam-mehmood-seo/", bio: "Strategic outreach specialist managing relationships with 500+ high-authority publishers. Drives organic link placements and brand mentions." },
-    { name: "Muhammad Touheed", role: "Junior Outreach Manager", img: "/pics/New%20folder/Muhammad%20Touheed.png", linkedin: "https://www.linkedin.com/in/muhammad-touheed-7295093a2", bio: "Rising talent in outreach and relationship management. Passionate about building meaningful connections with industry leaders." },
-    { name: "Haroon Hussain", role: "SEO Specialist", img: "/pics/New%20folder/Haroon%20Hussain.png", linkedin: "https://www.linkedin.com/in/haroon-hussain-7a49293a7/", bio: "Technical SEO expert with deep knowledge of Core Web Vitals, schema markup, and site architecture optimization." },
-    { name: "Muhammad Fahad", role: "SEO Analyst", img: "/pics/New%20folder/M%20fahad.png", linkedin: "https://www.linkedin.com/in/muhammad-fahad-9859823a5/", bio: "Data-driven SEO analyst specializing in keyword research, competitor analysis, and performance tracking." },
-    { name: "Nabeel Butt", role: "SEO Intern", img: "/pics/New%20folder/Nabeel%20Butt.png", linkedin: "https://www.linkedin.com/in/nabeel-butt-seo/", bio: "Enthusiastic SEO professional learning the ropes of organic search optimization and content strategy." },
-    { name: "Imtiaz Hussain", role: "AI & Full Stack Developer", img: "/pics/New%20folder/Imtiaz%20Hussain.png", linkedin: "https://www.linkedin.com/in/imtiaz-hussain", bio: "Full-stack developer integrating AI-powered tools for SEO automation. Expert in React, Node.js, and machine learning applications." },
-    { name: "Rehan Anwar", role: "Content & SEO Strategist", img: "/pics/New%20folder/Rehan%20Anwar.png", linkedin: "https://www.linkedin.com/in/rehan-anwar-9b2b373b2/", bio: "Content strategist creating SEO-optimized articles that rank and convert. Specializes in topic clustering and semantic optimization." },
+    { name: "Tayyab Mehmood", role: "Founder & CEO", img: "/pics/New%20folder/Tayyab%202.webp", linkedin: "https://www.linkedin.com/in/tayyab-mehmood-seo/", instagram: "https://www.instagram.com/tayyab_backlinks?igsh=cnQ1cXF0OGV0cnBt", facebook: "https://www.facebook.com/share/182MuBD7pM/", bio: "Founder of NextGen SEO with 10+ years of industry expertise. Visionary leader driving innovation in AI-powered SEO solutions." },
+    { name: "Fatima Ahad", role: "Senior Link Builder", img: "/pics/New%20folder/Fatima%20Ahad.webp", linkedin: "https://www.linkedin.com/in/fatima-ahad-8a7354396/", bio: "Expert in white-hat link building with 8+ years of experience. Specializes in high-authority backlink acquisition and digital PR strategies." },
+    { name: "Mahmood Akhtar", role: "Senior Link Builder", img: "/pics/New%20folder/Mahmood%20Akthar.webp", linkedin: "https://www.linkedin.com/in/mahmood-seo/", bio: "Proven track record of building 10,000+ quality backlinks for Fortune 500 companies. Master of outreach and relationship building." },
+    { name: "Islam Mehmood", role: "Outreach Manager", img: "/pics/New%20folder/Islam%20Mehmood.webp", linkedin: "https://www.linkedin.com/in/islam-mehmood-seo/", bio: "Strategic outreach specialist managing relationships with 500+ high-authority publishers. Drives organic link placements and brand mentions." },
+    { name: "Muhammad Touheed", role: "Junior Outreach Manager", img: "/pics/New%20folder/Muhammad%20Touheed.webp", linkedin: "https://www.linkedin.com/in/muhammad-touheed-7295093a2", bio: "Rising talent in outreach and relationship management. Passionate about building meaningful connections with industry leaders." },
+    { name: "Haroon Hussain", role: "SEO Specialist", img: "/pics/New%20folder/Haroon%20Hussain.webp", linkedin: "https://www.linkedin.com/in/haroon-hussain-7a49293a7/", bio: "Technical SEO expert with deep knowledge of Core Web Vitals, schema markup, and site architecture optimization." },
+    { name: "Muhammad Fahad", role: "SEO Analyst", img: "/pics/New%20folder/M%20fahad.webp", linkedin: "https://www.linkedin.com/in/muhammad-fahad-9859823a5/", bio: "Data-driven SEO analyst specializing in keyword research, competitor analysis, and performance tracking." },
+    { name: "Nabeel Butt", role: "SEO Intern", img: "/pics/New%20folder/Nabeel%20Butt.webp", linkedin: "https://www.linkedin.com/in/nabeel-butt-seo/", bio: "Enthusiastic SEO professional learning the ropes of organic search optimization and content strategy." },
+    { name: "Imtiaz Hussain", role: "AI & Full Stack Developer", img: "/pics/New%20folder/Imtiaz%20Hussain.webp", linkedin: "https://www.linkedin.com/in/imtiaz-hussain", bio: "Full-stack developer integrating AI-powered tools for SEO automation. Expert in React, Node.js, and machine learning applications." },
+    { name: "Rehan Anwar", role: "Content & SEO Strategist", img: "/pics/New%20folder/Rehan%20Anwar.webp", linkedin: "https://www.linkedin.com/in/rehan-anwar-9b2b373b2/", bio: "Content strategist creating SEO-optimized articles that rank and convert. Specializes in topic clustering and semantic optimization." },
   ];
 
   const allMembers = [...defaultMembers, ...customMembers];
-  const visible = allMembers.slice(0, visibleCount);
   
   const socialLinks = [
     { key: 'linkedin', icon: 'M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z' },
@@ -50,7 +50,7 @@ const Team = () => {
       <h2 className="text-5xl font-black mb-6 text-center">Meet Our <span className="gradient-text">Expert Team</span></h2>
       <p className="text-center text-slate-400 mb-16 max-w-2xl mx-auto">Dedicated professionals with 10+ years of combined SEO expertise</p>
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-        {visible.map((member, i) => (
+        {allMembers.map((member, i) => (
           <Card3D key={i} className="glass shine-3d glow-border-3d p-4 sm:p-6 rounded-2xl sm:rounded-3xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10">
@@ -94,17 +94,6 @@ const Team = () => {
           </Card3D>
         ))}
       </div>
-      {visibleCount < allMembers.length && (
-        <div className="text-center mt-8">
-          <button
-            onClick={() => setVisibleCount(v => v + 6)}
-            className="px-8 py-3 rounded-2xl glass border border-purple-500/30 text-purple-400 font-bold hover:bg-purple-500/10 transition-all"
-          >
-            Load More
-          </button>
-        </div>
-      )}
-    </div>
   );
 };
 

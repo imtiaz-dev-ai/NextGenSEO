@@ -1,24 +1,41 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth, signInAnonymously } from "firebase/auth";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
+import { getAuth, signInAnonymously, type Auth } from "firebase/auth";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, type Firestore } from "firebase/firestore";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyATM1oVH-Weo8Qx0257-94xDqB7Zu2_8hM",
-  authDomain: "next-gen-seo-agency.firebaseapp.com",
-  projectId: "next-gen-seo-agency",
-  storageBucket: "next-gen-seo-agency.firebasestorage.app",
-  messagingSenderId: "65904043530",
-  appId: "1:65904043530:web:9ce0789f7bf1ff645921f3"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+let _app: FirebaseApp | null = null;
+let _auth: Auth | null = null;
+let _db: Firestore | null = null;
+let _storage: FirebaseStorage | null = null;
 
-// Initialize anonymous auth
-signInAnonymously(auth).catch(err => console.error('Auth error:', err));
+const getApp = () => {
+  if (!_app) _app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+  return _app;
+};
+
+export const auth = new Proxy({} as Auth, { get: (_, prop) => (getAuth(getApp()) as any)[prop] });
+export const db = new Proxy({} as Firestore, { get: (_, prop) => (getFirestore(getApp()) as any)[prop] });
+export const storage = new Proxy({} as FirebaseStorage, { get: (_, prop) => (getStorage(getApp()) as any)[prop] });
+
+// Lazy auth — only after user interaction
+if (typeof window !== 'undefined') {
+  const initAuth = () => {
+    signInAnonymously(getAuth(getApp())).catch(() => {});
+    window.removeEventListener('mousemove', initAuth);
+    window.removeEventListener('touchstart', initAuth);
+  };
+  window.addEventListener('mousemove', initAuth, { once: true, passive: true });
+  window.addEventListener('touchstart', initAuth, { once: true, passive: true });
+}
 
 // LocalStorage fallback
 const getLocalData = (key: string) => {
@@ -53,7 +70,12 @@ export const saveBlogToFirebase = async (blog: any) => {
 
 export const getBlogsFromFirebase = async () => {
   try {
-    const snapshot = await getDocs(collection(db, "blogPosts"));
+    const app = getApp();
+    const authInstance = getAuth(app);
+    if (!authInstance.currentUser) {
+      await signInAnonymously(authInstance).catch(() => {});
+    }
+    const snapshot = await getDocs(collection(getFirestore(app), "blogPosts"));
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (e) {
     return getLocalData("customBlogs");

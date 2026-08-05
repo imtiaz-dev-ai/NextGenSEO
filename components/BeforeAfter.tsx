@@ -59,34 +59,32 @@ const BeforeAfter: React.FC = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 md:gap-6">
             {comparisonData.map((item, i) => (
-              <div key={i} className="glass p-4 sm:p-6 rounded-lg sm:rounded-2xl border-white/5 relative overflow-hidden group hover-lift">
+              <div key={i} className="glass p-3 sm:p-6 rounded-xl sm:rounded-2xl border-white/5 relative overflow-hidden group hover-lift">
                 <div className={`absolute top-0 right-0 w-16 sm:w-20 h-16 sm:h-20 rounded-full blur-2xl transition-all ${
-                  activeTab === 'before' ? 'bg-red-500/10 group-hover:bg-red-500/20' : 'bg-purple-500/10 group-hover:bg-purple-500/20'
+                  activeTab === 'before' ? 'bg-red-500/10' : 'bg-purple-500/10'
                 }`} />
                 <div className="relative z-10">
-                  <div className="text-slate-500 text-[10px] sm:text-xs font-black uppercase tracking-widest mb-3 sm:mb-4">
+                  <div className="text-slate-500 text-[9px] sm:text-xs font-black uppercase tracking-widest mb-2 sm:mb-4">
                     {item.metric}
                   </div>
-                  <div className="flex items-end gap-2 sm:gap-3 mb-3 sm:mb-4">
-                    <div className={`text-2xl sm:text-3xl md:text-4xl font-black transition-all ${
+                  <div className="flex items-end gap-1 sm:gap-3 mb-2 sm:mb-4">
+                    <div className={`text-lg sm:text-3xl md:text-4xl font-black transition-all ${
                       activeTab === 'before' ? 'text-red-400' : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400'
                     }`}>
                       {activeTab === 'before' ? item.before : item.after}
                     </div>
                     {activeTab === 'after' && (
-                      <div className="text-purple-400 font-black text-[10px] sm:text-xs">
+                      <div className="text-purple-400 font-black text-[9px] sm:text-xs mb-1">
                         {item.improvement}
                       </div>
                     )}
                   </div>
-                  <div className="h-1.5 sm:h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full transition-all duration-1000 ${
-                        activeTab === 'before' ? 'bg-red-500 w-1/4' : 'bg-gradient-to-r from-purple-500 to-pink-500 w-full'
-                      }`}
-                    />
+                  <div className="h-1 sm:h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div className={`h-full transition-all duration-1000 ${
+                      activeTab === 'before' ? 'bg-red-500 w-1/4' : 'bg-gradient-to-r from-purple-500 to-pink-500 w-full'
+                    }`} />
                   </div>
                 </div>
               </div>

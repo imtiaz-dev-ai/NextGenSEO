@@ -2,11 +2,11 @@ import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import ScrollProgress from './components/ScrollProgress';
-import ParticleBackground from './components/ParticleBackground';
 import ScrollReveal from './components/ScrollReveal';
-import FloatingActionButton from './components/FloatingActionButton';
 import BlogPageNew, { BlogPostBySlug } from './components/BlogPageNew';
+const ScrollProgress = lazy(() => import('./components/ScrollProgress'));
+const ParticleBackground = lazy(() => import('./components/ParticleBackground'));
+const FloatingActionButton = lazy(() => import('./components/FloatingActionButton'));
 import { ThemeProvider } from './components/ThemeToggle';
 import { AppRoute } from './types';
 
@@ -21,6 +21,7 @@ const DashboardPreview = lazy(() => import('./components/DashboardPreview'));
 const InteractiveServices = lazy(() => import('./components/InteractiveServices'));
 const AdminPanel = lazy(() => import('./components/AdminPanel'));
 const ClientsCarousel = lazy(() => import('./components/ClientsCarousel'));
+
 const LinkBuildingServices = lazy(() => import('./components/LinkBuildingServices'));
 const AnimatedStats = lazy(() => import('./components/AnimatedStats'));
 
@@ -63,14 +64,14 @@ const ServicePage = ({ title, description, features, benefits, route, setRoute, 
       </div>
     </div>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-20">
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 mb-12 sm:mb-20">
       {features.map((f: any, i: number) => (
-        <div key={i} className="glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-white/5 hover:border-purple-500/30 transition-all hover:-translate-y-2 group hover-lift">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform">
+        <div key={i} className="glass p-4 sm:p-8 rounded-xl sm:rounded-3xl border-white/5 hover:border-purple-500/30 transition-all hover:-translate-y-2 group hover-lift">
+          <div className="w-10 h-10 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-6 group-hover:scale-110 transition-transform">
             {f.icon}
           </div>
-          <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-colors">{f.title}</h3>
-          <p className="text-slate-400 leading-relaxed text-sm">{f.desc}</p>
+          <h3 className="text-sm sm:text-xl font-bold mb-2 sm:mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-colors leading-tight">{f.title}</h3>
+          <p className="text-slate-400 leading-relaxed text-xs sm:text-sm hidden sm:block">{f.desc}</p>
         </div>
       ))}
     </div>
@@ -97,7 +98,7 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start mb-4">
           <div className="relative shrink-0 w-full sm:w-[240px] sm:h-[300px] md:w-[340px] md:h-[420px] h-[220px]">
             <img
-              src="/pics/New%20folder/Tayyab.png"
+              src="/pics/New%20folder/Tayyab.webp"
               alt="Tayyab Mehmood - Founder and CEO of NextGen SEO Agency"
               width="400" height="400"
               loading="lazy" decoding="async"
@@ -124,7 +125,7 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
     </div>
 
     {/* Vision / Promise / Approach */}
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-10 sm:mb-16">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-16">
       <div className="glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-purple-500/20 hover-lift">
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
           <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -146,6 +147,13 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
         <h3 className="text-lg sm:text-xl font-black mb-2">Our Approach</h3>
         <p className="text-sm text-slate-400 leading-relaxed">Data-driven SEO strategies combined with expert link building and local SEO. Every campaign is custom-built for your unique business goals and budget.</p>
       </div>
+      <div className="glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-pink-500/20 hover-lift">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mb-4">
+          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+        </div>
+        <h3 className="text-lg sm:text-xl font-black mb-2">Our Values</h3>
+        <p className="text-sm text-slate-400 leading-relaxed">Integrity, transparency, and client success drive everything we do. We treat every business like our own and never compromise on quality.</p>
+      </div>
     </div>
 
     <div className="mb-10 sm:mb-16">
@@ -166,7 +174,7 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
     </div>
 
     <div className="mb-10 sm:mb-16">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
         <div className="glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover-lift">
           <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mb-4 sm:mb-6 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
             <svg className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -187,6 +195,13 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
           </div>
           <h3 className="text-lg sm:text-xl md:text-2xl font-black mb-3 sm:mb-4">Proven Results</h3>
           <p className="text-sm sm:text-base text-slate-400">200+ businesses trust us for their SEO needs. Real rankings, real traffic, real growth for your business.</p>
+        </div>
+        <div className="glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover-lift">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mb-4 sm:mb-6 rounded-xl sm:rounded-2xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
+            <svg className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          </div>
+          <h3 className="text-lg sm:text-xl md:text-2xl font-black mb-3 sm:mb-4">Transparent Reporting</h3>
+          <p className="text-sm sm:text-base text-slate-400">Clear, detailed monthly reports showing rankings, traffic growth, and ROI. No hidden metrics, full accountability.</p>
         </div>
       </div>
     </div>
@@ -216,16 +231,16 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="pt-24 pb-20 px-6">
+    <div className="pt-24 pb-20 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <div className="inline-block px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-6">Get In Touch</div>
-          <h1 className="text-5xl md:text-6xl font-black mb-6">Ready to <span className="gradient-text">Rank #1 on Google?</span></h1>
-          <p className="text-slate-400 text-lg max-w-3xl mx-auto leading-relaxed">Connect with Tayyab Mehmood's expert SEO team to discuss affordable SEO services, professional link building, and local SEO strategies for your business.</p>
+        <div className="text-center mb-10 sm:mb-16">
+          <div className="inline-block px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-4 sm:mb-6">Get In Touch</div>
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black mb-4 sm:mb-6">Ready to <span className="gradient-text">Rank #1 on Google?</span></h1>
+          <p className="text-slate-400 text-sm sm:text-lg max-w-3xl mx-auto leading-relaxed">Connect with Tayyab Mehmood's expert SEO team to discuss affordable SEO services, professional link building, and local SEO strategies for your business.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="glass p-10 rounded-[3rem] border-purple-500/20 hover-lift">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12">
+          <div className="glass p-6 sm:p-10 rounded-2xl sm:rounded-[3rem] border-purple-500/20 hover-lift">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,8 +292,8 @@ const ContactPage = () => {
             </form>
           </div>
 
-          <div className="space-y-6">
-            <div className="glass p-8 rounded-3xl border-purple-500/20 hover-lift group">
+          <div className="grid grid-cols-2 sm:grid-cols-1 gap-3 sm:gap-6">
+            <div className="glass p-5 sm:p-8 rounded-2xl sm:rounded-3xl border-purple-500/20 hover-lift group">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" role="img" aria-label="Email icon">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -286,7 +301,7 @@ const ContactPage = () => {
               </div>
               <h3 className="text-xl font-black mb-2">Email Us</h3>
               <p className="text-slate-400 mb-4 text-sm">Get a response within 24 hours</p>
-              <a href="mailto:tayyab@nextgenseo.pro" className="text-purple-400 font-bold hover:text-purple-300 transition-colors block mb-3">tayyab@nextgenseo.pro</a>
+              <a href="mailto:tayyab@nextgenseo.pro" className="text-purple-400 font-bold hover:text-purple-300 transition-colors block mb-3 break-all text-sm">tayyab@nextgenseo.pro</a>
               <a 
                 href="https://mail.google.com/mail/?view=cm&fs=1&to=nextgenseotool@gmail.com&su=SEO Inquiry&body=Hi NextGen SEO Team," 
                 target="_blank" 
@@ -303,7 +318,7 @@ const ContactPage = () => {
               </a>
             </div>
 
-            <div className="glass p-8 rounded-3xl border-amber-500/20 hover-lift group">
+            <div className="glass p-5 sm:p-8 rounded-2xl sm:rounded-3xl border-amber-500/20 hover-lift group">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" role="img" aria-label="Phone icon">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -323,7 +338,7 @@ const ContactPage = () => {
               </a>
             </div>
 
-            <div className="glass p-8 rounded-3xl border-violet-500/20 hover-lift group">
+            <div className="glass p-5 sm:p-8 rounded-2xl sm:rounded-3xl border-violet-500/20 hover-lift group">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" role="img" aria-label="Location icon">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -334,7 +349,7 @@ const ContactPage = () => {
               <p className="text-slate-400 text-sm leading-relaxed">123 SEO Street, Digital City<br/>New York, NY 10001</p>
             </div>
 
-            <div className="glass p-8 rounded-3xl border-pink-500/20 hover-lift">
+            <div className="glass p-5 sm:p-8 rounded-2xl sm:rounded-3xl border-pink-500/20 hover-lift">
               <h3 className="text-xl font-black mb-4 flex items-center gap-2">
                 <span className="gradient-text">Follow Us</span>
               </h3>
@@ -481,12 +496,19 @@ const App: React.FC = () => {
     ];
 
     // Initialize sample data if not exists
-    const existingCases = localStorage.getItem('caseStudies');
-    if (!existingCases || JSON.parse(existingCases).length < 6) {
-      localStorage.setItem('caseStudies', JSON.stringify(sampleCases));
-    }
-    if (!localStorage.getItem('teamMembers')) {
-      localStorage.setItem('teamMembers', JSON.stringify(sampleTeamMembers));
+    const initData = () => {
+      const existingCases = localStorage.getItem('caseStudies');
+      if (!existingCases || JSON.parse(existingCases).length < 6) {
+        localStorage.setItem('caseStudies', JSON.stringify(sampleCases));
+      }
+      if (!localStorage.getItem('teamMembers')) {
+        localStorage.setItem('teamMembers', JSON.stringify(sampleTeamMembers));
+      }
+    };
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(initData);
+    } else {
+      setTimeout(initData, 200);
     }
   }, []);
 
@@ -737,7 +759,7 @@ const App: React.FC = () => {
             {/* Logo & About */}
             <div className="lg:col-span-1">
               <button className="flex items-center gap-2 mb-4 group cursor-pointer" onClick={() => { setCurrentRoute(AppRoute.HOME); window.scrollTo(0, 0); }}>
-                <img src="/pics/logo.png" alt="NextGen SEO" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform" />
+                <img src="/pics/logo .webp" alt="NextGen SEO" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform" />
                 <span className="text-lg font-black tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
               </button>
               <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xs">Premium SEO agency founded by <span className="text-white font-semibold">Tayyab Mehmood</span>. Building the future of search visibility.</p>
@@ -786,7 +808,7 @@ const App: React.FC = () => {
                   <li><a href={`/${AppRoute.CASE_STUDIES}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.CASE_STUDIES); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-colors">Case Studies</a></li>
                   <li><a href="mailto:nextgenseotool@gmail.com" className="hover:text-amber-400 transition-colors">Email Us</a></li>
                   <li><a href="tel:+923480440402" className="hover:text-amber-400 transition-colors">Call Us</a></li>
-                  <li><a href="https://wa.me/923480440402" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 transition-colors">WhatsApp</a></li>
+
                 </ul>
               </div>
             </div>

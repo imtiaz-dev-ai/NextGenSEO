@@ -112,7 +112,7 @@ const Pricing: React.FC<PricingProps> = ({ onContact }) => {
           <p className="text-xs sm:text-base md:text-lg lg:text-xl text-slate-400 mb-8 leading-relaxed">Transparent pricing for professional SEO packages. Choose your keyword ranking and link building strategy. Affordable SEO services for startups to enterprise solutions.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 mb-12">
           {plans.map((plan, i) => (
             <Card3D
               key={i}
