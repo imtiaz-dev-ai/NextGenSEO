@@ -214,7 +214,7 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
   </div>
 );
 
-const ContactPage = () => {
+const ContactPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => void }) => {
   const [formData, setFormData] = React.useState({ name: '', email: '', service: '', message: '' });
 
   const handleGmailSubmit = (e: React.FormEvent) => {
@@ -235,9 +235,28 @@ const ContactPage = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10 sm:mb-16">
           <div className="inline-block px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-4 sm:mb-6">Get In Touch</div>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black mb-4 sm:mb-6">Ready to <span className="gradient-text">Rank #1 on Google?</span></h1>
-          <p className="text-slate-400 text-sm sm:text-lg max-w-3xl mx-auto leading-relaxed">Connect with Tayyab Mehmood's expert SEO team to discuss affordable SEO services, professional link building, and local SEO strategies for your business.</p>
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black mb-4 sm:mb-6">Contact NextGen SEO Agency — <span className="gradient-text">Get a Free SEO Consultation</span></h1>
+          <p className="text-slate-400 text-sm sm:text-lg max-w-3xl mx-auto leading-relaxed">Connect with Tayyab Mehmood's expert SEO team to discuss affordable SEO services, professional link building, and local SEO strategies for your business. Whether you need <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_ONPAGE); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">on-page SEO</button>, <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_TECHNICAL); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">technical SEO</button>, or <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_OFFPAGE); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">link building services</button>, we're here to help you rank higher on Google.</p>
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 sm:mb-14 text-center">
+          <div className="glass p-5 rounded-2xl border-purple-500/20">
+            <div className="text-3xl font-black gradient-text mb-1">200+</div>
+            <p className="text-slate-400 text-sm">Businesses helped to grow organic traffic through proven SEO strategies.</p>
+          </div>
+          <div className="glass p-5 rounded-2xl border-pink-500/20">
+            <div className="text-3xl font-black gradient-text mb-1">300%+</div>
+            <p className="text-slate-400 text-sm">Average organic traffic growth delivered to our SEO clients worldwide.</p>
+          </div>
+          <div className="glass p-5 rounded-2xl border-amber-500/20">
+            <div className="text-3xl font-black gradient-text mb-1">24h</div>
+            <p className="text-slate-400 text-sm">Response time guaranteed. We reply to every inquiry within 24 hours.</p>
+          </div>
+        </div>
+
+        <p className="text-slate-400 text-sm sm:text-base max-w-3xl mx-auto mb-10 leading-relaxed text-center">
+          Not sure which service is right for you? Browse our <button onClick={() => { setCurrentRoute(AppRoute.PRICING); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">SEO pricing packages</button> or read our <button onClick={() => { setCurrentRoute(AppRoute.CASE_STUDIES); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">SEO case studies</button> to see real results. You can also <button onClick={() => { setCurrentRoute(AppRoute.ABOUT); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">learn more about our agency</button> and <button onClick={() => { setCurrentRoute(AppRoute.TEAM); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">meet our expert team</button> before reaching out.
+        </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12">
           <div className="glass p-6 sm:p-10 rounded-2xl sm:rounded-[3rem] border-purple-500/20 hover-lift">
@@ -721,7 +740,7 @@ const App: React.FC = () => {
         </div>
       );
       case AppRoute.BLOG: return <BlogPageNew />;
-      case AppRoute.CONTACT: return <ContactPage />;
+      case AppRoute.CONTACT: return <ContactPage setCurrentRoute={setCurrentRoute} />;
       case AppRoute.PRICING: return <Pricing onContact={() => { setCurrentRoute(AppRoute.CONTACT); window.scrollTo(0, 0); }} />;
       case AppRoute.CASE_STUDIES: return <CaseStudies />;
       case AppRoute.ADMIN: return <AdminPanel />;

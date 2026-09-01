@@ -45,6 +45,12 @@
     Cache-Control = "public, max-age=2592000"
 
 [[redirects]]
+  from = "https://www.nextgenseo.pro/*"
+  to = "https://nextgenseo.pro/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
