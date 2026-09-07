@@ -300,3 +300,46 @@ export const deleteMarketplaceListingFromFirebase = async (id: string) => {
     saveLocalData("marketplaceListings", getLocalData("marketplaceListings").filter((i: any) => i.id !== id));
   }
 };
+
+// Community Posts
+export const getCommunityPostsFromFirebase = async () => {
+  try {
+    const snapshot = await getDocs(collection(db, "communityPosts"));
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    return getLocalData("communityPosts");
+  }
+};
+
+export const saveCommunityPostToFirebase = async (post: any) => {
+  try {
+    const ref = await addDoc(collection(db, "communityPosts"), { ...post, createdAt: serverTimestamp(), likes: 0, comments: [] });
+    return ref.id;
+  } catch (e) {
+    const posts = getLocalData("communityPosts");
+    const newPost = { ...post, id: Date.now().toString(), createdAt: new Date().toISOString(), likes: 0, comments: [] };
+    posts.unshift(newPost);
+    saveLocalData("communityPosts", posts);
+    return newPost.id;
+  }
+};
+
+export const likeCommunityPostInFirebase = async (postId: string, likes: number) => {
+  try {
+    await updateDoc(doc(db, "communityPosts", postId), { likes });
+  } catch (e) {
+    const posts = getLocalData("communityPosts");
+    const idx = posts.findIndex((p: any) => p.id === postId);
+    if (idx > -1) { posts[idx].likes = likes; saveLocalData("communityPosts", posts); }
+  }
+};
+
+export const addCommentToPostInFirebase = async (postId: string, comments: any[]) => {
+  try {
+    await updateDoc(doc(db, "communityPosts", postId), { comments });
+  } catch (e) {
+    const posts = getLocalData("communityPosts");
+    const idx = posts.findIndex((p: any) => p.id === postId);
+    if (idx > -1) { posts[idx].comments = comments; saveLocalData("communityPosts", posts); }
+  }
+};
