@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
 
+const IconLink = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>;
+const IconChart = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
+const IconSearch = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>;
+const IconMail = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
+const IconTrend = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>;
+const IconRobot = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
+const IconMsg = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>;
+const IconHeart = ({ filled }: { filled: boolean }) => <svg className="w-4 h-4" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>;
+const IconShare = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>;
+const IconDiscuss = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" /></svg>;
+const IconBox = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>;
+const IconUsers = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+
 const TABS = ['Discussions', 'Resources', 'Members'] as const;
 type Tab = typeof TABS[number];
 
@@ -12,12 +25,12 @@ const DISCUSSIONS = [
 ];
 
 const RESOURCES = [
-  { icon: '📋', title: 'Link Building Checklist 2025', desc: '50-point checklist for white-hat link acquisition used by our team', tag: 'Free' },
-  { icon: '📊', title: 'DR Improvement Roadmap', desc: 'Step-by-step guide to go from DR 20 to DR 60+ in 6 months', tag: 'Free' },
-  { icon: '🔍', title: 'Technical SEO Audit Template', desc: 'Google Sheets template covering 100+ technical SEO checks', tag: 'Free' },
-  { icon: '✉️', title: 'Outreach Email Templates', desc: '10 proven cold outreach templates with 30-40% reply rates', tag: 'Free' },
-  { icon: '📈', title: 'Keyword Research SOP', desc: 'Our internal SOP for finding low-competition, high-intent keywords', tag: 'Free' },
-  { icon: '🤖', title: 'AI SEO Prompt Library', desc: '100+ ChatGPT & Claude prompts for every SEO task imaginable', tag: 'Free' },
+  { icon: <IconLink />, title: 'Link Building Checklist 2025', desc: '50-point checklist for white-hat link acquisition used by our team', tag: 'Free' },
+  { icon: <IconChart />, title: 'DR Improvement Roadmap', desc: 'Step-by-step guide to go from DR 20 to DR 60+ in 6 months', tag: 'Free' },
+  { icon: <IconSearch />, title: 'Technical SEO Audit Template', desc: 'Google Sheets template covering 100+ technical SEO checks', tag: 'Free' },
+  { icon: <IconMail />, title: 'Outreach Email Templates', desc: '10 proven cold outreach templates with 30-40% reply rates', tag: 'Free' },
+  { icon: <IconTrend />, title: 'Keyword Research SOP', desc: 'Our internal SOP for finding low-competition, high-intent keywords', tag: 'Free' },
+  { icon: <IconRobot />, title: 'AI SEO Prompt Library', desc: '100+ ChatGPT & Claude prompts for every SEO task imaginable', tag: 'Free' },
 ];
 
 const MEMBERS = [
@@ -68,9 +81,14 @@ const Community: React.FC = () => {
 
         {/* Stats row */}
         <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8">
-          {[{ v: '2,000+', l: 'Members', icon: '👥' }, { v: '500+', l: 'Discussions', icon: '💬' }, { v: '50+', l: 'Free Resources', icon: '📦' }, { v: '100%', l: 'Free to Join', icon: '🎉' }].map((s, i) => (
+          {[
+            { v: '2,000+', l: 'Members', icon: <IconUsers /> },
+            { v: '500+', l: 'Discussions', icon: <IconDiscuss /> },
+            { v: '50+', l: 'Free Resources', icon: <IconBox /> },
+            { v: '100%', l: 'Free to Join', icon: <IconHeart filled={false} /> }
+          ].map((s, i) => (
             <div key={i} className="glass px-5 py-3 rounded-2xl text-center border border-white/5">
-              <div className="text-lg mb-0.5">{s.icon}</div>
+              <div className="flex justify-center text-purple-400 mb-0.5">{s.icon}</div>
               <div className="text-lg font-black gradient-text">{s.v}</div>
               <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">{s.l}</div>
             </div>
@@ -89,10 +107,10 @@ const Community: React.FC = () => {
       <div className="flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto">
         {TABS.map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
-            className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeTab === tab ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20' : 'glass text-slate-400 hover:text-white border border-white/5'}`}>
-            {tab === 'Discussions' && '💬 '}
-            {tab === 'Resources' && '📦 '}
-            {tab === 'Members' && '👥 '}
+            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeTab === tab ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/20' : 'glass text-slate-400 hover:text-white border border-white/5'}`}>
+            {tab === 'Discussions' && <IconDiscuss />}
+            {tab === 'Resources' && <IconBox />}
+            {tab === 'Members' && <IconUsers />}
             {tab}
           </button>
         ))}
@@ -116,17 +134,28 @@ const Community: React.FC = () => {
                   <p className="text-slate-400 text-sm leading-relaxed mb-4">{d.body}</p>
                   <div className="flex items-center gap-5 text-xs font-bold text-slate-500">
                     <button className="flex items-center gap-1.5 hover:text-purple-400 transition-colors">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                      <IconMsg />
                       {d.replies} Replies
                     </button>
                     <button
                       onClick={() => setLiked(prev => ({ ...prev, [d.id]: !prev[d.id] }))}
                       className={`flex items-center gap-1.5 transition-colors ${liked[d.id] ? 'text-pink-400' : 'hover:text-pink-400'}`}>
-                      <svg className="w-4 h-4" fill={liked[d.id] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                      <IconHeart filled={!!liked[d.id]} />
                       {liked[d.id] ? d.likes + 1 : d.likes}
                     </button>
-                    <button className="flex items-center gap-1.5 hover:text-slate-300 transition-colors ml-auto">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                    <button
+                      onClick={() => {
+                        const text = `${d.title} — ${d.body.slice(0, 80)}...`;
+                        const url = window.location.href;
+                        if (navigator.share) {
+                          navigator.share({ title: d.title, text, url }).catch(() => {});
+                        } else {
+                          const wa = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+                          window.open(wa, '_blank');
+                        }
+                      }}
+                      className="flex items-center gap-1.5 hover:text-slate-300 transition-colors ml-auto">
+                      <IconShare />
                       Share
                     </button>
                   </div>
@@ -154,7 +183,7 @@ const Community: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {RESOURCES.map((r, i) => (
             <div key={i} className="glass rounded-2xl p-6 border border-white/5 hover:border-purple-500/20 transition-all hover:-translate-y-1 group flex flex-col">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 flex items-center justify-center text-2xl mb-4">{r.icon}</div>
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4">{r.icon}</div>
               <div className="flex items-start gap-2 mb-2">
                 <h3 className="font-black text-white text-sm flex-1 leading-snug">{r.title}</h3>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-black shrink-0">{r.tag}</span>
