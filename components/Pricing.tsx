@@ -118,16 +118,8 @@ const Pricing: React.FC<PricingProps> = ({ onContact }) => {
               key={i}
               className={`glass shine-3d p-6 sm:p-8 rounded-2xl relative ${plan.popular ? 'border-2 border-purple-500 md:scale-105' : 'border border-white/5'} transition-all`}
             >
-              {plan.badge && (
-                <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-emerald-500 px-3 sm:px-6 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase">
-                  {plan.badge}
-                </div>
-              )}
-              {plan.popular && (
-                <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-500 to-pink-500 px-3 sm:px-6 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase">
-                  Popular
-                </div>
-              )}
+
+
               
               <div className="text-center mb-6 sm:mb-8">
                 <h3 className="text-xl sm:text-2xl font-black mb-2">{plan.name}</h3>

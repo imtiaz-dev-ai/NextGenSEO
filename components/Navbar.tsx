@@ -65,6 +65,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
 
         <NavLink route={AppRoute.PRICING} label="Pricing" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.PRICING ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
         <NavLink route={AppRoute.CASE_STUDIES} label="Cases" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.CASE_STUDIES ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
+        <NavLink route={AppRoute.COMMUNITY} label="Community" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.COMMUNITY ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
+        <NavLink route={AppRoute.MARKETPLACE} label="Marketplace" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.MARKETPLACE ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
 
         <div className="relative group/company">
           <button className={`text-xs xl:text-sm font-bold uppercase tracking-wider flex items-center gap-1 transition-all hover:scale-105 ${currentRoute === AppRoute.ABOUT || currentRoute === AppRoute.TEAM ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>
@@ -113,6 +115,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
             <NavLink route={AppRoute.BLOG} label="Blog" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.BLOG ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
             <NavLink route={AppRoute.PRICING} label="Pricing" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.PRICING ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
             <NavLink route={AppRoute.CASE_STUDIES} label="Case Studies" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.CASE_STUDIES ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
+            <NavLink route={AppRoute.COMMUNITY} label="Community" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.COMMUNITY ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
+            <NavLink route={AppRoute.MARKETPLACE} label="Marketplace" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.MARKETPLACE ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
           </div>
 
           <div className="pt-3 pb-2">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { saveBlogToFirebase, getBlogsFromFirebase, updateBlogInFirebase, deleteBlogFromFirebase, saveCaseToFirebase, getCasesFromFirebase, updateCaseInFirebase, deleteCaseFromFirebase, saveTeamToFirebase, getTeamFromFirebase, updateTeamInFirebase, deleteTeamFromFirebase, getChatMessagesFromFirebase, deleteChatMessageFromFirebase } from '../utils/firebase';
+import { saveBlogToFirebase, getBlogsFromFirebase, updateBlogInFirebase, deleteBlogFromFirebase, saveCaseToFirebase, getCasesFromFirebase, updateCaseInFirebase, deleteCaseFromFirebase, saveTeamToFirebase, getTeamFromFirebase, updateTeamInFirebase, deleteTeamFromFirebase, getChatMessagesFromFirebase, deleteChatMessageFromFirebase, saveMarketplaceListingToFirebase, getMarketplaceListingsFromFirebase, updateMarketplaceListingInFirebase, deleteMarketplaceListingFromFirebase } from '../utils/firebase';
 
 interface ChatMessage {
   id: string;
@@ -153,11 +153,30 @@ const TeamIcon = () => (
   </svg>
 );
 
+const MarketIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+  </svg>
+);
+
+interface MarketplaceListing {
+  id: string;
+  domain: string;
+  dr: number;
+  traffic: string;
+  niche: string;
+  price: number;
+}
+
 const AdminPanel: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'messages' | 'blogs' | 'cases' | 'team'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'messages' | 'blogs' | 'cases' | 'team' | 'marketplace'>('dashboard');
+  const [listings, setListings] = useState<MarketplaceListing[]>([]);
+  const [showListingForm, setShowListingForm] = useState(false);
+  const [editingListing, setEditingListing] = useState<MarketplaceListing | null>(null);
+  const [listingForm, setListingForm] = useState({ domain: '', dr: '', traffic: '', niche: '', price: '' });
   const [lastActivity, setLastActivity] = useState(Date.now());
   const inactivityTimeout = 5 * 60 * 1000;
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -212,6 +231,7 @@ const AdminPanel: React.FC = () => {
       loadBlogs();
       loadCases();
       loadTeam();
+      loadListings();
     }
   }, []);
 
@@ -265,6 +285,15 @@ const AdminPanel: React.FC = () => {
     }
   };
 
+  const loadListings = async () => {
+    try {
+      const data = await getMarketplaceListingsFromFirebase();
+      setListings(data as MarketplaceListing[]);
+    } catch (error) {
+      console.error('Error loading listings:', error);
+    }
+  };
+
   const loadTeam = async () => {
     try {
       const savedTeam = await getTeamFromFirebase();
@@ -283,6 +312,7 @@ const AdminPanel: React.FC = () => {
       loadBlogs();
       loadCases();
       loadTeam();
+      loadListings();
     } else {
       alert('Invalid credentials!');
     }
@@ -502,6 +532,7 @@ const AdminPanel: React.FC = () => {
             { id: 'blogs', label: 'Blogs', icon: BlogIcon },
             { id: 'cases', label: 'Cases', icon: CaseIcon },
             { id: 'team', label: 'Team', icon: TeamIcon },
+            { id: 'marketplace', label: 'Marketplace', icon: MarketIcon },
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -564,6 +595,17 @@ const AdminPanel: React.FC = () => {
                 <div>
                   <p className="text-slate-400 text-sm font-bold">Team</p>
                   <p className="text-3xl font-black text-pink-400">{teamMembers.length}</p>
+                </div>
+              </div>
+            </div>
+            <div className="glass p-8 rounded-2xl border border-teal-500/30 hover:border-teal-500/50 transition-all">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-teal-500/20 flex items-center justify-center">
+                  <MarketIcon />
+                </div>
+                <div>
+                  <p className="text-slate-400 text-sm font-bold">Listings</p>
+                  <p className="text-3xl font-black text-teal-400">{listings.length}</p>
                 </div>
               </div>
             </div>
@@ -757,6 +799,90 @@ const AdminPanel: React.FC = () => {
                   <div className="flex gap-2">
                     <button onClick={() => editCase(c)} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-4 py-2 rounded-lg text-sm font-bold transition-all">Edit</button>
                     <button onClick={() => deleteCase(c.id)} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-4 py-2 rounded-lg text-sm font-bold transition-all">Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'marketplace' && (
+          <div className="glass p-8 rounded-2xl border border-white/5">
+            <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+              <h2 className="text-3xl font-black">Marketplace Listings</h2>
+              <button
+                onClick={() => { setShowListingForm(true); setEditingListing(null); setListingForm({ domain: '', dr: '', traffic: '', niche: '', price: '' }); }}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                Add Site
+              </button>
+            </div>
+
+            {showListingForm && (
+              <div className="bg-slate-900/50 p-8 rounded-xl mb-8 border border-purple-500/30">
+                <h3 className="text-xl font-bold mb-6">{editingListing ? 'Edit Listing' : 'Add New Site'}</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Domain</label>
+                      <input type="text" placeholder="example.com" value={listingForm.domain} onChange={e => setListingForm({...listingForm, domain: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">DR (Domain Rating)</label>
+                      <input type="number" placeholder="65" min="0" max="100" value={listingForm.dr} onChange={e => setListingForm({...listingForm, dr: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Monthly Traffic</label>
+                      <input type="text" placeholder="50K" value={listingForm.traffic} onChange={e => setListingForm({...listingForm, traffic: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Niche / Category</label>
+                      <input type="text" placeholder="Technology, Finance..." value={listingForm.niche} onChange={e => setListingForm({...listingForm, niche: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Price ($)</label>
+                      <input type="number" placeholder="300" min="0" value={listingForm.price} onChange={e => setListingForm({...listingForm, price: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button onClick={async () => {
+                      if (!listingForm.domain || !listingForm.dr || !listingForm.price) { alert('Domain, DR and Price required!'); return; }
+                      const data = { domain: listingForm.domain, dr: Number(listingForm.dr), traffic: listingForm.traffic, niche: listingForm.niche, price: Number(listingForm.price) };
+                      try {
+                        if (editingListing) {
+                          await updateMarketplaceListingInFirebase(editingListing.id, data);
+                          setListings(listings.map(l => l.id === editingListing.id ? { ...data, id: editingListing.id } : l));
+                        } else {
+                          const id = await saveMarketplaceListingToFirebase(data);
+                          setListings([...listings, { ...data, id }]);
+                        }
+                        setShowListingForm(false); setEditingListing(null); setListingForm({ domain: '', dr: '', traffic: '', niche: '', price: '' });
+                        alert('Saved!');
+                      } catch (e: any) { alert('Error: ' + e.message); }
+                    }} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save</button>
+                    <button onClick={() => { setShowListingForm(false); setEditingListing(null); }} className="glass px-8 py-3 rounded-lg font-bold">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="glass rounded-xl overflow-hidden">
+              <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 px-6 py-3 border-b border-white/5 text-xs font-black uppercase text-slate-400">
+                <span>Domain</span><span>DR</span><span>Traffic</span><span>Niche</span><span>Price</span><span />
+              </div>
+              {listings.length === 0 ? (
+                <p className="text-center text-slate-400 py-12">No listings yet. Click "Add Site" to add one.</p>
+              ) : listings.map(l => (
+                <div key={l.id} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_auto] gap-4 items-center px-6 py-4 border-b border-white/5 hover:bg-white/[0.02] transition-all">
+                  <span className="font-bold text-white truncate">{l.domain}</span>
+                  <span className="text-teal-400 font-black">{l.dr}</span>
+                  <span className="text-slate-300 text-sm">{l.traffic}</span>
+                  <span className="text-purple-400 text-sm">{l.niche}</span>
+                  <span className="text-emerald-400 font-bold">${l.price}</span>
+                  <div className="flex gap-2">
+                    <button onClick={() => { setEditingListing(l); setListingForm({ domain: l.domain, dr: String(l.dr), traffic: l.traffic, niche: l.niche, price: String(l.price) }); setShowListingForm(true); }} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Edit</button>
+                    <button onClick={async () => { if (confirm('Delete this listing?')) { await deleteMarketplaceListingFromFirebase(l.id); setListings(listings.filter(x => x.id !== l.id)); } }} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Delete</button>
                   </div>
                 </div>
               ))}

@@ -22,28 +22,53 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
         </div>
         
         <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter mb-4 sm:mb-8 md:mb-10 leading-[0.9] px-0 animate-in">
-          Professional <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">SEO Services</span> <br className="hidden sm:block" />
-          for <span className="gradient-text">Organic Growth</span>
+          The <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">#1 SEO Agency</span> <br className="hidden sm:block" />
+          for <span className="gradient-text">Link Building</span>
         </h1>
         
         <p className="text-sm sm:text-lg md:text-2xl lg:text-3xl text-slate-400 max-w-4xl mx-auto mb-8 sm:mb-12 md:mb-14 leading-relaxed sm:leading-tight font-medium tracking-tight px-0">
-          NextGen SEO is a professional <span className="text-slate-100 font-bold">AI SEO agency</span> specializing in <span className="text-slate-100 font-bold">keyword research</span>, <span className="text-slate-100 font-bold">technical SEO audits</span>, <span className="text-slate-100 font-bold">white-hat link building</span>, and <span className="text-slate-100 font-bold">content optimization</span> to drive organic traffic and increase Google rankings.
+          From <span className="text-slate-100 font-bold">high-authority guest posts</span> to <span className="text-slate-100 font-bold">permanent do-follow link insertions</span> — NextGen SEO drives faster organic growth with transparent metrics and a hand-vetted publisher network. <span className="text-slate-100 font-bold">You approve, we execute.</span>
         </p>
 
-        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 mb-12 sm:mb-20 md:mb-24 px-0">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-14 md:mb-16 px-0">
           <button 
             onClick={() => onStart(AppRoute.CONTACT)}
             className="group relative w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 sm:px-10 md:px-12 py-4 sm:py-5 md:py-6 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base md:text-lg lg:text-xl transition-all shadow-2xl shadow-purple-500/50 active:scale-95 overflow-hidden hover-lift"
           >
             <span className="relative z-10 flex items-center justify-center gap-2 md:gap-3">
-              Book a Consultation
+              Book a Call
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
           </button>
-          {/* Removed AI tool CTA */}
+          <button
+            onClick={() => onStart(AppRoute.MARKETPLACE)}
+            className="group w-full sm:w-auto glass px-6 sm:px-10 md:px-12 py-4 sm:py-5 md:py-6 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base md:text-lg lg:text-xl hover:bg-white/10 transition-all border border-white/10 hover:border-purple-500/40"
+          >
+            <span className="flex items-center justify-center gap-2">
+              See How It Works
+              <svg className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </button>
+        </div>
+
+        {/* Trust badges */}
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mb-12 sm:mb-20 md:mb-24">
+          <div className="flex items-center gap-2">
+            <span className="text-yellow-400 text-base sm:text-lg">⭐</span>
+            <span className="text-slate-300 text-xs sm:text-sm font-bold">Trusted by <span className="text-white font-black">500+</span> SaaS brands worldwide</span>
+          </div>
+          <div className="w-px h-5 bg-white/10 hidden sm:block" />
+          <div className="flex items-center gap-2">
+            <div className="flex text-yellow-400 text-sm">
+              {'★★★★★'.split('').map((s, i) => <span key={i}>{s}</span>)}
+            </div>
+            <span className="text-slate-300 text-xs sm:text-sm font-bold"><span className="text-white font-black">4.8/5</span> on SEO Reviews</span>
+          </div>
         </div>
 
         <div className="pt-8 sm:pt-10 md:pt-12 border-t border-white/5 max-w-6xl mx-auto opacity-60 transition-all hover:opacity-100 duration-500">
@@ -59,20 +84,6 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
         </div>
 
         {/* Floating badges - desktop only */}
-        <div className="hidden lg:block">
-          <div className="absolute top-8 right-0 glass-premium px-4 py-2 rounded-2xl border border-purple-500/20 animate-float-3d shadow-3d" style={{ animationDelay: '0s' }}>
-            <div className="flex items-center gap-2 text-xs font-bold">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-slate-300">300%+ Avg Growth</span>
-            </div>
-          </div>
-          <div className="absolute top-24 right-0 glass-premium px-4 py-2 rounded-2xl border border-pink-500/20 animate-float-3d shadow-3d" style={{ animationDelay: '1s' }}>
-            <div className="flex items-center gap-2 text-xs font-bold">
-              <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
-              <span className="text-slate-300">200+ Happy Clients</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -24,6 +24,7 @@ const ClientsCarousel = lazy(() => import('./components/ClientsCarousel'));
 
 const LinkBuildingServices = lazy(() => import('./components/LinkBuildingServices'));
 const AnimatedStats = lazy(() => import('./components/AnimatedStats'));
+const Community = lazy(() => import('./components/Community'));
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[40vh]">
@@ -523,6 +524,18 @@ const App: React.FC = () => {
       if (!localStorage.getItem('teamMembers')) {
         localStorage.setItem('teamMembers', JSON.stringify(sampleTeamMembers));
       }
+      // Marketplace sample listings
+      const existingListings = localStorage.getItem('marketplaceListings');
+      if (!existingListings || JSON.parse(existingListings).length === 0) {
+        const sampleListings = [
+          { id: 'ml1', domain: 'techcrunch.com', dr: 92, traffic: '180K', niche: 'Technology', price: 850 },
+          { id: 'ml2', domain: 'healthline.com', dr: 88, traffic: '220K', niche: 'Health', price: 750 },
+          { id: 'ml3', domain: 'forbes.com', dr: 94, traffic: '310K', niche: 'Finance', price: 1200 },
+          { id: 'ml4', domain: 'hubspot.com', dr: 85, traffic: '95K', niche: 'Marketing', price: 650 },
+          { id: 'ml5', domain: 'shopify.com', dr: 91, traffic: '140K', niche: 'E-commerce', price: 900 },
+        ];
+        localStorage.setItem('marketplaceListings', JSON.stringify(sampleListings));
+      }
     };
     if ('requestIdleCallback' in window) {
       (window as any).requestIdleCallback(initData);
@@ -744,6 +757,18 @@ const App: React.FC = () => {
       case AppRoute.PRICING: return <Pricing onContact={() => { setCurrentRoute(AppRoute.CONTACT); window.scrollTo(0, 0); }} />;
       case AppRoute.CASE_STUDIES: return <CaseStudies />;
       case AppRoute.ADMIN: return <AdminPanel />;
+      case AppRoute.MARKETPLACE: return (
+        <div className="pt-24">
+          <Suspense fallback={<PageLoader />}>
+            {React.createElement(lazy(() => import('./components/Marketplace')))}
+          </Suspense>
+        </div>
+      );
+      case AppRoute.COMMUNITY: return (
+        <div className="pt-24">
+          <Community />
+        </div>
+      );
 
       default: return <Hero onStart={setCurrentRoute} />;
     }

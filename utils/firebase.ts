@@ -259,3 +259,44 @@ export const deleteBacklinkFromFirebase = async (backlinkId: string) => {
 };
 
 export const uploadBlogImage = async (imageData: string) => imageData;
+
+// Marketplace functions
+export const saveMarketplaceListingToFirebase = async (listing: any) => {
+  try {
+    const ref = await addDoc(collection(db, "marketplaceListings"), { ...listing, createdAt: serverTimestamp() });
+    return ref.id;
+  } catch (e) {
+    const items = getLocalData("marketplaceListings");
+    const newItem = { ...listing, id: Date.now().toString(), createdAt: new Date().toISOString() };
+    items.push(newItem);
+    saveLocalData("marketplaceListings", items);
+    return newItem.id;
+  }
+};
+
+export const getMarketplaceListingsFromFirebase = async () => {
+  try {
+    const snapshot = await getDocs(collection(db, "marketplaceListings"));
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    return getLocalData("marketplaceListings");
+  }
+};
+
+export const updateMarketplaceListingInFirebase = async (id: string, updates: any) => {
+  try {
+    await updateDoc(doc(db, "marketplaceListings", id), updates);
+  } catch (e) {
+    const items = getLocalData("marketplaceListings");
+    const idx = items.findIndex((i: any) => i.id === id);
+    if (idx > -1) { items[idx] = { ...items[idx], ...updates }; saveLocalData("marketplaceListings", items); }
+  }
+};
+
+export const deleteMarketplaceListingFromFirebase = async (id: string) => {
+  try {
+    await deleteDoc(doc(db, "marketplaceListings", id));
+  } catch (e) {
+    saveLocalData("marketplaceListings", getLocalData("marketplaceListings").filter((i: any) => i.id !== id));
+  }
+};
