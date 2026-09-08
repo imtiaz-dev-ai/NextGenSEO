@@ -22,12 +22,12 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
         </div>
         
         <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter mb-4 sm:mb-8 md:mb-10 leading-[0.9] px-0 animate-in">
-          The <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">#1 SEO Agency</span> <br className="hidden sm:block" />
-          for <span className="gradient-text">Link Building</span>
+          The <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">#1 SEO Partner</span> <br className="hidden sm:block" />
+          for <span className="gradient-text">High-Growth SaaS Companies</span>
         </h1>
         
         <p className="text-sm sm:text-lg md:text-2xl lg:text-3xl text-slate-400 max-w-4xl mx-auto mb-8 sm:mb-12 md:mb-14 leading-relaxed sm:leading-tight font-medium tracking-tight px-0">
-          From <span className="text-slate-100 font-bold">high-authority guest posts</span> to <span className="text-slate-100 font-bold">permanent do-follow link insertions</span> — NextGen SEO drives faster organic growth with transparent metrics and a hand-vetted publisher network. <span className="text-slate-100 font-bold">You approve, we execute.</span>
+          SaaS SEO and link building that drives <span className="text-slate-100 font-bold">300%+ organic growth</span> — Stop buying low-quality links. Partner with an agency that turns <span className="text-slate-100 font-bold">search authority into pipeline revenue.</span>
         </p>
 
         <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-14 md:mb-16 px-0">

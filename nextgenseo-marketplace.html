@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NextGenSEO.pro — Backlink Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12141A;
+    --panel:#1C1F27;
+    --panel-2:#22262f;
+    --line:#2C303B;
+    --paper:#ECE8DF;
+    --muted:#9CA0AC;
+    --gold:#E4A93B;
+    --gold-dim:#8a6a2c;
+    --teal:#4FA394;
+    --alert:#E2654A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-feature-settings:"tnum" 1;
+    line-height:1.5;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit;}
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+
+  /* NAV */
+  nav{
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:50;
+    background:rgba(18,20,26,0.92);
+    backdrop-filter:blur(8px);
+  }
+  nav .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height:72px;
+  }
+  .logo{
+    font-family:'Fraunces', serif;
+    font-size:20px; font-weight:700;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;}
+  .navlinks{display:flex; gap:32px; font-size:14.5px; color:var(--muted);}
+  .navlinks a{text-decoration:none; transition:color .15s;}
+  .navlinks a:hover{color:var(--paper);}
+  .nav-cta{
+    background:var(--gold); color:#20170a; font-weight:600;
+    padding:10px 20px; border-radius:3px; text-decoration:none; font-size:14px;
+  }
+  @media (max-width:900px){ .navlinks{display:none;} }
+
+  /* HERO */
+  .hero{padding:76px 0 64px; border-bottom:1px solid var(--line);}
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:start;}
+  @media (max-width:960px){ .hero-grid{grid-template-columns:1fr;} }
+  .eyebrow-row{display:flex; align-items:center; gap:10px; margin-bottom:22px; color:var(--muted); font-size:13.5px;}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--teal); animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  .hero h1{font-size:50px; line-height:1.08;}
+  @media (max-width:640px){ .hero h1{font-size:36px;} }
+  .hero p.lead{
+    color:var(--muted); font-size:17px; max-width:480px; margin:22px 0 30px;
+  }
+  .hero-actions{display:flex; gap:14px; margin-bottom:44px;}
+  .btn-primary{
+    background:var(--gold); color:#20170a; font-weight:600; font-size:15px;
+    padding:14px 26px; border-radius:3px; text-decoration:none; border:none; cursor:pointer;
+  }
+  .btn-ghost{
+    background:transparent; color:var(--paper); font-weight:500; font-size:15px;
+    padding:14px 22px; border-radius:3px; text-decoration:none; border:1px solid var(--line);
+  }
+  .hero-stats{display:flex; gap:36px; flex-wrap:wrap;}
+  .hero-stats div b{font-family:'Fraunces',serif; font-size:26px; display:block; font-weight:600;}
+  .hero-stats div span{color:var(--muted); font-size:13px;}
+
+  /* Ticker card */
+  .ticker{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px; overflow:hidden;
+  }
+  .ticker-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 18px; border-bottom:1px solid var(--line); font-size:13px; color:var(--muted);
+  }
+  .ticker-row{
+    display:grid; grid-template-columns:1.4fr 0.7fr 0.6fr 0.7fr;
+    padding:13px 18px; border-bottom:1px solid var(--line); font-size:13.5px; align-items:center;
+    gap:8px;
+  }
+  .ticker-row:last-child{border-bottom:none;}
+  .ticker-row .dom{font-weight:600;}
+  .ticker-row .niche{color:var(--muted); font-size:12px; display:block; margin-top:2px;}
+  .dr-pill{
+    background:rgba(228,169,59,0.12); color:var(--gold); font-size:12px; font-weight:600;
+    padding:3px 8px; border-radius:3px; display:inline-block; width:fit-content;
+  }
+  .price{font-weight:600; text-align:right;}
+  .buy-mini{
+    background:transparent; border:1px solid var(--line); color:var(--paper);
+    font-size:12px; padding:6px 10px; border-radius:3px; cursor:pointer; justify-self:end;
+  }
+  .buy-mini:hover{border-color:var(--gold); color:var(--gold);}
+
+  /* SECTION HEADS */
+  .section{padding:72px 0; border-bottom:1px solid var(--line);}
+  .section-head{max-width:600px; margin-bottom:40px;}
+  .section-head h2{font-size:32px;}
+  .section-head p{color:var(--muted); font-size:15.5px; margin-top:12px;}
+
+  /* FILTER BAR */
+  .filters{display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; align-items:center;}
+  .filter-pill{
+    background:var(--panel); border:1px solid var(--line); color:var(--muted);
+    font-size:13.5px; padding:9px 16px; border-radius:999px; cursor:pointer;
+    transition:all .15s; font-family:inherit;
+  }
+  .filter-pill.active{background:var(--gold); border-color:var(--gold); color:#20170a; font-weight:600;}
+  .filter-pill:hover:not(.active){border-color:var(--gold-dim); color:var(--paper);}
+  .search-box{
+    margin-left:auto; background:var(--panel); border:1px solid var(--line); border-radius:6px;
+    padding:9px 14px; color:var(--paper); font-size:13.5px; font-family:inherit; width:220px;
+  }
+  @media (max-width:640px){ .search-box{width:100%; margin-left:0;} }
+
+  /* MARKET TABLE */
+  .market-table{background:var(--panel); border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+  .mt-head{
+    display:grid; grid-template-columns:1.8fr 0.9fr 0.6fr 1fr 1.3fr 0.9fr 0.8fr 0.9fr;
+    padding:14px 20px; font-size:12px; text-transform:uppercase; letter-spacing:0.04em;
+    color:var(--muted); border-bottom:1px solid var(--line);
+  }
+  .mt-row{
+    display:grid; grid-template-columns:1.8fr 0.9fr 0.6fr 1fr 1.3fr 0.9fr 0.8fr 0.9fr;
+    padding:17px 20px; border-bottom:1px solid var(--line); align-items:center; font-size:14px;
+  }
+  .mt-row:last-child{border-bottom:none;}
+  .mt-row .domain-name{font-weight:600;}
+  .mt-row .domain-sub{color:var(--muted); font-size:12px; margin-top:2px;}
+  .verified{color:var(--teal); font-size:11.5px; display:inline-flex; align-items:center; gap:5px; margin-top:4px;}
+  .verified::before{content:"✓"; font-weight:700;}
+  .svc-tags{display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;}
+  .svc-tag{
+    font-size:11px; padding:2px 8px; border-radius:3px; font-weight:600; border:1px solid var(--line);
+  }
+  .svc-tag.yes{color:var(--teal); border-color:rgba(79,163,148,0.4); background:rgba(79,163,148,0.08);}
+  .svc-tag.no{color:var(--muted); border-color:var(--line); background:transparent; text-decoration:line-through; opacity:0.6;}
+  .mt-price{font-weight:600; text-align:right;}
+  .mt-buy{
+    background:transparent; border:1px solid var(--gold); color:var(--gold);
+    font-size:13px; padding:8px 14px; border-radius:3px; cursor:pointer; font-family:inherit;
+    justify-self:end;
+  }
+  .mt-buy:hover{background:var(--gold); color:#20170a;}
+  @media (max-width:860px){
+    .mt-head{display:none;}
+    .mt-row{grid-template-columns:1fr; gap:6px; padding:16px 18px;}
+    .mt-row > div{display:flex; justify-content:space-between; font-size:13px;}
+    .mt-row > div::before{content:attr(data-label); color:var(--muted); font-size:11px;}
+    .mt-buy{justify-self:stretch; margin-top:6px;}
+  }
+  .empty-hint{padding:32px 20px; text-align:center; color:var(--muted); font-size:14px;}
+
+  /* FEATURE STRIP */
+  .strip{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid var(--line); border-radius:6px; overflow:hidden;
+  }
+  .strip div{padding:26px 22px; border-right:1px solid var(--line);}
+  .strip div:last-child{border-right:none;}
+  .strip b{font-family:'Fraunces',serif; font-size:26px; font-weight:600; display:block;}
+  .strip span{color:var(--muted); font-size:12.5px;}
+  @media (max-width:760px){ .strip{grid-template-columns:1fr 1fr;} .strip div:nth-child(2){border-right:none;} }
+
+  /* WHY LIST (edge features) */
+  .why-list{display:flex; flex-direction:column;}
+  .why-item{
+    display:grid; grid-template-columns:56px 1fr; gap:22px; padding:26px 0; border-bottom:1px solid var(--line);
+  }
+  .why-item:last-child{border-bottom:none;}
+  .why-num{font-family:'Fraunces',serif; font-size:22px; color:var(--gold-dim); font-weight:600;}
+  .why-item h3{font-size:19px; margin-bottom:6px;}
+  .why-item p{color:var(--muted); font-size:14.5px; max-width:560px; margin:0;}
+  .tag-new{
+    background:rgba(79,163,148,0.14); color:var(--teal); font-size:11px; font-weight:600;
+    padding:2px 8px; border-radius:3px; margin-left:10px; vertical-align:middle;
+  }
+
+  /* FAQ */
+  .faq-item{border-bottom:1px solid var(--line);}
+  .faq-q{
+    display:flex; justify-content:space-between; align-items:center; padding:20px 0; cursor:pointer;
+    font-size:15.5px; font-weight:500;
+  }
+  .faq-q .plus{color:var(--gold); font-size:20px; transition:transform .2s; font-family:'Fraunces',serif;}
+  .faq-item.open .plus{transform:rotate(45deg);}
+  .faq-a{max-height:0; overflow:hidden; transition:max-height .25s ease; color:var(--muted); font-size:14.5px;}
+  .faq-item.open .faq-a{max-height:200px; padding-bottom:20px;}
+
+  /* CTA BAND */
+  .cta-band{
+    padding:80px 0; text-align:left;
+  }
+  .cta-band h2{font-size:36px; max-width:520px;}
+  .cta-band p{color:var(--muted); margin:16px 0 28px; max-width:480px;}
+
+  footer{padding:40px 0; color:var(--muted); font-size:13px;}
+  .foot-row{display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo"><span class="dot"></span>NextGenSEO<span style="color:var(--muted);font-weight:400;">.pro</span></div>
+    <div class="navlinks">
+      <a href="#market">Marketplace</a>
+      <a href="#features">Features</a>
+      <a href="#faq">FAQ</a>
+      <a href="#">Case Studies</a>
+    </div>
+    <a href="#" class="nav-cta">Get Started</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow-row"><span class="live-dot"></span> Inventory refreshed today</div>
+      <h1>Backlinks, priced like a real order book.</h1>
+      <p class="lead">Filter by authority, niche and traffic. Pay a fixed price, track the placement to publish, and get proof it went live — no bidding, no guesswork.</p>
+      <div class="hero-actions">
+        <a href="#market" class="btn-primary">Browse the marketplace</a>
+        <a href="#features" class="btn-ghost">See what's different</a>
+      </div>
+      <div class="hero-stats">
+        <div><b>640+</b><span>domains listed</span></div>
+        <div><b>DR 41</b><span>average authority</span></div>
+        <div><b>2–5 days</b><span>typical turnaround</span></div>
+        <div><b>100%</b><span>manual outreach</span></div>
+      </div>
+    </div>
+
+    <div class="ticker">
+      <div class="ticker-head"><span>Live listings</span><span>Price</span></div>
+      <div class="ticker-row">
+        <div><span class="dom">saastoolreview.com</span><span class="niche">SaaS · DR 61</span></div>
+        <div><span class="dr-pill">DR 61</span></div>
+        <div></div>
+        <div class="price">$185</div>
+      </div>
+      <div class="ticker-row">
+        <div><span class="dom">markethealthly.io</span><span class="niche">Health · DR 48</span></div>
+        <div><span class="dr-pill">DR 48</span></div>
+        <div></div>
+        <div class="price">$120</div>
+      </div>
+      <div class="ticker-row">
+        <div><span class="dom">fintrail.co</span><span class="niche">Finance · DR 73</span></div>
+        <div><span class="dr-pill">DR 73</span></div>
+        <div></div>
+        <div class="price">$310</div>
+      </div>
+      <div class="ticker-row">
+        <div><span class="dom">dailygrowthhq.com</span><span class="niche">Marketing · DR 55</span></div>
+        <div><span class="dr-pill">DR 55</span></div>
+        <div></div>
+        <div class="price">$150</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="market">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Search the live listing</h2>
+      <p>Filter by tier, niche or TLD, then check out directly at the listed price.</p>
+    </div>
+
+    <div class="filters" id="filterBar">
+      <button class="filter-pill active" data-filter="all">All listings</button>
+      <button class="filter-pill" data-filter="com">.com</button>
+      <button class="filter-pill" data-filter="io">.io / .ai / .co</button>
+      <button class="filter-pill" data-filter="dr70">DR 70+</button>
+      <button class="filter-pill" data-filter="guestpost">Guest Post</button>
+      <button class="filter-pill" data-filter="linkinsertion">Link Insertion</button>
+      <input class="search-box" id="searchBox" placeholder="Search domain or niche…">
+    </div>
+
+    <div class="market-table">
+      <div class="mt-head">
+        <div>Domain</div><div>Niche</div><div>DR</div><div>Monthly traffic</div><div>Guest Post / Link Insertion</div><div>Turnaround</div><div>Price</div><div></div>
+      </div>
+      <div id="mtBody"></div>
+      <div class="empty-hint" id="emptyHint" style="display:none;">No domains matched that search. Try a different keyword.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="strip">
+      <div><b>640+</b><span>domain inventory</span></div>
+      <div><b>DR 15–91</b><span>authority range</span></div>
+      <div><b>24/7</b><span>expert support</span></div>
+      <div><b>100%</b><span>do-follow, lifetime</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Built to go further than a listing page</h2>
+      <p>Everything you'd expect from a fixed-price link marketplace — plus the parts that usually only show up after you've already paid someone.</p>
+    </div>
+    <div class="why-list">
+      <div class="why-item">
+        <div class="why-num">01</div>
+        <div><h3>Order tracking, not just an inbox <span class="tag-new">New</span></h3>
+        <p>Every order moves through a visible pipeline — placed, written, outreach, live, reported — so you're never emailing to ask "any update?"</p></div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">02</div>
+        <div><h3>Escrow-style payment <span class="tag-new">New</span></h3>
+        <p>Funds are held until the link is verified live on the target domain. If placement fails, you're refunded automatically — not after a support ticket.</p></div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">03</div>
+        <div><h3>Bulk cart with instant tiered pricing <span class="tag-new">New</span></h3>
+        <p>Add multiple domains to one cart and see your discount calculate live, instead of waiting on a quote for volume orders.</p></div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">04</div>
+        <div><h3>An assistant that shortlists for you <span class="tag-new">New</span></h3>
+        <p>Tell it your niche and budget — it filters the listing down to domains worth bidding your budget on, based on relevance, not just DR.</p></div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">05</div>
+        <div><h3>Publisher portal</h3>
+        <p>Site owners can submit their own domain for listing and get paid per placement — which is how the inventory keeps growing past what one team can source manually.</p></div>
+      </div>
+      <div class="why-item">
+        <div class="why-num">06</div>
+        <div><h3>Verified metrics, not self-reported</h3>
+        <p>Every DR, traffic and spam-score figure is pulled from Ahrefs and Semrush and timestamped, so what you see is what was true this week — not the day the domain was onboarded.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="wrap" style="max-width:760px; margin:0 auto;">
+    <div class="section-head" style="max-width:none;">
+      <h2>Common questions</h2>
+    </div>
+    <div id="faqList">
+      <div class="faq-item">
+        <div class="faq-q">How do you verify traffic and authority?<span class="plus">+</span></div>
+        <div class="faq-a">We cross-check every domain against Ahrefs and Semrush before it's listed, and re-verify monthly — so DR alone never determines a placement's value.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What happens if a placement fails?<span class="plus">+</span></div>
+        <div class="faq-a">Your payment is held in escrow until the link goes live. If we can't secure the placement, you're refunded automatically or offered an equivalent alternative domain.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is the link permanent and do-follow?<span class="plus">+</span></div>
+        <div class="faq-a">Yes — every placement is do-follow and guaranteed for lifetime, with a live monitoring check so you're alerted if it's ever removed.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I list my own domain as a publisher?<span class="plus">+</span></div>
+        <div class="faq-a">Yes, through the publisher portal. Submit your domain's metrics, pass verification, and set your own base rate — we handle outreach and payment collection.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>Ready to build your link profile the transparent way?</h2>
+    <p>No proposals to wait on, no back-and-forth on price. Pick your domains and check out.</p>
+    <a href="#market" class="btn-primary">Browse live inventory</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <div>© 2026 NextGenSEO.pro. All rights reserved.</div>
+    <div>Privacy Policy · Terms · Refund Policy · Contact</div>
+  </div>
+</footer>
+
+<script>
+const listings = [
+  {domain:"saastoolreview.com", niche:"SaaS", tld:"com", dr:61, traffic:"12.4k/mo", turnaround:"3 days", price:185, guestPost:true, linkInsertion:true},
+  {domain:"markethealthly.io", niche:"Health", tld:"io", dr:48, traffic:"6.1k/mo", turnaround:"4 days", price:120, guestPost:true, linkInsertion:false},
+  {domain:"fintrail.co", niche:"Finance", tld:"io", dr:73, traffic:"31k/mo", turnaround:"5 days", price:310, guestPost:false, linkInsertion:true},
+  {domain:"dailygrowthhq.com", niche:"Marketing", tld:"com", dr:55, traffic:"9.8k/mo", turnaround:"3 days", price:150, guestPost:true, linkInsertion:true},
+  {domain:"remoteworkedge.ai", niche:"SaaS", tld:"io", dr:71, traffic:"22k/mo", turnaround:"4 days", price:275, guestPost:true, linkInsertion:false},
+  {domain:"budgetwisely.com", niche:"Finance", tld:"com", dr:38, traffic:"4.2k/mo", turnaround:"2 days", price:95, guestPost:false, linkInsertion:true},
+  {domain:"cloudstacknews.io", niche:"Tech", tld:"io", dr:82, traffic:"48k/mo", turnaround:"6 days", price:420, guestPost:true, linkInsertion:true},
+  {domain:"greenlivingtoday.com", niche:"Lifestyle", tld:"com", dr:44, traffic:"7.5k/mo", turnaround:"3 days", price:110, guestPost:false, linkInsertion:false},
+];
+
+const mtBody = document.getElementById('mtBody');
+const emptyHint = document.getElementById('emptyHint');
+let activeFilter = 'all';
+let searchTerm = '';
+
+function matchesFilter(item){
+  if(activeFilter === 'com') return item.tld === 'com';
+  if(activeFilter === 'io') return item.tld === 'io';
+  if(activeFilter === 'dr70') return item.dr >= 70;
+  if(activeFilter === 'guestpost') return item.guestPost === true;
+  if(activeFilter === 'linkinsertion') return item.linkInsertion === true;
+  return true;
+}
+
+function render(){
+  const term = searchTerm.trim().toLowerCase();
+  const rows = listings.filter(item =>
+    matchesFilter(item) &&
+    (term === '' || item.domain.toLowerCase().includes(term) || item.niche.toLowerCase().includes(term))
+  );
+
+  mtBody.innerHTML = rows.map(item => `
+    <div class="mt-row">
+      <div data-label="Domain">
+        <span>
+          <span class="domain-name">${item.domain}</span>
+          <span class="domain-sub">${item.niche}</span>
+          <span class="verified">Verified</span>
+        </span>
+      </div>
+      <div data-label="Niche">${item.niche}</div>
+      <div data-label="DR"><span class="dr-pill">${item.dr}</span></div>
+      <div data-label="Traffic">${item.traffic}</div>
+      <div data-label="Guest Post / Link Insertion">
+        <span class="svc-tags">
+          <span class="svc-tag ${item.guestPost ? 'yes' : 'no'}">Guest Post ${item.guestPost ? '✓' : '✕'}</span>
+          <span class="svc-tag ${item.linkInsertion ? 'yes' : 'no'}">Link Insertion ${item.linkInsertion ? '✓' : '✕'}</span>
+        </span>
+      </div>
+      <div data-label="Turnaround">${item.turnaround}</div>
+      <div data-label="Price" class="mt-price">$${item.price}</div>
+      <button class="mt-buy">Buy</button>
+    </div>
+  `).join('');
+
+  emptyHint.style.display = rows.length === 0 ? 'block' : 'none';
+}
+
+document.getElementById('filterBar').addEventListener('click', (e) => {
+  if(!e.target.classList.contains('filter-pill')) return;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  e.target.classList.add('active');
+  activeFilter = e.target.dataset.filter;
+  render();
+});
+
+document.getElementById('searchBox').addEventListener('input', (e) => {
+  searchTerm = e.target.value;
+  render();
+});
+
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    q.parentElement.classList.toggle('open');
+  });
+});
+
+render();
+</script>
+
+</body>
+</html>
