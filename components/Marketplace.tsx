@@ -44,8 +44,8 @@ const Marketplace: React.FC = () => {
     if (activeFilter === 'com') return matchSearch && item.domain.endsWith('.com');
     if (activeFilter === 'io') return matchSearch && (item.domain.endsWith('.io') || item.domain.endsWith('.ai') || item.domain.endsWith('.co'));
     if (activeFilter === 'dr70') return matchSearch && item.dr >= 70;
-    if (activeFilter === 'guestpost') return matchSearch && item.guestPost === true;
-    if (activeFilter === 'linkinsertion') return matchSearch && item.linkInsertion === true;
+    if (activeFilter === 'guestpost') return matchSearch && !!item.guestPost;
+    if (activeFilter === 'linkinsertion') return matchSearch && !!item.linkInsertion;
     return matchSearch;
   });
 
@@ -230,12 +230,18 @@ const Marketplace: React.FC = () => {
                 <span className="text-slate-300 font-bold text-sm">{item.traffic}</span>
                 {/* Services */}
                 <div className="flex gap-2 flex-wrap">
-                  <span className={`text-xs px-2 py-0.5 rounded font-bold border ${item.guestPost ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' : 'text-slate-500 border-white/5 line-through opacity-50'}`}>
-                    Guest Post {item.guestPost ? '✓' : '✕'}
-                  </span>
-                  <span className={`text-xs px-2 py-0.5 rounded font-bold border ${item.linkInsertion ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' : 'text-slate-500 border-white/5 line-through opacity-50'}`}>
-                    Link Insertion {item.linkInsertion ? '✓' : '✕'}
-                  </span>
+                  {item.guestPost !== undefined || item.linkInsertion !== undefined ? (
+                    <>
+                      <span className={`text-xs px-2 py-0.5 rounded font-bold border ${item.guestPost ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' : 'text-slate-500 border-white/5 opacity-50'}`}>
+                        Guest Post {item.guestPost ? '✓' : '✕'}
+                      </span>
+                      <span className={`text-xs px-2 py-0.5 rounded font-bold border ${item.linkInsertion ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' : 'text-slate-500 border-white/5 opacity-50'}`}>
+                        Link Insertion {item.linkInsertion ? '✓' : '✕'}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-slate-500 text-xs">Contact for details</span>
+                  )}
                 </div>
                 {/* Turnaround */}
                 <span className="text-slate-300 text-sm">{item.turnaround || '3–5 days'}</span>

@@ -277,7 +277,15 @@ export const saveMarketplaceListingToFirebase = async (listing: any) => {
 export const getMarketplaceListingsFromFirebase = async () => {
   try {
     const snapshot = await getDocs(collection(db, "marketplaceListings"));
-    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    return snapshot.docs.map(d => {
+      const data = d.data();
+      return {
+        id: d.id,
+        ...data,
+        guestPost: data.guestPost ?? data.guest_post ?? data.guestpost ?? undefined,
+        linkInsertion: data.linkInsertion ?? data.link_insertion ?? data.linkinsertion ?? undefined,
+      };
+    });
   } catch (e) {
     return getLocalData("marketplaceListings");
   }

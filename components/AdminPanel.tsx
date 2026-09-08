@@ -166,6 +166,9 @@ interface MarketplaceListing {
   traffic: string;
   niche: string;
   price: number;
+  turnaround?: string;
+  guestPost?: boolean;
+  linkInsertion?: boolean;
 }
 
 const AdminPanel: React.FC = () => {
@@ -176,7 +179,7 @@ const AdminPanel: React.FC = () => {
   const [listings, setListings] = useState<MarketplaceListing[]>([]);
   const [showListingForm, setShowListingForm] = useState(false);
   const [editingListing, setEditingListing] = useState<MarketplaceListing | null>(null);
-  const [listingForm, setListingForm] = useState({ domain: '', dr: '', traffic: '', niche: '', price: '' });
+  const [listingForm, setListingForm] = useState({ domain: '', dr: '', traffic: '', niche: '', price: '', turnaround: '', guestPost: true, linkInsertion: true });
   const [lastActivity, setLastActivity] = useState(Date.now());
   const inactivityTimeout = 5 * 60 * 1000;
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -811,7 +814,7 @@ const AdminPanel: React.FC = () => {
             <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
               <h2 className="text-3xl font-black">Marketplace Listings</h2>
               <button
-                onClick={() => { setShowListingForm(true); setEditingListing(null); setListingForm({ domain: '', dr: '', traffic: '', niche: '', price: '' }); }}
+                onClick={() => { setShowListingForm(true); setEditingListing(null); setListingForm({ domain: '', dr: '', traffic: '', niche: '', price: '', turnaround: '', guestPost: true, linkInsertion: true }); }}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
@@ -844,11 +847,25 @@ const AdminPanel: React.FC = () => {
                       <label className="block text-sm font-bold text-slate-300 mb-2">Price ($)</label>
                       <input type="number" placeholder="300" min="0" value={listingForm.price} onChange={e => setListingForm({...listingForm, price: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
                     </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Turnaround</label>
+                      <input type="text" placeholder="3 days" value={listingForm.turnaround} onChange={e => setListingForm({...listingForm, turnaround: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div className="flex gap-6 pt-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={listingForm.guestPost} onChange={e => setListingForm({...listingForm, guestPost: e.target.checked})} className="w-4 h-4 accent-purple-500" />
+                      <span className="text-sm font-bold text-slate-300">Guest Post</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={listingForm.linkInsertion} onChange={e => setListingForm({...listingForm, linkInsertion: e.target.checked})} className="w-4 h-4 accent-purple-500" />
+                      <span className="text-sm font-bold text-slate-300">Link Insertion</span>
+                    </label>
                   </div>
                   <div className="flex gap-3 pt-4">
                     <button onClick={async () => {
                       if (!listingForm.domain || !listingForm.dr || !listingForm.price) { alert('Domain, DR and Price required!'); return; }
-                      const data = { domain: listingForm.domain, dr: Number(listingForm.dr), traffic: listingForm.traffic, niche: listingForm.niche, price: Number(listingForm.price) };
+                      const data = { domain: listingForm.domain, dr: Number(listingForm.dr), traffic: listingForm.traffic, niche: listingForm.niche, price: Number(listingForm.price), turnaround: listingForm.turnaround, guestPost: listingForm.guestPost, linkInsertion: listingForm.linkInsertion };
                       try {
                         if (editingListing) {
                           await updateMarketplaceListingInFirebase(editingListing.id, data);
@@ -857,7 +874,7 @@ const AdminPanel: React.FC = () => {
                           const id = await saveMarketplaceListingToFirebase(data);
                           setListings([...listings, { ...data, id }]);
                         }
-                        setShowListingForm(false); setEditingListing(null); setListingForm({ domain: '', dr: '', traffic: '', niche: '', price: '' });
+                        setShowListingForm(false); setEditingListing(null); setListingForm({ domain: '', dr: '', traffic: '', niche: '', price: '', turnaround: '', guestPost: true, linkInsertion: true });
                         alert('Saved!');
                       } catch (e: any) { alert('Error: ' + e.message); }
                     }} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save</button>
@@ -881,7 +898,7 @@ const AdminPanel: React.FC = () => {
                   <span className="text-purple-400 text-sm">{l.niche}</span>
                   <span className="text-emerald-400 font-bold">${l.price}</span>
                   <div className="flex gap-2">
-                    <button onClick={() => { setEditingListing(l); setListingForm({ domain: l.domain, dr: String(l.dr), traffic: l.traffic, niche: l.niche, price: String(l.price) }); setShowListingForm(true); }} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Edit</button>
+                    <button onClick={() => { setEditingListing(l); setListingForm({ domain: l.domain, dr: String(l.dr), traffic: l.traffic, niche: l.niche, price: String(l.price), turnaround: l.turnaround || '', guestPost: l.guestPost ?? true, linkInsertion: l.linkInsertion ?? true }); setShowListingForm(true); }} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Edit</button>
                     <button onClick={async () => { if (confirm('Delete this listing?')) { await deleteMarketplaceListingFromFirebase(l.id); setListings(listings.filter(x => x.id !== l.id)); } }} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Delete</button>
                   </div>
                 </div>
