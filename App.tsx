@@ -860,7 +860,12 @@ const App: React.FC = () => {
 
           {/* Footer Bottom */}
           <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 text-white text-xs font-semibold">
-            <p className="text-center sm:text-left">© 2025 NextGen SEO. Masterminded by <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Tayyab Mehmood</span></p>
+            <div className="flex items-center gap-6">
+              <p className="text-center sm:text-left">© 2025 NextGen SEO. Masterminded by <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Tayyab Mehmood</span></p>
+              <a href="https://www.designrush.com/agency/search-engine-optimization/pk" target="_blank" rel="noopener noreferrer">
+                <img src="/pics/designrush.webp" alt="Designrush" className="h-14 w-auto opacity-90 hover:opacity-100 transition-opacity" />
+              </a>
+            </div>
             <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all">Privacy Policy</a>
           </div>
         </div>
