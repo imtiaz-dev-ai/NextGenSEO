@@ -156,6 +156,14 @@ export const BlogPostBySlug = () => {
       setLoading(false);
       return;
     }
+    // Check cache first
+    try {
+      const cached = localStorage.getItem('cachedBlogs');
+      if (cached) {
+        const match = JSON.parse(cached).find((p: any) => getPostSlug(p.title) === slug);
+        if (match) { setPost(match); setLoading(false); return; }
+      }
+    } catch {}
     // Then check firebase blogs
     getFirebaseBlogs()
       .then(blogs => {
@@ -203,9 +211,16 @@ const BlogPage = () => {
       if (match) setSelectedPost(match);
     }
 
+    // Load cached blogs instantly, then fetch fresh from Firebase
+    try {
+      const cached = localStorage.getItem('cachedBlogs');
+      if (cached) setCustomBlogs(JSON.parse(cached));
+    } catch {}
+
     getFirebaseBlogs()
       .then(blogs => {
         setCustomBlogs(blogs);
+        try { localStorage.setItem('cachedBlogs', JSON.stringify(blogs)); } catch {}
         const currentPath = location.pathname;
         if (currentPath.startsWith('/blog/')) {
           const slug = currentPath.replace('/blog/', '');
