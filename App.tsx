@@ -26,11 +26,7 @@ const LinkBuildingServices = lazy(() => import('./components/LinkBuildingService
 const AnimatedStats = lazy(() => import('./components/AnimatedStats'));
 const Community = lazy(() => import('./components/Community'));
 
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-[40vh]">
-    <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-  </div>
-);
+const PageLoader = () => null;
 import {
   PencilIcon, LinkIcon, CogIcon, SparklesIcon, TagIcon, DocumentIcon,
   ArrowsIcon, CheckIcon, BoltIcon, CodeIcon, ServerIcon, LockIcon,
@@ -781,7 +777,7 @@ const App: React.FC = () => {
         <ScrollProgress />
         <Navbar currentRoute={currentRoute} setRoute={setCurrentRoute} />
         <main className="pt-20 sm:pt-24 min-h-screen relative z-10">
-          <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={null}>
           <Routes>
             <Route path="/" element={renderContent()} />
             {Object.values(AppRoute).filter(r => r !== AppRoute.HOME).map(route => (
@@ -859,14 +855,22 @@ const App: React.FC = () => {
           </div>
 
           {/* Footer Bottom */}
-          <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 text-white text-xs font-semibold">
-            <div className="flex items-center gap-6">
-              <p className="text-center sm:text-left">© 2025 NextGen SEO. Masterminded by <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Tayyab Mehmood</span></p>
-              <a href="https://www.designrush.com/agency/search-engine-optimization/pk" target="_blank" rel="noopener noreferrer">
-                <img src="/pics/designrush.webp" alt="Designrush" className="h-14 w-auto opacity-90 hover:opacity-100 transition-opacity" />
-              </a>
+          <div className="pt-6 border-t border-white/5">
+            <div className="flex flex-col items-center gap-3 mb-4">
+              <p className="text-xs font-black uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Our Reviews</p>
+              <div className="flex items-center gap-6">
+                <a href="https://clutch.co/profile/nextgen-seo-0" target="_blank" rel="noopener noreferrer">
+                  <img src="/pics/clutch-review.png" alt="Clutch Review" className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity" />
+                </a>
+                <a href="https://www.designrush.com/agency/profile/next-gen-seo#reviews" target="_blank" rel="noopener noreferrer">
+                  <img src="/pics/Design Rush.png" alt="DesignRush" className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity" />
+                </a>
+              </div>
             </div>
-            <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all">Privacy Policy</a>
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-white text-xs font-semibold">
+              <p>© 2025 NextGen SEO. Masterminded by <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Tayyab Mehmood</span></p>
+              <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 transition-all">Privacy Policy</a>
+            </div>
           </div>
         </div>
       </footer>
