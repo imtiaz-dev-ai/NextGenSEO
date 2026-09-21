@@ -20,8 +20,8 @@ const Testimonials: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-sky-500/5 to-transparent" />
       <div className="max-w-6xl mx-auto relative z-10 px-0">
         <div className="text-center mb-12 sm:mb-16 md:mb-20 px-0">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 sm:mb-6"><span className="gradient-text">Client Success Stories</span> & Professional SEO Results</h2>
-          <p className="text-xs sm:text-base md:text-lg lg:text-xl text-slate-400 leading-relaxed">Real organic search growth and Google ranking improvements from our professional AI SEO agency clients</p>
+          <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6"><span className="gradient-text">Client Success Stories</span> & Professional SEO Results</h2>
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 leading-relaxed">Real organic search growth and Google ranking improvements from our professional AI SEO agency clients</p>
         </div>
         
         <div className="relative px-0">

@@ -47,8 +47,8 @@ const Team = () => {
 
   return (
     <div className="mb-32">
-      <h2 className="text-5xl font-black mb-6 text-center">Meet Our <span className="gradient-text">Expert Team</span></h2>
-      <p className="text-center text-slate-400 mb-16 max-w-2xl mx-auto">Dedicated professionals with 10+ years of combined SEO expertise</p>
+      <h2 className="text-3xl sm:text-4xl font-black mb-6 text-center">Meet Our <span className="gradient-text">Expert Team</span></h2>
+      <p className="text-center text-slate-400 mb-16 max-w-2xl mx-auto text-sm sm:text-base">Dedicated professionals with 10+ years of combined SEO expertise</p>
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {allMembers.map((member, i) => (
           <Card3D key={i} className="glass shine-3d glow-border-3d p-4 sm:p-6 rounded-2xl sm:rounded-3xl relative overflow-hidden">

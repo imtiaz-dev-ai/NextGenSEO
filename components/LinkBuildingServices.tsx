@@ -53,10 +53,10 @@ const LinkBuildingServices: React.FC = () => {
     <div className="py-12 sm:py-16 md:py-20 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-8 sm:mb-12">
         <div className="text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 sm:mb-4">
             Explore More <span className="gradient-text">Link Building Services</span>
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base md:text-lg">
+          <p className="text-slate-400 text-xs sm:text-sm md:text-base">
             Professional white-hat link building strategies for maximum SEO impact
           </p>
         </div>

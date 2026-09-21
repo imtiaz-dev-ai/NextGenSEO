@@ -46,8 +46,8 @@ const ServicePage = ({ title, description, features, benefits, route, setRoute, 
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-4 sm:mb-6 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto lg:mx-0">
             {icon}
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-4 sm:mb-6 leading-tight text-center lg:text-left">{title} <span className="gradient-text">Service</span></h1>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-400 leading-relaxed text-center lg:text-left">{description}</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6 leading-tight text-center lg:text-left">{title} <span className="gradient-text">Service</span></h1>
+          <p className="text-sm sm:text-base md:text-lg text-slate-400 leading-relaxed text-center lg:text-left">{description}</p>
         </div>
         <div className="flex-1 w-full">
           <div className="glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-purple-500/20">
@@ -87,8 +87,8 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
   <div className="pt-24 pb-20 px-4 sm:px-6 max-w-7xl mx-auto">
     <div className="text-center mb-12 sm:mb-16 md:mb-20">
       <div className="inline-block px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-4 sm:mb-6">About NextGen SEO</div>
-      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 sm:mb-6">Professional <span className="gradient-text">SEO Services</span> Agency</h1>
-      <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed px-4">Leading SEO agency providing expert SEO services, professional link building services, and SEO consultants. Trusted by 200+ businesses worldwide.</p>
+      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">Professional <span className="gradient-text">SEO Services</span> Agency</h1>
+      <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed px-4">Leading SEO agency providing expert SEO services, professional link building services, and SEO consultants. Trusted by 200+ businesses worldwide.</p>
     </div>
 
     <div className="mb-10 sm:mb-16">
@@ -232,8 +232,8 @@ const ContactPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) =
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10 sm:mb-16">
           <div className="inline-block px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-4 sm:mb-6">Get In Touch</div>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black mb-4 sm:mb-6">Contact NextGen SEO Agency — <span className="gradient-text">Get a Free SEO Consultation</span></h1>
-          <p className="text-slate-400 text-sm sm:text-lg max-w-3xl mx-auto leading-relaxed">Connect with Tayyab Mehmood's expert SEO team to discuss affordable SEO services, professional link building, and local SEO strategies for your business. Whether you need <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_ONPAGE); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">on-page SEO</button>, <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_TECHNICAL); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">technical SEO</button>, or <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_OFFPAGE); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">link building services</button>, we're here to help you rank higher on Google.</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black mb-4 sm:mb-6">Contact NextGen SEO Agency — <span className="gradient-text">Get a Free SEO Consultation</span></h1>
+          <p className="text-slate-400 text-xs sm:text-sm md:text-base max-w-3xl mx-auto leading-relaxed">Connect with Tayyab Mehmood's expert SEO team to discuss affordable SEO services, professional link building, and local SEO strategies for your business. Whether you need <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_ONPAGE); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">on-page SEO</button>, <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_TECHNICAL); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">technical SEO</button>, or <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_OFFPAGE); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">link building services</button>, we're here to help you rank higher on Google.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 sm:mb-14 text-center">
@@ -737,8 +737,8 @@ const App: React.FC = () => {
         <div className="pt-24 pb-20 px-6 max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <div className="inline-block px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-6">Our Team</div>
-            <h1 className="text-6xl md:text-7xl font-black mb-6">Meet The <span className="gradient-text">Experts</span></h1>
-            <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">A diverse team of SEO specialists, content strategists, and technical experts united by one goal: your success.</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6">Meet The <span className="gradient-text">Experts</span></h1>
+            <p className="text-sm sm:text-base text-slate-400 max-w-3xl mx-auto leading-relaxed">A diverse team of SEO specialists, content strategists, and technical experts united by one goal: your success.</p>
           </div>
           <Team />
           <div className="mt-20 glass p-12 rounded-[3rem] border-purple-500/20 bg-purple-500/[0.02] text-center">

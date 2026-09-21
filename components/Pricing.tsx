@@ -108,8 +108,8 @@ const Pricing: React.FC<PricingProps> = ({ onContact }) => {
     <div className="pt-16 sm:pt-20 md:pt-24 pb-16 sm:pb-20 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16 px-0">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 sm:mb-6">SEO Services & <span className="gradient-text">Professional Pricing Plans</span></h1>
-          <p className="text-xs sm:text-base md:text-lg lg:text-xl text-slate-400 mb-8 leading-relaxed">Transparent pricing for professional SEO packages. Choose your keyword ranking and link building strategy. Affordable SEO services for startups to enterprise solutions.</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">SEO Services & <span className="gradient-text">Professional Pricing Plans</span></h1>
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 mb-8 leading-relaxed">Transparent pricing for professional SEO packages. Choose your keyword ranking and link building strategy. Affordable SEO services for startups to enterprise solutions.</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 mb-12">

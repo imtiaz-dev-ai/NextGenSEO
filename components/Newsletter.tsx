@@ -44,10 +44,10 @@ const Newsletter: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">
+          <h3 className="text-lg sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6">
             Stay Ahead with <span className="gradient-text">Professional SEO Intelligence</span>
           </h3>
-          <p className="text-slate-400 text-xs sm:text-sm md:text-base lg:text-lg mb-6 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-400 text-xs sm:text-sm md:text-base mb-6 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
             Get exclusive SEO insights, AI-powered keyword research strategies, technical SEO optimization tips, link building guides, and proven organic search strategies delivered weekly. Master Google ranking techniques and improve your search visibility.
           </p>
           

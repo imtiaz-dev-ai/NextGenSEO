@@ -262,10 +262,10 @@ const BlogPage = () => {
   return (
     <div className="pb-12 sm:pb-20 px-4 sm:px-6 max-w-6xl mx-auto">
       <div className="text-center mb-12 sm:mb-16">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-4 sm:mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6">
           Intelligence <span className="gradient-text">Hub</span>
         </h1>
-        <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto">
           Expert insights, strategies, and trends from the NextGen SEO team
         </p>
       </div>

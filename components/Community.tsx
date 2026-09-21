@@ -130,8 +130,8 @@ const Community: React.FC = () => {
       {/* Hero */}
       <div className="text-center mb-10 sm:mb-14">
         <div className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-4">SEO Community</div>
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black mb-4">The <span className="gradient-text">SEO Community</span><br />Built for Growth</h1>
-        <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto mb-8">Connect with SEO professionals. Share strategies, get feedback, and grow together.</p>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">The <span className="gradient-text">SEO Community</span><br />Built for Growth</h1>
+        <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto mb-8">Connect with SEO professionals. Share strategies, get feedback, and grow together.</p>
         <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8">
           {[{v:`${posts.length || '0'}+`,l:'Discussions',icon:<IconDiscuss />},{v:'2,000+',l:'Members',icon:<IconUsers />},{v:'50+',l:'Resources',icon:<IconBox />}].map((s,i)=>(
             <div key={i} className="glass px-5 py-3 rounded-2xl text-center border border-white/5">

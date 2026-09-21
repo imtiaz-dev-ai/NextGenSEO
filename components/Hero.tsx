@@ -21,19 +21,19 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
           Next-Generation SEO Agency
         </div>
         
-        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter mb-4 sm:mb-8 md:mb-10 leading-[0.9] px-0 animate-in">
+        <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter mb-4 sm:mb-8 md:mb-10 leading-[0.9] px-0 animate-in">
           The <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">#1 SEO Partner</span> <br className="hidden sm:block" />
           for <span className="gradient-text">High-Growth SaaS Companies</span>
         </h1>
         
-        <p className="text-sm sm:text-lg md:text-2xl lg:text-3xl text-slate-400 max-w-4xl mx-auto mb-8 sm:mb-12 md:mb-14 leading-relaxed sm:leading-tight font-medium tracking-tight px-0">
+        <p className="text-[11px] sm:text-sm md:text-base lg:text-lg text-slate-400 max-w-4xl mx-auto mb-8 sm:mb-12 md:mb-14 leading-relaxed sm:leading-tight font-medium tracking-tight px-0">
           SaaS SEO and link building that drives <span className="text-slate-100 font-bold">300%+ organic growth</span> — Stop buying low-quality links. Partner with an agency that turns <span className="text-slate-100 font-bold">search authority into pipeline revenue.</span>
         </p>
 
         <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-14 md:mb-16 px-0">
           <button 
             onClick={() => onStart(AppRoute.CONTACT)}
-            className="group relative w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 sm:px-10 md:px-12 py-4 sm:py-5 md:py-6 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base md:text-lg lg:text-xl transition-all shadow-2xl shadow-purple-500/50 active:scale-95 overflow-hidden hover-lift"
+            className="group relative w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-5 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm md:text-base transition-all shadow-2xl shadow-purple-500/50 active:scale-95 overflow-hidden hover-lift"
           >
             <span className="relative z-10 flex items-center justify-center gap-2 md:gap-3">
               Book a Call
@@ -45,7 +45,7 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
           </button>
           <button
             onClick={() => onStart(AppRoute.MARKETPLACE)}
-            className="group w-full sm:w-auto glass px-6 sm:px-10 md:px-12 py-4 sm:py-5 md:py-6 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base md:text-lg lg:text-xl hover:bg-white/10 transition-all border border-white/10 hover:border-purple-500/40"
+            className="group w-full sm:w-auto glass px-5 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm md:text-base hover:bg-white/10 transition-all border border-white/10 hover:border-purple-500/40"
           >
             <span className="flex items-center justify-center gap-2">
               See How It Works

@@ -97,8 +97,8 @@ const CaseStudies: React.FC = () => {
     <div className="py-16 sm:py-20 md:py-32 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 sm:mb-16 md:mb-20 px-0">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 sm:mb-6">SEO Case Studies & <span className="gradient-text">Proven Results</span></h2>
-          <p className="text-xs sm:text-base md:text-lg lg:text-xl text-slate-400 leading-relaxed">Real organic search growth, keyword rankings, and traffic increases from our professional SEO agency client portfolio.</p>
+          <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">SEO Case Studies & <span className="gradient-text">Proven Results</span></h2>
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 leading-relaxed">Real organic search growth, keyword rankings, and traffic increases from our professional SEO agency client portfolio.</p>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 px-0">

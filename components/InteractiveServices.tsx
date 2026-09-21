@@ -108,10 +108,10 @@ const InteractiveServices: React.FC = () => {
     <div className="py-12 sm:py-16 md:py-20 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10 sm:mb-14 md:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 sm:mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-4 sm:mb-6">
             Our <span className="gradient-text">SEO Services</span>
           </h2>
-          <p className="text-sm sm:text-base md:text-xl text-slate-400 max-w-2xl mx-auto">
+          <p className="text-xs sm:text-sm md:text-base text-slate-400 max-w-2xl mx-auto">
             Comprehensive SEO solutions powered by AI and 10+ years of expertise
           </p>
         </div>

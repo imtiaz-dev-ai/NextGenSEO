@@ -37,10 +37,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
       <a
         href="/"
         onClick={(e) => navAction(AppRoute.HOME, e)}
-        className="flex items-center gap-1 sm:gap-2 cursor-pointer group shrink-0"
+        className="flex items-center gap-3 sm:gap-4 cursor-pointer group shrink-0"
       >
-        <img src="/pics/logo .webp" alt="NextGen SEO Agency Logo" width="96" height="96" className="h-16 sm:h-20 md:h-24 w-16 sm:w-20 md:w-24 object-contain group-hover:scale-110 transition-all duration-300 filter drop-shadow-[0_0_12px_rgba(168,85,247,0.6)]" />
-        <span className="text-sm sm:text-lg md:text-2xl font-black tracking-tighter hidden sm:inline group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
+        <img src="/pics/logo .webp" alt="NextGen SEO Agency Logo" width="96" height="96" className="h-10 sm:h-12 md:h-14 w-10 sm:w-12 md:w-14 object-contain group-hover:scale-110 transition-all duration-300 filter drop-shadow-[0_0_12px_rgba(168,85,247,0.6)]" />
+        <span className="text-xs sm:text-sm md:text-base font-black tracking-tighter hidden sm:inline group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
         <span className="text-xs font-black tracking-tighter sm:hidden">NG<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
       </a>
 

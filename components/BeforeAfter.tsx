@@ -23,10 +23,10 @@ const BeforeAfter: React.FC = () => {
     <div className="py-16 sm:py-20 md:py-32 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 sm:mb-16 md:mb-20 px-0">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">
             The <span className="gradient-text">Transformation</span> - Real SEO Results
           </h2>
-          <p className="text-xs sm:text-base md:text-lg lg:text-xl text-slate-400 leading-relaxed">Real metrics from a proven 6-month professional SEO optimization campaign with keyword ranking improvements and organic traffic growth</p>
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 leading-relaxed">Real metrics from a proven 6-month professional SEO optimization campaign with keyword ranking improvements and organic traffic growth</p>
         </div>
 
         <div className="glass p-6 sm:p-8 md:p-12 rounded-2xl md:rounded-[3rem] border-purple-500/20">

@@ -39,10 +39,10 @@ const FAQ: React.FC = () => {
     <div className="py-16 sm:py-20 md:py-32 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto px-0">
         <div className="text-center mb-12 sm:mb-16 md:mb-20 px-0">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">
             Frequently Asked <span className="gradient-text">Questions About SEO</span>
           </h2>
-          <p className="text-xs sm:text-base md:text-lg lg:text-xl text-slate-400 leading-relaxed">Everything you need to know about our professional SEO services and keyword ranking strategies</p>
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 leading-relaxed">Everything you need to know about our professional SEO services and keyword ranking strategies</p>
         </div>
 
         <div className="space-y-2 sm:space-y-4 px-0">
