@@ -76,6 +76,7 @@ export enum AppRoute {
   CASE_STUDIES = 'case_studies',
   ADMIN = 'admin',
   MARKETPLACE = 'marketplace',
+  BUY_BACKLINKS = 'buy-backlinks',
   COMMUNITY = 'community',
   PRIVACY = 'privacy',
   // AI Tools (Interactive)

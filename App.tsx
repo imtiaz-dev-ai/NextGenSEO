@@ -561,6 +561,8 @@ const App: React.FC = () => {
       [AppRoute.SERVICE_TECHNICAL]: 'Technical SEO Services | Core Web Vitals | NextGen SEO',
       [AppRoute.SERVICE_AI]: 'AI-Powered SEO Services 2026 | NextGen SEO',
       [AppRoute.ADMIN]: 'Admin Panel | NextGen SEO',
+      [AppRoute.MARKETPLACE]: 'Backlink Marketplace | Buy High-DA Backlinks | NextGen SEO',
+      [AppRoute.BUY_BACKLINKS]: 'Buy Backlinks | High-Authority Link Building | NextGen SEO',
     };
     const routeDescriptions: Record<string, string> = {
       [AppRoute.HOME]: 'NextGen SEO Agency by Tayyab Mehmood. Professional SEO services, expert link building, affordable SEO packages. Get 300%+ organic traffic growth.',
@@ -574,6 +576,8 @@ const App: React.FC = () => {
       [AppRoute.SERVICE_OFFPAGE]: 'Expert link building and off-page SEO. High-authority backlinks, digital PR, and brand mentions.',
       [AppRoute.SERVICE_TECHNICAL]: 'Technical SEO services. Core Web Vitals, schema markup, crawlability, and site speed optimization.',
       [AppRoute.SERVICE_AI]: 'AI-powered SEO strategies. Predictive analytics, semantic mapping, and automated SEO insights.',
+      [AppRoute.MARKETPLACE]: 'Browse and buy high-DA backlinks from top authority sites. Transparent pricing, real metrics.',
+      [AppRoute.BUY_BACKLINKS]: 'Buy high-authority backlinks for your website. Vetted sites, real traffic, white-hat link building.',
     };
     const routeCanonicals: Record<string, string> = {
       [AppRoute.HOME]: 'https://nextgenseo.pro/',
@@ -587,6 +591,8 @@ const App: React.FC = () => {
       [AppRoute.SERVICE_OFFPAGE]: 'https://nextgenseo.pro/service_offpage',
       [AppRoute.SERVICE_TECHNICAL]: 'https://nextgenseo.pro/service_technical',
       [AppRoute.SERVICE_AI]: 'https://nextgenseo.pro/service_ai',
+      [AppRoute.MARKETPLACE]: 'https://nextgenseo.pro/marketplace',
+      [AppRoute.BUY_BACKLINKS]: 'https://nextgenseo.pro/buy-backlinks',
     };
     document.title = routeTitles[currentRoute] || 'NextGen SEO Agency';
     const desc = routeDescriptions[currentRoute];
@@ -753,7 +759,8 @@ const App: React.FC = () => {
       case AppRoute.PRICING: return <Pricing onContact={() => { setCurrentRoute(AppRoute.CONTACT); window.scrollTo(0, 0); }} />;
       case AppRoute.CASE_STUDIES: return <CaseStudies />;
       case AppRoute.ADMIN: return <AdminPanel />;
-      case AppRoute.MARKETPLACE: return (
+      case AppRoute.MARKETPLACE:
+      case AppRoute.BUY_BACKLINKS: return (
         <div className="pt-24">
           <Suspense fallback={<PageLoader />}>
             {React.createElement(lazy(() => import('./components/Marketplace')))}
