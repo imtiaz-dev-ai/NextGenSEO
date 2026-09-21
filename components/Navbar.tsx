@@ -1,10 +1,32 @@
 import React, { useState } from 'react';
 import { AppRoute } from '../types';
+import { useTheme } from './ThemeToggle';
 
 interface NavbarProps {
   currentRoute: AppRoute;
   setRoute: (route: AppRoute) => void;
 }
+
+const ThemeToggleBtn: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    <button
+      onClick={toggleTheme}
+      aria-label="Toggle theme"
+      className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-300 hover:bg-white/5 transition-colors border border-white/10"
+    >
+      {theme === 'dark' ? (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+        </svg>
+      ) : (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
+        </svg>
+      )}
+    </button>
+  );
+};
 
 const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -83,15 +105,19 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
 
         <NavLink route={AppRoute.BLOG} label="Blog" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.BLOG ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
         <NavLink route={AppRoute.CONTACT} label="Contact" className={`text-xs xl:text-sm font-bold uppercase tracking-wider bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500 hover:to-pink-500 px-6 py-3 rounded-xl transition-all hover:scale-105 border border-purple-500/30 ${currentRoute === AppRoute.CONTACT ? 'text-white from-purple-500 to-pink-500' : 'text-purple-400 hover:text-white'}`} />
+        <ThemeToggleBtn />
       </div>
 
       {/* Hamburger */}
-      <button onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} className="lg:hidden w-11 h-11 flex items-center justify-center rounded-xl text-slate-300 hover:bg-white/5 transition-colors">
+      <div className="lg:hidden flex items-center gap-2">
+      <ThemeToggleBtn />
+      <button onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} className="w-11 h-11 flex items-center justify-center rounded-xl text-slate-300 hover:bg-white/5 transition-colors">
         {menuOpen
           ? <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           : <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
         }
       </button>
+      </div>
 
       {/* Mobile menu — right side drawer */}
       {menuOpen && (
