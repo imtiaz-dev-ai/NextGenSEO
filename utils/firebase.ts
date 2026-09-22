@@ -48,10 +48,17 @@ const saveLocalData = (key: string, data: any) => {
   }
 };
 
+// Strip base64 images — Firestore has 1MB doc limit
+const stripBase64 = (obj: any) => {
+  const clean = { ...obj };
+  if (clean.image && clean.image.startsWith('data:image')) clean.image = '';
+  return clean;
+};
+
 // Blog functions
 export const saveBlogToFirebase = async (blog: any) => {
   try {
-    const ref = await addDoc(collection(db, "blogPosts"), { ...blog, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const ref = await addDoc(collection(db, "blogPosts"), { ...stripBase64(blog), createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
     const blogs = getLocalData("customBlogs");
@@ -76,7 +83,7 @@ export const getBlogsFromFirebase = async () => {
 
 export const updateBlogInFirebase = async (blogId: string, updates: any) => {
   try {
-    await updateDoc(doc(db, "blogPosts", blogId), { ...updates, updatedAt: serverTimestamp() });
+    await updateDoc(doc(db, "blogPosts", blogId), { ...stripBase64(updates), updatedAt: serverTimestamp() });
   } catch (e) {
     const blogs = getLocalData("customBlogs");
     const idx = blogs.findIndex((b: any) => b.id === blogId);
@@ -99,7 +106,7 @@ export const deleteBlogFromFirebase = async (blogId: string) => {
 // Case functions
 export const saveCaseToFirebase = async (caseStudy: any) => {
   try {
-    const ref = await addDoc(collection(db, "caseStudies"), { ...caseStudy, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const ref = await addDoc(collection(db, "caseStudies"), { ...stripBase64(caseStudy), createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
     const cases = getLocalData("customCases");
@@ -124,7 +131,7 @@ export const getCasesFromFirebase = async () => {
 
 export const updateCaseInFirebase = async (caseId: string, updates: any) => {
   try {
-    await updateDoc(doc(db, "caseStudies", caseId), { ...updates, updatedAt: serverTimestamp() });
+    await updateDoc(doc(db, "caseStudies", caseId), { ...stripBase64(updates), updatedAt: serverTimestamp() });
   } catch (e) {
     const cases = getLocalData("customCases");
     const idx = cases.findIndex((c: any) => c.id === caseId);
@@ -147,7 +154,7 @@ export const deleteCaseFromFirebase = async (caseId: string) => {
 // Team functions
 export const saveTeamToFirebase = async (member: any) => {
   try {
-    const ref = await addDoc(collection(db, "teamMembers"), { ...member, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const ref = await addDoc(collection(db, "teamMembers"), { ...stripBase64(member), createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
     const team = getLocalData("customTeam");
@@ -172,7 +179,7 @@ export const getTeamFromFirebase = async () => {
 
 export const updateTeamInFirebase = async (memberId: string, updates: any) => {
   try {
-    await updateDoc(doc(db, "teamMembers", memberId), { ...updates, updatedAt: serverTimestamp() });
+    await updateDoc(doc(db, "teamMembers", memberId), { ...stripBase64(updates), updatedAt: serverTimestamp() });
   } catch (e) {
     const team = getLocalData("customTeam");
     const idx = team.findIndex((m: any) => m.id === memberId);

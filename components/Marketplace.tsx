@@ -33,9 +33,31 @@ const Marketplace: React.FC = () => {
   ];
 
   useEffect(() => {
-    getMarketplaceListings()
-      .then(data => { setListings(data.length > 0 ? data : defaultListings); setLoading(false); })
-      .catch(() => { setListings(defaultListings); setLoading(false); });
+    const load = async () => {
+      try {
+        const { getMarketplaceListingsFromFirebase } = await import('../utils/firebase');
+        const { getAuth, signInAnonymously } = await import('firebase/auth');
+        const { initializeApp, getApps } = await import('firebase/app');
+        const firebaseConfig = {
+          apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+          authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+          projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+          storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+          messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+          appId: import.meta.env.VITE_FIREBASE_APP_ID,
+        };
+        const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+        const auth = getAuth(app);
+        if (!auth.currentUser) await signInAnonymously(auth);
+        const data = await getMarketplaceListingsFromFirebase();
+        setListings(data as MarketplaceListing[]);
+      } catch (e) {
+        setListings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
   const filtered = listings.filter(item => {

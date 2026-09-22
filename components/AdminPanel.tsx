@@ -70,7 +70,7 @@ const compressImage = async (base64: string): Promise<string> => {
 
 const ImageUploadField = ({ image, onImageChange, onImageRemove, label, aspect = 'landscape' }: { image: string; onImageChange: (img: string) => void; onImageRemove: () => void; label: string; aspect?: string }) => {
   const [urlInput, setUrlInput] = React.useState('');
-  const [mode, setMode] = React.useState<'upload' | 'url'>('upload');
+  const [mode, setMode] = React.useState<'upload' | 'url'>('url');
 
   const handleUrl = () => {
     if (urlInput.trim()) { onImageChange(urlInput.trim()); setUrlInput(''); }
