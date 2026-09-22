@@ -18,8 +18,12 @@ const CaseStudies: React.FC = () => {
   const [customCases, setCustomCases] = React.useState<any[]>([]);
   
   React.useEffect(() => {
-    const saved = localStorage.getItem('caseStudies');
-    if (saved) setCustomCases(JSON.parse(saved));
+    import('../utils/firebase').then(m => m.getCasesFromFirebase()).then(data => {
+      if (data.length > 0) setCustomCases(data);
+    }).catch(() => {
+      const saved = localStorage.getItem('caseStudies');
+      if (saved) setCustomCases(JSON.parse(saved));
+    });
   }, []);
 
   const defaultCases = [
