@@ -26,15 +26,9 @@ export const auth = new Proxy({} as Auth, { get: (_, prop) => (getAuth(getApp())
 export const db = new Proxy({} as Firestore, { get: (_, prop) => (getFirestore(getApp()) as any)[prop] });
 export const storage = new Proxy({} as FirebaseStorage, { get: (_, prop) => (getStorage(getApp()) as any)[prop] });
 
-// Lazy auth — only after user interaction
+// Eagerly init auth so Firestore reads work immediately
 if (typeof window !== 'undefined') {
-  const initAuth = () => {
-    signInAnonymously(getAuth(getApp())).catch(() => {});
-    window.removeEventListener('mousemove', initAuth);
-    window.removeEventListener('touchstart', initAuth);
-  };
-  window.addEventListener('mousemove', initAuth, { once: true, passive: true });
-  window.addEventListener('touchstart', initAuth, { once: true, passive: true });
+  signInAnonymously(getAuth(getApp())).catch(() => {});
 }
 
 // LocalStorage fallback
@@ -72,9 +66,7 @@ export const getBlogsFromFirebase = async () => {
   try {
     const app = getApp();
     const authInstance = getAuth(app);
-    if (!authInstance.currentUser) {
-      await signInAnonymously(authInstance).catch(() => {});
-    }
+    if (!authInstance.currentUser) await signInAnonymously(authInstance).catch(() => {});
     const snapshot = await getDocs(collection(getFirestore(app), "blogPosts"));
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (e) {
@@ -120,7 +112,10 @@ export const saveCaseToFirebase = async (caseStudy: any) => {
 
 export const getCasesFromFirebase = async () => {
   try {
-    const snapshot = await getDocs(collection(db, "caseStudies"));
+    const app = getApp();
+    const authInstance = getAuth(app);
+    if (!authInstance.currentUser) await signInAnonymously(authInstance).catch(() => {});
+    const snapshot = await getDocs(collection(getFirestore(app), "caseStudies"));
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (e) {
     return getLocalData("customCases");
@@ -165,7 +160,10 @@ export const saveTeamToFirebase = async (member: any) => {
 
 export const getTeamFromFirebase = async () => {
   try {
-    const snapshot = await getDocs(collection(db, "teamMembers"));
+    const app = getApp();
+    const authInstance = getAuth(app);
+    if (!authInstance.currentUser) await signInAnonymously(authInstance).catch(() => {});
+    const snapshot = await getDocs(collection(getFirestore(app), "teamMembers"));
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (e) {
     return getLocalData("customTeam");
@@ -276,7 +274,10 @@ export const saveMarketplaceListingToFirebase = async (listing: any) => {
 
 export const getMarketplaceListingsFromFirebase = async () => {
   try {
-    const snapshot = await getDocs(collection(db, "marketplaceListings"));
+    const app = getApp();
+    const authInstance = getAuth(app);
+    if (!authInstance.currentUser) await signInAnonymously(authInstance).catch(() => {});
+    const snapshot = await getDocs(collection(getFirestore(app), "marketplaceListings"));
     return snapshot.docs.map(d => {
       const data = d.data();
       return {
