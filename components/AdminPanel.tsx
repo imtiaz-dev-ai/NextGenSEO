@@ -290,7 +290,11 @@ const AdminPanel: React.FC = () => {
 
   const loadListings = async () => {
     try {
-      const data = await getMarketplaceListingsFromFirebase();
+      let data = await getMarketplaceListingsFromFirebase();
+      if (!data || data.length === 0) {
+        await new Promise(r => setTimeout(r, 1500));
+        data = await getMarketplaceListingsFromFirebase();
+      }
       setListings(data as MarketplaceListing[]);
     } catch (error) {
       console.error('Error loading listings:', error);
@@ -875,8 +879,8 @@ const AdminPanel: React.FC = () => {
                           setListings([...listings, { ...data, id }]);
                         }
                         setShowListingForm(false); setEditingListing(null); setListingForm({ domain: '', dr: '', traffic: '', niche: '', price: '', turnaround: '', guestPost: true, linkInsertion: true });
-                        alert('Saved!');
-                      } catch (e: any) { alert('Error: ' + e.message); }
+                        alert('Saved to Firebase!');
+                      } catch (e: any) { alert('Firebase Error: ' + (e?.message || JSON.stringify(e))); }
                     }} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save</button>
                     <button onClick={() => { setShowListingForm(false); setEditingListing(null); }} className="glass px-8 py-3 rounded-lg font-bold">Cancel</button>
                   </div>
