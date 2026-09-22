@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getMarketplaceListingsFromFirebase } from '../utils/firebase';
 
 export interface MarketplaceListing {
   id: string;
@@ -16,8 +17,22 @@ const Marketplace: React.FC = () => {
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [extraListings, setExtraListings] = useState<MarketplaceListing[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [moreLoaded, setMoreLoaded] = useState(false);
 
-  const listings: MarketplaceListing[] = [
+  const handleLoadMore = async () => {
+    if (moreLoaded) return;
+    setLoadingMore(true);
+    try {
+      const data = await getMarketplaceListingsFromFirebase();
+      if (data && data.length > 0) setExtraListings(data as MarketplaceListing[]);
+    } catch {}
+    setLoadingMore(false);
+    setMoreLoaded(true);
+  };
+
+  const hardcoded: MarketplaceListing[] = [
     { id: 'd1', domain: 'saastoolreview.com', niche: 'SaaS', dr: 61, traffic: '12.4k/mo', price: 185, turnaround: '3 days', guestPost: true, linkInsertion: true },
     { id: 'd2', domain: 'markethealthly.io', niche: 'Health', dr: 48, traffic: '6.1k/mo', price: 120, turnaround: '4 days', guestPost: true, linkInsertion: false },
     { id: 'd3', domain: 'fintrail.co', niche: 'Finance', dr: 73, traffic: '31k/mo', price: 310, turnaround: '5 days', guestPost: false, linkInsertion: true },
@@ -31,6 +46,8 @@ const Marketplace: React.FC = () => {
     { id: 'd11', domain: 'wealthwisehub.com', niche: 'Finance', dr: 79, traffic: '42k/mo', price: 380, turnaround: '5 days', guestPost: true, linkInsertion: true },
     { id: 'd12', domain: 'fitlifedaily.com', niche: 'Health', dr: 52, traffic: '11k/mo', price: 140, turnaround: '3 days', guestPost: false, linkInsertion: true },
   ];
+
+  const listings = [...hardcoded, ...extraListings];
 
   const filtered = listings.filter(item => {
     const term = search.trim().toLowerCase();
@@ -248,6 +265,18 @@ const Marketplace: React.FC = () => {
 
         {filtered.length > 0 && (
           <p className="text-center text-slate-500 text-sm mt-4">Showing {filtered.length} of {listings.length} listings</p>
+        )}
+
+        {!moreLoaded && (
+          <div className="text-center mt-8">
+            <button
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-60 px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-lg shadow-purple-500/30"
+            >
+              {loadingMore ? 'Loading...' : 'Load More Listings'}
+            </button>
+          </div>
         )}
       </div>
 
