@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-const getMarketplaceListings = () => import('../utils/firebase').then(m => m.getMarketplaceListingsFromFirebase());
+import React, { useState } from 'react';
 
 export interface MarketplaceListing {
   id: string;
@@ -11,17 +10,14 @@ export interface MarketplaceListing {
   turnaround?: string;
   guestPost?: boolean;
   linkInsertion?: boolean;
-  createdAt?: any;
 }
 
 const Marketplace: React.FC = () => {
-  const [listings, setListings] = useState<MarketplaceListing[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const defaultListings: MarketplaceListing[] = [
+  const listings: MarketplaceListing[] = [
     { id: 'd1', domain: 'saastoolreview.com', niche: 'SaaS', dr: 61, traffic: '12.4k/mo', price: 185, turnaround: '3 days', guestPost: true, linkInsertion: true },
     { id: 'd2', domain: 'markethealthly.io', niche: 'Health', dr: 48, traffic: '6.1k/mo', price: 120, turnaround: '4 days', guestPost: true, linkInsertion: false },
     { id: 'd3', domain: 'fintrail.co', niche: 'Finance', dr: 73, traffic: '31k/mo', price: 310, turnaround: '5 days', guestPost: false, linkInsertion: true },
@@ -30,35 +26,11 @@ const Marketplace: React.FC = () => {
     { id: 'd6', domain: 'budgetwisely.com', niche: 'Finance', dr: 38, traffic: '4.2k/mo', price: 95, turnaround: '2 days', guestPost: false, linkInsertion: true },
     { id: 'd7', domain: 'cloudstacknews.io', niche: 'Tech', dr: 82, traffic: '48k/mo', price: 420, turnaround: '6 days', guestPost: true, linkInsertion: true },
     { id: 'd8', domain: 'greenlivingtoday.com', niche: 'Lifestyle', dr: 44, traffic: '7.5k/mo', price: 110, turnaround: '3 days', guestPost: false, linkInsertion: false },
+    { id: 'd9', domain: 'techinsiderpro.com', niche: 'Tech', dr: 67, traffic: '18k/mo', price: 230, turnaround: '4 days', guestPost: true, linkInsertion: true },
+    { id: 'd10', domain: 'startupgrowthlab.io', niche: 'SaaS', dr: 54, traffic: '8.3k/mo', price: 160, turnaround: '3 days', guestPost: true, linkInsertion: false },
+    { id: 'd11', domain: 'wealthwisehub.com', niche: 'Finance', dr: 79, traffic: '42k/mo', price: 380, turnaround: '5 days', guestPost: true, linkInsertion: true },
+    { id: 'd12', domain: 'fitlifedaily.com', niche: 'Health', dr: 52, traffic: '11k/mo', price: 140, turnaround: '3 days', guestPost: false, linkInsertion: true },
   ];
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const { getMarketplaceListingsFromFirebase } = await import('../utils/firebase');
-        const { getAuth, signInAnonymously } = await import('firebase/auth');
-        const { initializeApp, getApps } = await import('firebase/app');
-        const firebaseConfig = {
-          apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-          authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-          projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-          storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-          messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-          appId: import.meta.env.VITE_FIREBASE_APP_ID,
-        };
-        const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-        const auth = getAuth(app);
-        if (!auth.currentUser) await signInAnonymously(auth);
-        const data = await getMarketplaceListingsFromFirebase();
-        setListings(data.length > 0 ? data as MarketplaceListing[] : defaultListings);
-      } catch (e) {
-        setListings(defaultListings);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
 
   const filtered = listings.filter(item => {
     const term = search.trim().toLowerCase();
@@ -218,13 +190,9 @@ const Marketplace: React.FC = () => {
             <span>Guest Post / Link Insertion</span><span>Turnaround</span><span>Price</span><span />
           </div>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : filtered.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="text-center py-16 text-slate-400 text-sm">
-              {listings.length === 0 ? 'No listings yet. Admin can add sites from the Admin Panel.' : 'No domains matched. Try a different keyword.'}
+              No domains matched. Try a different keyword.
             </div>
           ) : (
             filtered.map((item, i) => (
