@@ -503,31 +503,37 @@ img {
 .animate-float { animation: float 3s ease-in-out infinite; }
 .animate-glow { animation: glow 2s ease-in-out infinite; }
 /* Light Mode Styles */
-html.light-mode body { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%); color: #0f172a; }
-html.light-mode .glass { background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(0, 0, 0, 0.1); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); }
+html.light-mode body { background: #ffffff !important; color: #0f172a; }
+html.light-mode { background: #ffffff !important; }
+html.light-mode nav { background: #ffffff !important; border-bottom: 1px solid rgba(0,0,0,0.08) !important; box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important; }
+html.light-mode .glass { background: rgba(255,255,255,0.98) !important; border: 1px solid rgba(0,0,0,0.08) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important; }
+html.light-mode .glass-premium { background: rgba(255,255,255,0.98) !important; border: 1px solid rgba(0,0,0,0.08) !important; }
 html.light-mode h1, html.light-mode h2, html.light-mode h3, html.light-mode h4, html.light-mode h5, html.light-mode h6 { color: #0f172a !important; }
-html.light-mode p, html.light-mode span:not(.gradient-text), html.light-mode div, html.light-mode button, html.light-mode a, html.light-mode label { color: #1e293b; }
-html.light-mode .text-slate-400, html.light-mode .text-slate-300, html.light-mode .text-slate-500 { color: #475569 !important; }
+html.light-mode p { color: #334155 !important; }
+html.light-mode .text-slate-400 { color: #64748b !important; }
+html.light-mode .text-slate-300 { color: #475569 !important; }
+html.light-mode .text-slate-500 { color: #64748b !important; }
 html.light-mode .text-white { color: #0f172a !important; }
-html.light-mode .text-white\/5, html.light-mode .text-white\/10, html.light-mode .text-white\/20 { color: #0f172a !important; }
-html.light-mode .bg-gradient-to-r { background-color: #f1f5f9 !important; }
-html.light-mode .from-purple-500, html.light-mode .to-pink-500 { background: linear-gradient(to right, #9333ea, #db2777) !important; color: white !important; }
-html.light-mode button.bg-gradient-to-r { color: white !important; }
-html.light-mode .gradient-text { color: #9333ea !important; -webkit-text-fill-color: #9333ea !important; }
-html.light-mode .text-purple-400 { color: #9333ea !important; }
+html.light-mode .gradient-text { background: linear-gradient(135deg, #7c3aed, #db2777, #0891b2) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; }
+html.light-mode .text-purple-400 { color: #7c3aed !important; }
 html.light-mode .text-cyan-400 { color: #0891b2 !important; }
 html.light-mode .text-emerald-400 { color: #059669 !important; }
 html.light-mode .text-pink-400 { color: #db2777 !important; }
-html.light-mode .text-sky-500 { color: #f59e0b !important; }
-html.light-mode .bg-slate-900\/30 { background-color: rgba(226, 232, 240, 0.5) !important; }
+html.light-mode .text-amber-400 { color: #d97706 !important; }
+html.light-mode .bg-slate-900\/50, html.light-mode .bg-slate-900\/30 { background-color: rgba(241,245,249,0.8) !important; }
 html.light-mode .bg-slate-800 { background-color: #f1f5f9 !important; }
-html.light-mode .border-white\/10, html.light-mode .border-white\/5 { border-color: rgba(0, 0, 0, 0.1) !important; }
-html.light-mode .bg-white\/5 { background-color: rgba(0, 0, 0, 0.05) !important; }
-html.light-mode input, html.light-mode textarea { background-color: rgba(241, 245, 249, 0.8) !important; color: #0f172a !important; border-color: rgba(0, 0, 0, 0.15) !important; }
+html.light-mode .border-white\/10, html.light-mode .border-white\/5 { border-color: rgba(0,0,0,0.08) !important; }
+html.light-mode .bg-white\/5 { background-color: rgba(0,0,0,0.04) !important; }
+html.light-mode .bg-white\/\[0\.03\], html.light-mode .bg-white\/\[0\.01\] { background-color: rgba(0,0,0,0.02) !important; }
+html.light-mode input, html.light-mode textarea, html.light-mode select { background-color: #f8fafc !important; color: #0f172a !important; border-color: rgba(0,0,0,0.12) !important; }
 html.light-mode input::placeholder, html.light-mode textarea::placeholder { color: #94a3b8 !important; }
-html.light-mode footer { background: linear-gradient(to bottom, #f1f5f9, #e2e8f0) !important; }
-html.light-mode footer h4, html.light-mode footer p, html.light-mode footer span, html.light-mode footer button, html.light-mode footer a, html.light-mode footer div { color: #1e293b !important; }
+html.light-mode footer { background: #f8fafc !important; border-top: 1px solid rgba(0,0,0,0.08) !important; }
+html.light-mode footer * { color: #334155 !important; }
+html.light-mode footer .gradient-text { -webkit-text-fill-color: transparent !important; }
 html.light-mode footer .text-slate-400, html.light-mode footer .text-slate-500 { color: #64748b !important; }
+html.light-mode [class*="bg-purple-500/"], html.light-mode [class*="bg-pink-500/"] { background-color: rgba(124,58,237,0.08) !important; }
+html.light-mode [class*="bg-slate-950"] { background-color: #f8fafc !important; }
+html.light-mode [class*="from-slate-950"] { background: #f8fafc !important; }
 /* ============================================
    GLOBAL 3D PAGE ANIMATIONS
 ============================================ */
