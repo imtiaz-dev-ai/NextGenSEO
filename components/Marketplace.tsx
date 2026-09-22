@@ -50,9 +50,9 @@ const Marketplace: React.FC = () => {
         const auth = getAuth(app);
         if (!auth.currentUser) await signInAnonymously(auth);
         const data = await getMarketplaceListingsFromFirebase();
-        setListings(data as MarketplaceListing[]);
+        setListings(data.length > 0 ? data as MarketplaceListing[] : defaultListings);
       } catch (e) {
-        setListings([]);
+        setListings(defaultListings);
       } finally {
         setLoading(false);
       }

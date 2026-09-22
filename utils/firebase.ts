@@ -48,17 +48,12 @@ const saveLocalData = (key: string, data: any) => {
   }
 };
 
-// Strip base64 images — Firestore has 1MB doc limit
-const stripBase64 = (obj: any) => {
-  const clean = { ...obj };
-  if (clean.image && clean.image.startsWith('data:image')) clean.image = '';
-  return clean;
-};
-
 // Blog functions
 export const saveBlogToFirebase = async (blog: any) => {
   try {
-    const ref = await addDoc(collection(db, "blogPosts"), { ...stripBase64(blog), createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const clean = { ...blog };
+    if (clean.image?.startsWith('data:image')) clean.image = '';
+    const ref = await addDoc(collection(db, "blogPosts"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
     const blogs = getLocalData("customBlogs");
@@ -83,7 +78,9 @@ export const getBlogsFromFirebase = async () => {
 
 export const updateBlogInFirebase = async (blogId: string, updates: any) => {
   try {
-    await updateDoc(doc(db, "blogPosts", blogId), { ...stripBase64(updates), updatedAt: serverTimestamp() });
+    const clean = { ...updates };
+    if (clean.image?.startsWith('data:image')) clean.image = '';
+    await updateDoc(doc(db, "blogPosts", blogId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
     const blogs = getLocalData("customBlogs");
     const idx = blogs.findIndex((b: any) => b.id === blogId);
@@ -106,7 +103,9 @@ export const deleteBlogFromFirebase = async (blogId: string) => {
 // Case functions
 export const saveCaseToFirebase = async (caseStudy: any) => {
   try {
-    const ref = await addDoc(collection(db, "caseStudies"), { ...stripBase64(caseStudy), createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const clean = { ...caseStudy };
+    if (clean.image?.startsWith('data:image')) clean.image = '';
+    const ref = await addDoc(collection(db, "caseStudies"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
     const cases = getLocalData("customCases");
@@ -131,7 +130,9 @@ export const getCasesFromFirebase = async () => {
 
 export const updateCaseInFirebase = async (caseId: string, updates: any) => {
   try {
-    await updateDoc(doc(db, "caseStudies", caseId), { ...stripBase64(updates), updatedAt: serverTimestamp() });
+    const clean = { ...updates };
+    if (clean.image?.startsWith('data:image')) clean.image = '';
+    await updateDoc(doc(db, "caseStudies", caseId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
     const cases = getLocalData("customCases");
     const idx = cases.findIndex((c: any) => c.id === caseId);
@@ -154,7 +155,9 @@ export const deleteCaseFromFirebase = async (caseId: string) => {
 // Team functions
 export const saveTeamToFirebase = async (member: any) => {
   try {
-    const ref = await addDoc(collection(db, "teamMembers"), { ...stripBase64(member), createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const clean = { ...member };
+    if (clean.image?.startsWith('data:image')) clean.image = '';
+    const ref = await addDoc(collection(db, "teamMembers"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
     const team = getLocalData("customTeam");
@@ -179,7 +182,9 @@ export const getTeamFromFirebase = async () => {
 
 export const updateTeamInFirebase = async (memberId: string, updates: any) => {
   try {
-    await updateDoc(doc(db, "teamMembers", memberId), { ...stripBase64(updates), updatedAt: serverTimestamp() });
+    const clean = { ...updates };
+    if (clean.image?.startsWith('data:image')) clean.image = '';
+    await updateDoc(doc(db, "teamMembers", memberId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
     const team = getLocalData("customTeam");
     const idx = team.findIndex((m: any) => m.id === memberId);
@@ -266,9 +271,17 @@ export const deleteBacklinkFromFirebase = async (backlinkId: string) => {
 export const uploadBlogImage = async (imageData: string) => imageData;
 
 // Marketplace functions
+const ensureAuth = async () => {
+  const app = getApp();
+  const authInstance = getAuth(app);
+  if (!authInstance.currentUser) await signInAnonymously(authInstance).catch(() => {});
+  return { app, db: getFirestore(app) };
+};
+
 export const saveMarketplaceListingToFirebase = async (listing: any) => {
   try {
-    const ref = await addDoc(collection(db, "marketplaceListings"), { ...listing, createdAt: serverTimestamp() });
+    const { db: fdb } = await ensureAuth();
+    const ref = await addDoc(collection(fdb, "marketplaceListings"), { ...listing, createdAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
     const items = getLocalData("marketplaceListings");
@@ -281,10 +294,8 @@ export const saveMarketplaceListingToFirebase = async (listing: any) => {
 
 export const getMarketplaceListingsFromFirebase = async () => {
   try {
-    const app = getApp();
-    const authInstance = getAuth(app);
-    if (!authInstance.currentUser) await signInAnonymously(authInstance).catch(() => {});
-    const snapshot = await getDocs(collection(getFirestore(app), "marketplaceListings"));
+    const { db: fdb } = await ensureAuth();
+    const snapshot = await getDocs(collection(fdb, "marketplaceListings"));
     return snapshot.docs.map(d => {
       const data = d.data();
       return {
@@ -301,7 +312,8 @@ export const getMarketplaceListingsFromFirebase = async () => {
 
 export const updateMarketplaceListingInFirebase = async (id: string, updates: any) => {
   try {
-    await updateDoc(doc(db, "marketplaceListings", id), updates);
+    const { db: fdb } = await ensureAuth();
+    await updateDoc(doc(fdb, "marketplaceListings", id), updates);
   } catch (e) {
     const items = getLocalData("marketplaceListings");
     const idx = items.findIndex((i: any) => i.id === id);
@@ -311,7 +323,8 @@ export const updateMarketplaceListingInFirebase = async (id: string, updates: an
 
 export const deleteMarketplaceListingFromFirebase = async (id: string) => {
   try {
-    await deleteDoc(doc(db, "marketplaceListings", id));
+    const { db: fdb } = await ensureAuth();
+    await deleteDoc(doc(fdb, "marketplaceListings", id));
   } catch (e) {
     saveLocalData("marketplaceListings", getLocalData("marketplaceListings").filter((i: any) => i.id !== id));
   }
