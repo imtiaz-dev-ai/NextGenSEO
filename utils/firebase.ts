@@ -53,11 +53,14 @@ const saveLocalData = (key: string, data: any) => {
 // Blog functions
 export const saveBlogToFirebase = async (blog: any) => {
   try {
+    await waitForAuth();
+    const app = getApp();
     const clean = { ...blog };
     if (clean.image?.startsWith('data:image')) clean.image = '';
-    const ref = await addDoc(collection(db, "blogPosts"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const ref = await addDoc(collection(getFirestore(app), "blogPosts"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
+    console.error('saveBlogToFirebase error:', e);
     const blogs = getLocalData("customBlogs");
     const newBlog = { ...blog, id: Date.now().toString(), createdAt: new Date().toISOString() };
     blogs.push(newBlog);
@@ -73,16 +76,20 @@ export const getBlogsFromFirebase = async () => {
     const snapshot = await getDocs(collection(getFirestore(app), "blogPosts"));
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (e) {
+    console.error('getBlogsFromFirebase error:', e);
     return getLocalData("customBlogs");
   }
 };
 
 export const updateBlogInFirebase = async (blogId: string, updates: any) => {
   try {
+    await waitForAuth();
+    const app = getApp();
     const clean = { ...updates };
     if (clean.image?.startsWith('data:image')) clean.image = '';
-    await updateDoc(doc(db, "blogPosts", blogId), { ...clean, updatedAt: serverTimestamp() });
+    await updateDoc(doc(getFirestore(app), "blogPosts", blogId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
+    console.error('updateBlogInFirebase error:', e);
     const blogs = getLocalData("customBlogs");
     const idx = blogs.findIndex((b: any) => b.id === blogId);
     if (idx > -1) {
@@ -94,8 +101,11 @@ export const updateBlogInFirebase = async (blogId: string, updates: any) => {
 
 export const deleteBlogFromFirebase = async (blogId: string) => {
   try {
-    await deleteDoc(doc(db, "blogPosts", blogId));
+    await waitForAuth();
+    const app = getApp();
+    await deleteDoc(doc(getFirestore(app), "blogPosts", blogId));
   } catch (e) {
+    console.error('deleteBlogFromFirebase error:', e);
     const blogs = getLocalData("customBlogs").filter((b: any) => b.id !== blogId);
     saveLocalData("customBlogs", blogs);
   }
@@ -104,11 +114,14 @@ export const deleteBlogFromFirebase = async (blogId: string) => {
 // Case functions
 export const saveCaseToFirebase = async (caseStudy: any) => {
   try {
+    await waitForAuth();
+    const app = getApp();
     const clean = { ...caseStudy };
     if (clean.image?.startsWith('data:image')) clean.image = '';
-    const ref = await addDoc(collection(db, "caseStudies"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const ref = await addDoc(collection(getFirestore(app), "caseStudies"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
+    console.error('saveCaseToFirebase error:', e);
     const cases = getLocalData("customCases");
     const newCase = { ...caseStudy, id: Date.now().toString(), createdAt: new Date().toISOString() };
     cases.push(newCase);
@@ -130,9 +143,11 @@ export const getCasesFromFirebase = async () => {
 
 export const updateCaseInFirebase = async (caseId: string, updates: any) => {
   try {
+    await waitForAuth();
+    const app = getApp();
     const clean = { ...updates };
     if (clean.image?.startsWith('data:image')) clean.image = '';
-    await updateDoc(doc(db, "caseStudies", caseId), { ...clean, updatedAt: serverTimestamp() });
+    await updateDoc(doc(getFirestore(app), "caseStudies", caseId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
     const cases = getLocalData("customCases");
     const idx = cases.findIndex((c: any) => c.id === caseId);
@@ -145,7 +160,9 @@ export const updateCaseInFirebase = async (caseId: string, updates: any) => {
 
 export const deleteCaseFromFirebase = async (caseId: string) => {
   try {
-    await deleteDoc(doc(db, "caseStudies", caseId));
+    await waitForAuth();
+    const app = getApp();
+    await deleteDoc(doc(getFirestore(app), "caseStudies", caseId));
   } catch (e) {
     const cases = getLocalData("customCases").filter((c: any) => c.id !== caseId);
     saveLocalData("customCases", cases);
@@ -155,11 +172,14 @@ export const deleteCaseFromFirebase = async (caseId: string) => {
 // Team functions
 export const saveTeamToFirebase = async (member: any) => {
   try {
+    await waitForAuth();
+    const app = getApp();
     const clean = { ...member };
     if (clean.image?.startsWith('data:image')) clean.image = '';
-    const ref = await addDoc(collection(db, "teamMembers"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const ref = await addDoc(collection(getFirestore(app), "teamMembers"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
+    console.error('saveTeamToFirebase error:', e);
     const team = getLocalData("customTeam");
     const newMember = { ...member, id: Date.now().toString(), createdAt: new Date().toISOString() };
     team.push(newMember);
@@ -181,9 +201,11 @@ export const getTeamFromFirebase = async () => {
 
 export const updateTeamInFirebase = async (memberId: string, updates: any) => {
   try {
+    await waitForAuth();
+    const app = getApp();
     const clean = { ...updates };
     if (clean.image?.startsWith('data:image')) clean.image = '';
-    await updateDoc(doc(db, "teamMembers", memberId), { ...clean, updatedAt: serverTimestamp() });
+    await updateDoc(doc(getFirestore(app), "teamMembers", memberId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
     const team = getLocalData("customTeam");
     const idx = team.findIndex((m: any) => m.id === memberId);
@@ -196,7 +218,9 @@ export const updateTeamInFirebase = async (memberId: string, updates: any) => {
 
 export const deleteTeamFromFirebase = async (memberId: string) => {
   try {
-    await deleteDoc(doc(db, "teamMembers", memberId));
+    await waitForAuth();
+    const app = getApp();
+    await deleteDoc(doc(getFirestore(app), "teamMembers", memberId));
   } catch (e) {
     const team = getLocalData("customTeam").filter((m: any) => m.id !== memberId);
     saveLocalData("customTeam", team);
@@ -325,7 +349,9 @@ export const deleteMarketplaceListingFromFirebase = async (id: string) => {
 // Community Posts
 export const getCommunityPostsFromFirebase = async () => {
   try {
-    const snapshot = await getDocs(collection(db, "communityPosts"));
+    await waitForAuth();
+    const app = getApp();
+    const snapshot = await getDocs(collection(getFirestore(app), "communityPosts"));
     return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (e) {
     return getLocalData("communityPosts");
@@ -334,7 +360,9 @@ export const getCommunityPostsFromFirebase = async () => {
 
 export const saveCommunityPostToFirebase = async (post: any) => {
   try {
-    const ref = await addDoc(collection(db, "communityPosts"), { ...post, createdAt: serverTimestamp(), likes: 0, comments: [] });
+    await waitForAuth();
+    const app = getApp();
+    const ref = await addDoc(collection(getFirestore(app), "communityPosts"), { ...post, createdAt: serverTimestamp(), likes: 0, comments: [] });
     return ref.id;
   } catch (e) {
     const posts = getLocalData("communityPosts");
@@ -347,7 +375,9 @@ export const saveCommunityPostToFirebase = async (post: any) => {
 
 export const likeCommunityPostInFirebase = async (postId: string, likes: number) => {
   try {
-    await updateDoc(doc(db, "communityPosts", postId), { likes });
+    await waitForAuth();
+    const app = getApp();
+    await updateDoc(doc(getFirestore(app), "communityPosts", postId), { likes });
   } catch (e) {
     const posts = getLocalData("communityPosts");
     const idx = posts.findIndex((p: any) => p.id === postId);
@@ -357,7 +387,9 @@ export const likeCommunityPostInFirebase = async (postId: string, likes: number)
 
 export const addCommentToPostInFirebase = async (postId: string, comments: any[]) => {
   try {
-    await updateDoc(doc(db, "communityPosts", postId), { comments });
+    await waitForAuth();
+    const app = getApp();
+    await updateDoc(doc(getFirestore(app), "communityPosts", postId), { comments });
   } catch (e) {
     const posts = getLocalData("communityPosts");
     const idx = posts.findIndex((p: any) => p.id === postId);
