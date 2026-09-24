@@ -43,37 +43,57 @@ interface TeamMember {
   twitter?: string;
 }
 
-const compressImage = async (base64: string): Promise<string> => {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.src = base64;
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const maxW = 800;
-      const ratio = Math.min(1, maxW / img.width);
-      canvas.width = Math.round(img.width * ratio);
-      canvas.height = Math.round(img.height * ratio);
-      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-      // Keep reducing quality until under 500KB
-      let quality = 0.85;
-      let result = canvas.toDataURL('image/jpeg', quality);
-      while (result.length > 500000 && quality > 0.3) {
-        quality -= 0.1;
-        result = canvas.toDataURL('image/jpeg', quality);
-      }
-      resolve(result);
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { initializeApp, getApps } from 'firebase/app';
+
+const uploadFileToStorage = (file: File, folder: string, onProgress: (p: number) => void): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const firebaseConfig = {
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: import.meta.env.VITE_FIREBASE_APP_ID,
     };
-    img.onerror = () => resolve(base64);
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+    const storage = getStorage(app);
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${folder}/${Date.now()}.${ext}`;
+    const sRef = storageRef(storage, path);
+    const task = uploadBytesResumable(sRef, file);
+    task.on('state_changed',
+      snap => onProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
+      reject,
+      () => getDownloadURL(task.snapshot.ref).then(resolve).catch(reject)
+    );
   });
 };
 
-const ImageUploadField = ({ image, onImageChange, onImageRemove, label, aspect = 'landscape' }: { image: string; onImageChange: (img: string) => void; onImageRemove: () => void; label: string; aspect?: string }) => {
+const ImageUploadField = ({ image, onImageChange, onImageRemove, label, folder = 'blogs', aspect = 'landscape' }: { image: string; onImageChange: (img: string) => void; onImageRemove: () => void; label: string; folder?: string; aspect?: string }) => {
   const [urlInput, setUrlInput] = React.useState('');
-  const [mode, setMode] = React.useState<'upload' | 'url'>('url');
+  const [mode, setMode] = React.useState<'upload' | 'url'>('upload');
+  const [uploading, setUploading] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
+  const [error, setError] = React.useState('');
 
   const handleUrl = () => {
     if (urlInput.trim()) { onImageChange(urlInput.trim()); setUrlInput(''); }
+  };
+
+  const handleFile = async (file: File) => {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { setError('File too large (max 10MB)'); return; }
+    setError('');
+    setUploading(true);
+    setProgress(0);
+    try {
+      const url = await uploadFileToStorage(file, folder, setProgress);
+      onImageChange(url);
+    } catch (e: any) {
+      setError('Upload failed: ' + (e?.message || 'Check Firebase Storage rules'));
+    }
+    setUploading(false);
   };
 
   return (
@@ -83,6 +103,7 @@ const ImageUploadField = ({ image, onImageChange, onImageRemove, label, aspect =
         <button type="button" onClick={() => setMode('upload')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${mode === 'upload' ? 'bg-purple-500 text-white' : 'glass text-slate-400'}`}>Upload File</button>
         <button type="button" onClick={() => setMode('url')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${mode === 'url' ? 'bg-purple-500 text-white' : 'glass text-slate-400'}`}>Image URL</button>
       </div>
+      {error && <p className="text-red-400 text-xs mb-2 font-bold">{error}</p>}
       {image ? (
         <div className="relative">
           <img src={image} alt="preview" className={`w-full ${aspect === 'square' ? 'h-48' : 'h-40'} object-contain bg-slate-900 rounded-lg`} />
@@ -90,33 +111,31 @@ const ImageUploadField = ({ image, onImageChange, onImageRemove, label, aspect =
         </div>
       ) : mode === 'url' ? (
         <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="https://images.unsplash.com/..."
-            value={urlInput}
+          <input type="text" placeholder="https://images.unsplash.com/..." value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleUrl()}
-            className="flex-1 bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none text-sm"
-          />
+            className="flex-1 bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none text-sm" />
           <button type="button" onClick={handleUrl} className="bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded-lg font-bold text-sm transition-all">Add</button>
         </div>
       ) : (
-        <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-purple-500/50 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-500/5 transition-all group">
-          <div className="flex flex-col items-center justify-center">
-            <svg className="w-10 h-10 text-purple-400/60 group-hover:text-purple-400 mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <p className="text-sm text-slate-300 font-bold">Click to upload image</p>
-            <p className="text-xs text-slate-500 mt-1">PNG, JPG (max 5MB) — will be compressed</p>
-          </div>
-          <input type="file" accept="image/*" onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              const reader = new FileReader();
-              reader.onloadend = () => onImageChange(reader.result as string);
-              reader.readAsDataURL(file);
-            }
-          }} className="hidden" />
+        <label className={`flex flex-col items-center justify-center w-full h-36 border-2 border-dashed rounded-lg transition-all ${uploading ? 'border-purple-500 bg-purple-500/5 cursor-wait' : 'border-purple-500/50 cursor-pointer hover:border-purple-500 hover:bg-purple-500/5'} group`}>
+          {uploading ? (
+            <div className="flex flex-col items-center gap-2 w-full px-8">
+              <div className="w-full bg-slate-800 rounded-full h-2">
+                <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all" style={{ width: `${progress}%` }} />
+              </div>
+              <p className="text-purple-400 text-sm font-bold">Uploading... {progress}%</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center">
+              <svg className="w-10 h-10 text-purple-400/60 group-hover:text-purple-400 mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p className="text-sm text-slate-300 font-bold">Click to upload image</p>
+              <p className="text-xs text-slate-500 mt-1">PNG, JPG, WebP (max 10MB)</p>
+            </div>
+          )}
+          <input type="file" accept="image/*" disabled={uploading} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ''; }} className="hidden" />
         </label>
       )}
     </div>
@@ -159,6 +178,53 @@ const MarketIcon = () => (
   </svg>
 );
 
+const RedirectIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+  </svg>
+);
+
+// ─── Universal Slug Utilities ───────────────────────────────────────────────
+const toSlug = (str: string) =>
+  str.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+const SlugField = ({
+  slug, onChange, prefix, existingSlugs, currentId
+}: {
+  slug: string;
+  onChange: (s: string) => void;
+  prefix: string;
+  existingSlugs: string[];
+  currentId?: string;
+}) => {
+  const isDuplicate = slug && existingSlugs.includes(slug);
+  return (
+    <div>
+      <label className="block text-sm font-bold text-slate-300 mb-2">
+        URL Slug <span className="text-slate-500 font-normal">(auto-generated if blank)</span>
+      </label>
+      <div className={`flex items-center gap-2 bg-slate-900/50 border rounded-lg px-4 py-3 transition-all ${
+        isDuplicate ? 'border-red-500' : 'border-white/10 focus-within:border-purple-500'
+      }`}>
+        <span className="text-slate-500 text-sm whitespace-nowrap">{prefix}/</span>
+        <input
+          type="text"
+          placeholder="my-custom-slug"
+          value={slug}
+          onChange={e => onChange(toSlug(e.target.value))}
+          className="flex-1 bg-transparent text-white placeholder-slate-500 focus:outline-none font-mono text-sm"
+        />
+      </div>
+      {isDuplicate && <p className="text-red-400 text-xs mt-1 font-bold">⚠ This slug is already in use. Please choose another.</p>}
+      {slug && !isDuplicate && <p className="text-emerald-400 text-xs mt-1 font-mono">✓ {prefix}/{slug}</p>}
+    </div>
+  );
+};
+
 interface MarketplaceListing {
   id: string;
   domain: string;
@@ -175,7 +241,13 @@ const AdminPanel: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'messages' | 'blogs' | 'cases' | 'team' | 'marketplace'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'messages' | 'blogs' | 'cases' | 'team' | 'marketplace' | 'redirects'>('dashboard');
+  const [redirects, setRedirects] = useState<{id: string; from: string; to: string}[]>(() => {
+    try { return JSON.parse(localStorage.getItem('siteRedirects') || '[]'); } catch { return []; }
+  });
+  const [redirectFrom, setRedirectFrom] = useState('');
+  const [redirectTo, setRedirectTo] = useState('');
+  const [redirectError, setRedirectError] = useState('');
   const [listings, setListings] = useState<MarketplaceListing[]>([]);
   const [showListingForm, setShowListingForm] = useState(false);
   const [editingListing, setEditingListing] = useState<MarketplaceListing | null>(null);
@@ -193,6 +265,8 @@ const AdminPanel: React.FC = () => {
     content: '',
     category: '',
     author: '',
+    readTime: '5 min',
+    slug: '',
     image: ''
   });
   const [cases, setCases] = useState<CaseStudy[]>([]);
@@ -207,6 +281,7 @@ const AdminPanel: React.FC = () => {
     keywordsRanked: '',
     revenueIncrease: '',
     duration: '',
+    slug: '',
     image: '',
     color: 'purple'
   });
@@ -217,6 +292,7 @@ const AdminPanel: React.FC = () => {
   const [teamForm, setTeamForm] = useState({
     name: '',
     role: '',
+    slug: '',
     bio: '',
     image: '',
     linkedin: '',
@@ -342,16 +418,12 @@ const AdminPanel: React.FC = () => {
   };
 
   const saveBlog = async () => {
-    if (!blogForm.title || !blogForm.content) {
-      alert('Title and content required!');
-      return;
-    }
+    if (!blogForm.title || !blogForm.content) { alert('Title and content required!'); return; }
+    const finalSlug = (blogForm as any).slug?.trim() || toSlug(blogForm.title);
+    const otherSlugs = blogs.filter(b => b.id !== editingBlog?.id).map((b: any) => b.slug || toSlug(b.title));
+    if (otherSlugs.includes(finalSlug)) { alert(`Slug "${finalSlug}" is already in use. Please choose another.`); return; }
     try {
-      let imageData = blogForm.image;
-      if (blogForm.image && blogForm.image.startsWith('data:image')) {
-        imageData = await compressImage(blogForm.image);
-      }
-      const blogData = { ...blogForm, image: imageData, date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) };
+      const blogData = { ...blogForm, slug: finalSlug, readTime: (blogForm as any).readTime || '5 min', date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) };
       if (editingBlog) {
         await updateBlogInFirebase(editingBlog.id, blogData);
         setBlogs(blogs.map(b => b.id === editingBlog.id ? { ...blogData, id: editingBlog.id } : b));
@@ -359,14 +431,12 @@ const AdminPanel: React.FC = () => {
         const docId = await saveBlogToFirebase(blogData);
         setBlogs([...blogs, { ...blogData, id: docId }]);
       }
-      setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', image: '' });
+      setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', readTime: '5 min', slug: '', image: '' });
       setBlogImage('');
       setShowBlogForm(false);
       setEditingBlog(null);
       alert('Blog saved!');
-    } catch (error: any) {
-      alert('Error: ' + error.message);
-    }
+    } catch (error: any) { alert('Error: ' + error.message); }
   };
 
   const editBlog = (blog: BlogPost) => {
@@ -388,16 +458,12 @@ const AdminPanel: React.FC = () => {
   };
 
   const saveCase = async () => {
-    if (!caseForm.client || !caseForm.industry) {
-      alert('Client and industry required!');
-      return;
-    }
+    if (!caseForm.client || !caseForm.industry) { alert('Client and industry required!'); return; }
+    const finalSlug = (caseForm as any).slug?.trim() || toSlug(caseForm.client + '-' + caseForm.industry);
+    const otherSlugs = cases.filter(c => c.id !== editingCase?.id).map((c: any) => c.slug || toSlug(c.client + '-' + c.industry));
+    if (otherSlugs.includes(finalSlug)) { alert(`Slug "${finalSlug}" is already in use.`); return; }
     try {
-      let imageData = caseForm.image;
-      if (caseForm.image && caseForm.image.startsWith('data:image')) {
-        imageData = await compressImage(caseForm.image);
-      }
-      const caseData = { ...caseForm, image: imageData };
+      const caseData = { ...caseForm, slug: finalSlug };
       if (editingCase) {
         await updateCaseInFirebase(editingCase.id, caseData);
         setCases(cases.map(c => c.id === editingCase.id ? { ...caseData, id: editingCase.id } : c));
@@ -405,19 +471,15 @@ const AdminPanel: React.FC = () => {
         const docId = await saveCaseToFirebase(caseData);
         setCases([...cases, { ...caseData, id: docId }]);
       }
-      setCaseForm({ client: '', industry: '', challenge: '', trafficGrowth: '', keywordsRanked: '', revenueIncrease: '', duration: '', image: '', color: 'purple' });
-      setCaseImage('');
-      setShowCaseForm(false);
-      setEditingCase(null);
+      setCaseForm({ client: '', industry: '', challenge: '', trafficGrowth: '', keywordsRanked: '', revenueIncrease: '', duration: '', slug: '', image: '', color: 'purple' });
+      setCaseImage(''); setShowCaseForm(false); setEditingCase(null);
       alert('Case saved!');
-    } catch (error: any) {
-      alert('Error: ' + error.message);
-    }
+    } catch (error: any) { alert('Error: ' + error.message); }
   };
 
   const editCase = (caseStudy: CaseStudy) => {
     setEditingCase(caseStudy);
-    setCaseForm(caseStudy);
+    setCaseForm({ ...caseStudy, slug: (caseStudy as any).slug || '' } as any);
     setCaseImage(caseStudy.image);
     setShowCaseForm(true);
   };
@@ -434,16 +496,12 @@ const AdminPanel: React.FC = () => {
   };
 
   const saveTeam = async () => {
-    if (!teamForm.name || !teamForm.role) {
-      alert('Name and role required!');
-      return;
-    }
+    if (!teamForm.name || !teamForm.role) { alert('Name and role required!'); return; }
+    const finalSlug = (teamForm as any).slug?.trim() || toSlug(teamForm.name);
+    const otherSlugs = teamMembers.filter(t => t.id !== editingTeam?.id).map((t: any) => t.slug || toSlug(t.name));
+    if (otherSlugs.includes(finalSlug)) { alert(`Slug "${finalSlug}" is already in use.`); return; }
     try {
-      let imageData = teamForm.image;
-      if (teamForm.image && teamForm.image.startsWith('data:image')) {
-        imageData = await compressImage(teamForm.image);
-      }
-      const teamData = { ...teamForm, image: imageData };
+      const teamData = { ...teamForm, slug: finalSlug };
       if (editingTeam) {
         await updateTeamInFirebase(editingTeam.id, teamData);
         setTeamMembers(teamMembers.map(t => t.id === editingTeam.id ? { ...teamData, id: editingTeam.id } : t));
@@ -451,19 +509,15 @@ const AdminPanel: React.FC = () => {
         const docId = await saveTeamToFirebase(teamData);
         setTeamMembers([...teamMembers, { ...teamData, id: docId }]);
       }
-      setTeamForm({ name: '', role: '', bio: '', image: '', linkedin: '', twitter: '' });
-      setTeamImage('');
-      setShowTeamForm(false);
-      setEditingTeam(null);
+      setTeamForm({ name: '', role: '', slug: '', bio: '', image: '', linkedin: '', twitter: '' });
+      setTeamImage(''); setShowTeamForm(false); setEditingTeam(null);
       alert('Member saved!');
-    } catch (error: any) {
-      alert('Error: ' + error.message);
-    }
+    } catch (error: any) { alert('Error: ' + error.message); }
   };
 
   const editTeam = (member: TeamMember) => {
     setEditingTeam(member);
-    setTeamForm(member);
+    setTeamForm({ ...member, slug: (member as any).slug || '' } as any);
     setTeamImage(member.image);
     setShowTeamForm(true);
   };
@@ -540,6 +594,7 @@ const AdminPanel: React.FC = () => {
             { id: 'cases', label: 'Cases', icon: CaseIcon },
             { id: 'team', label: 'Team', icon: TeamIcon },
             { id: 'marketplace', label: 'Marketplace', icon: MarketIcon },
+            { id: 'redirects', label: 'Redirects', icon: RedirectIcon },
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -651,7 +706,7 @@ const AdminPanel: React.FC = () => {
                 onClick={() => {
                   setShowBlogForm(true);
                   setEditingBlog(null);
-                  setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', image: '' });
+                  setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', readTime: '5 min', slug: '', image: '' });
                   setBlogImage('');
                 }}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
@@ -679,7 +734,7 @@ const AdminPanel: React.FC = () => {
                     <label className="block text-sm font-bold text-slate-300 mb-2">Content (HTML)</label>
                     <textarea placeholder="Detailed content" value={blogForm.content} onChange={(e) => setBlogForm({...blogForm, content: e.target.value})} rows={5} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-bold text-slate-300 mb-2">Category</label>
                       <input type="text" placeholder="e.g., AI & Trends" value={blogForm.category} onChange={(e) => setBlogForm({...blogForm, category: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
@@ -688,12 +743,23 @@ const AdminPanel: React.FC = () => {
                       <label className="block text-sm font-bold text-slate-300 mb-2">Author</label>
                       <input type="text" placeholder="Author name" value={blogForm.author} onChange={(e) => setBlogForm({...blogForm, author: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
                     </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-2">Read Time</label>
+                      <input type="text" placeholder="5 min" value={(blogForm as any).readTime} onChange={(e) => setBlogForm({...blogForm, readTime: e.target.value} as any)} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
+                    </div>
                   </div>
+                  <SlugField
+                    slug={(blogForm as any).slug || ''}
+                    onChange={s => setBlogForm({...blogForm, slug: s} as any)}
+                    prefix="/blog"
+                    existingSlugs={blogs.filter(b => b.id !== editingBlog?.id).map((b: any) => b.slug || toSlug(b.title))}
+                  />
                   <ImageUploadField 
                     image={blogImage}
                     onImageChange={(img) => {setBlogImage(img); setBlogForm({...blogForm, image: img});}}
                     onImageRemove={() => {setBlogImage(''); setBlogForm({...blogForm, image: ''});}}
                     label="Featured Image"
+                    folder="blogs"
                   />
                   <div className="flex gap-3 pt-4">
                     <button onClick={saveBlog} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save Blog</button>
@@ -709,7 +775,8 @@ const AdminPanel: React.FC = () => {
                   <div className="flex-1">
                     <h3 className="font-bold text-lg">{blog.title}</h3>
                     <p className="text-sm text-purple-400 mt-1">{blog.category}</p>
-                    <p className="text-sm text-slate-400 mt-2">{blog.author}</p>
+                    <p className="text-xs text-slate-500 font-mono mt-1">/blog/{(blog as any).slug || toSlug(blog.title)}</p>
+                    <p className="text-sm text-slate-400 mt-1">{blog.author}</p>
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => editBlog(blog)} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-4 py-2 rounded-lg text-sm font-bold transition-all">Edit</button>
@@ -729,7 +796,7 @@ const AdminPanel: React.FC = () => {
                 onClick={() => {
                   setShowCaseForm(true);
                   setEditingCase(null);
-                  setCaseForm({ client: '', industry: '', challenge: '', trafficGrowth: '', keywordsRanked: '', revenueIncrease: '', duration: '', image: '', color: 'purple' });
+                  setCaseForm({ client: '', industry: '', challenge: '', trafficGrowth: '', keywordsRanked: '', revenueIncrease: '', duration: '', slug: '', image: '', color: 'purple' });
                   setCaseImage('');
                 }}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
@@ -777,11 +844,18 @@ const AdminPanel: React.FC = () => {
                       <input type="text" placeholder="6 months" value={caseForm.duration} onChange={(e) => setCaseForm({...caseForm, duration: e.target.value})} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
                     </div>
                   </div>
+                  <SlugField
+                    slug={(caseForm as any).slug || ''}
+                    onChange={s => setCaseForm({...caseForm, slug: s} as any)}
+                    prefix="/cases"
+                    existingSlugs={cases.filter(c => c.id !== editingCase?.id).map((c: any) => c.slug || toSlug(c.client + '-' + c.industry))}
+                  />
                   <ImageUploadField 
                     image={caseImage}
                     onImageChange={(img) => {setCaseImage(img); setCaseForm({...caseForm, image: img});}}
                     onImageRemove={() => {setCaseImage(''); setCaseForm({...caseForm, image: ''});}}
                     label="Case Image"
+                    folder="cases"
                   />
                   <div className="flex gap-3 pt-4">
                     <button onClick={saveCase} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save Case</button>
@@ -911,6 +985,93 @@ const AdminPanel: React.FC = () => {
           </div>
         )}
 
+        {activeTab === 'redirects' && (
+          <div className="glass p-8 rounded-2xl border border-white/5">
+            <div className="mb-8">
+              <h2 className="text-3xl font-black mb-1">URL Redirects</h2>
+              <p className="text-slate-400 text-sm">Redirect any old or custom URL to another page on your site.</p>
+            </div>
+
+            {/* Add form */}
+            <div className="bg-slate-900/50 p-6 rounded-xl border border-purple-500/30 mb-8">
+              <h3 className="text-sm font-black uppercase tracking-widest text-purple-400 mb-4">Add New Redirect</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">From (old URL)</label>
+                  <div className="flex items-center gap-2 bg-slate-900 border border-white/10 rounded-lg px-3 py-2.5 focus-within:border-purple-500 transition-all">
+                    <span className="text-slate-500 text-sm">/</span>
+                    <input
+                      type="text" placeholder="old-page-url"
+                      value={redirectFrom}
+                      onChange={e => { setRedirectFrom(e.target.value.replace(/^\//,'')); setRedirectError(''); }}
+                      className="flex-1 bg-transparent text-white placeholder-slate-500 focus:outline-none font-mono text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">To (destination URL)</label>
+                  <div className="flex items-center gap-2 bg-slate-900 border border-white/10 rounded-lg px-3 py-2.5 focus-within:border-purple-500 transition-all">
+                    <span className="text-slate-500 text-sm">/</span>
+                    <input
+                      type="text" placeholder="new-page-url"
+                      value={redirectTo}
+                      onChange={e => { setRedirectTo(e.target.value.replace(/^\//,'')); setRedirectError(''); }}
+                      className="flex-1 bg-transparent text-white placeholder-slate-500 focus:outline-none font-mono text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+              {redirectError && <p className="text-red-400 text-xs font-bold mb-3">{redirectError}</p>}
+              <button
+                onClick={() => {
+                  const from = redirectFrom.trim().replace(/^\//, '');
+                  const to = redirectTo.trim().replace(/^\//, '');
+                  if (!from || !to) { setRedirectError('Both fields are required.'); return; }
+                  if (from === to) { setRedirectError('From and To cannot be the same.'); return; }
+                  if (redirects.some(r => r.from === from)) { setRedirectError(`"/${from}" already has a redirect.`); return; }
+                  const updated = [...redirects, { id: Date.now().toString(), from, to }];
+                  setRedirects(updated);
+                  localStorage.setItem('siteRedirects', JSON.stringify(updated));
+                  setRedirectFrom(''); setRedirectTo('');
+                }}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 py-2.5 rounded-lg font-bold text-sm transition-all"
+              >
+                Add Redirect
+              </button>
+            </div>
+
+            {/* List */}
+            {redirects.length === 0 ? (
+              <p className="text-slate-400 text-center py-12">No redirects yet.</p>
+            ) : (
+              <div className="glass rounded-xl overflow-hidden">
+                <div className="grid grid-cols-[1fr_1fr_auto] gap-4 px-6 py-3 border-b border-white/5 text-xs font-black uppercase text-slate-400">
+                  <span>From</span><span>To</span><span />
+                </div>
+                {redirects.map(r => (
+                  <div key={r.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 items-center px-6 py-4 border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-all">
+                    <span className="font-mono text-sm text-red-400">/{r.from}</span>
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                      <span className="font-mono text-sm text-emerald-400">/{r.to}</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const updated = redirects.filter(x => x.id !== r.id);
+                        setRedirects(updated);
+                        localStorage.setItem('siteRedirects', JSON.stringify(updated));
+                      }}
+                      className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'team' && (
           <div className="glass p-8 rounded-2xl border border-white/5">
             <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
@@ -919,7 +1080,7 @@ const AdminPanel: React.FC = () => {
                 onClick={() => {
                   setShowTeamForm(true);
                   setEditingTeam(null);
-                  setTeamForm({ name: '', role: '', bio: '', image: '', linkedin: '', twitter: '' });
+                  setTeamForm({ name: '', role: '', slug: '', bio: '', image: '', linkedin: '', twitter: '' });
                   setTeamImage('');
                 }}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
@@ -949,12 +1110,19 @@ const AdminPanel: React.FC = () => {
                     <label className="block text-sm font-bold text-slate-300 mb-2">Bio</label>
                     <textarea placeholder="Team member bio" value={teamForm.bio} onChange={(e) => setTeamForm({...teamForm, bio: e.target.value})} rows={3} className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none" />
                   </div>
+                  <SlugField
+                    slug={(teamForm as any).slug || ''}
+                    onChange={s => setTeamForm({...teamForm, slug: s} as any)}
+                    prefix="/team"
+                    existingSlugs={teamMembers.filter(t => t.id !== editingTeam?.id).map((t: any) => t.slug || toSlug(t.name))}
+                  />
                   <ImageUploadField 
                     image={teamImage}
                     onImageChange={(img) => {setTeamImage(img); setTeamForm({...teamForm, image: img});}}
                     onImageRemove={() => {setTeamImage(''); setTeamForm({...teamForm, image: ''});}}
                     label="Profile Image"
                     aspect="square"
+                    folder="team"
                   />
                   <div className="grid grid-cols-2 gap-4">
                     <div>

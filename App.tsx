@@ -540,6 +540,19 @@ const App: React.FC = () => {
     }
   }, []);
 
+  // Handle client-side redirects from admin panel
+  React.useEffect(() => {
+    try {
+      const redirects: {from: string; to: string}[] = JSON.parse(localStorage.getItem('siteRedirects') || '[]');
+      const currentPath = location.pathname.replace(/^\//, '');
+      const match = redirects.find(r => r.from === currentPath);
+      if (match) {
+        const dest = match.to.startsWith('/') ? match.to : '/' + match.to;
+        navigate(dest, { replace: true });
+      }
+    } catch {}
+  }, [location.pathname]);
+
   // Sync route when browser back/forward is used
   React.useEffect(() => {
     setCurrentRouteState(pathToRoute(location.pathname));

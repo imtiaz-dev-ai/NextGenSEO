@@ -1,7 +1,7 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, signInAnonymously, type Auth } from "firebase/auth";
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, type Firestore } from "firebase/firestore";
-import { getStorage, type FirebaseStorage } from "firebase/storage";
+import { getStorage, ref as storageRef, uploadString, getDownloadURL, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -50,13 +50,28 @@ const saveLocalData = (key: string, data: any) => {
   }
 };
 
+// Upload base64 image to Firebase Storage and return download URL
+const uploadImageToStorage = async (base64: string, path: string): Promise<string> => {
+  try {
+    const app = getApp();
+    const sRef = storageRef(getStorage(app), path);
+    await uploadString(sRef, base64, 'data_url');
+    return await getDownloadURL(sRef);
+  } catch (e) {
+    console.error('uploadImageToStorage error:', e);
+    return '';
+  }
+};
+
 // Blog functions
 export const saveBlogToFirebase = async (blog: any) => {
   try {
     await waitForAuth();
     const app = getApp();
     const clean = { ...blog };
-    if (clean.image?.startsWith('data:image')) clean.image = '';
+    if (clean.image?.startsWith('data:image')) {
+      clean.image = await uploadImageToStorage(clean.image, `blogs/${Date.now()}.jpg`);
+    }
     const ref = await addDoc(collection(getFirestore(app), "blogPosts"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
@@ -86,7 +101,9 @@ export const updateBlogInFirebase = async (blogId: string, updates: any) => {
     await waitForAuth();
     const app = getApp();
     const clean = { ...updates };
-    if (clean.image?.startsWith('data:image')) clean.image = '';
+    if (clean.image?.startsWith('data:image')) {
+      clean.image = await uploadImageToStorage(clean.image, `blogs/${blogId}_${Date.now()}.jpg`);
+    }
     await updateDoc(doc(getFirestore(app), "blogPosts", blogId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
     console.error('updateBlogInFirebase error:', e);
@@ -117,7 +134,9 @@ export const saveCaseToFirebase = async (caseStudy: any) => {
     await waitForAuth();
     const app = getApp();
     const clean = { ...caseStudy };
-    if (clean.image?.startsWith('data:image')) clean.image = '';
+    if (clean.image?.startsWith('data:image')) {
+      clean.image = await uploadImageToStorage(clean.image, `cases/${Date.now()}.jpg`);
+    }
     const ref = await addDoc(collection(getFirestore(app), "caseStudies"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
@@ -146,7 +165,9 @@ export const updateCaseInFirebase = async (caseId: string, updates: any) => {
     await waitForAuth();
     const app = getApp();
     const clean = { ...updates };
-    if (clean.image?.startsWith('data:image')) clean.image = '';
+    if (clean.image?.startsWith('data:image')) {
+      clean.image = await uploadImageToStorage(clean.image, `cases/${caseId}_${Date.now()}.jpg`);
+    }
     await updateDoc(doc(getFirestore(app), "caseStudies", caseId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
     const cases = getLocalData("customCases");
@@ -175,7 +196,9 @@ export const saveTeamToFirebase = async (member: any) => {
     await waitForAuth();
     const app = getApp();
     const clean = { ...member };
-    if (clean.image?.startsWith('data:image')) clean.image = '';
+    if (clean.image?.startsWith('data:image')) {
+      clean.image = await uploadImageToStorage(clean.image, `team/${Date.now()}.jpg`);
+    }
     const ref = await addDoc(collection(getFirestore(app), "teamMembers"), { ...clean, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
     return ref.id;
   } catch (e) {
@@ -204,7 +227,9 @@ export const updateTeamInFirebase = async (memberId: string, updates: any) => {
     await waitForAuth();
     const app = getApp();
     const clean = { ...updates };
-    if (clean.image?.startsWith('data:image')) clean.image = '';
+    if (clean.image?.startsWith('data:image')) {
+      clean.image = await uploadImageToStorage(clean.image, `team/${memberId}_${Date.now()}.jpg`);
+    }
     await updateDoc(doc(getFirestore(app), "teamMembers", memberId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
     const team = getLocalData("customTeam");

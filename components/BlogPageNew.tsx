@@ -3,8 +3,11 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 // Firebase lazily loaded — only when blog page actually needs custom blogs
 const getFirebaseBlogs = () => import('../utils/firebase').then(m => m.getBlogsFromFirebase());
 
-export const getPostSlug = (title: string) =>
-  title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+export const getPostSlug = (post: any) => {
+  if (typeof post === 'string') return post.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  if (post?.slug) return post.slug;
+  return (post?.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+};
 
 export const defaultPosts = [
   {
@@ -90,18 +93,20 @@ const BlogPostPage = ({ post, onBack }: { post: any; onBack: () => void }) => {
       </button>
 
       {/* Hero image */}
-      <div className="rounded-2xl overflow-hidden mb-8" style={{ contain: 'paint' }}>
-        <img
-          src={post.image}
-          alt={post.title}
-          width="1600"
-          height="900"
-          decoding="async"
-          className="w-full object-cover block"
-          style={{ aspectRatio: '16/9' }}
-          onError={(e: any) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
-        />
-      </div>
+      {post.image && (
+        <div className="rounded-2xl overflow-hidden mb-8" style={{ contain: 'paint' }}>
+          <img
+            src={post.image}
+            alt={post.title}
+            width="1600"
+            height="900"
+            decoding="async"
+            className="w-full object-cover block"
+            style={{ aspectRatio: '16/9' }}
+            onError={(e: any) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
+          />
+        </div>
+      )}
 
       {/* Meta */}
       <div className="mb-6">
@@ -149,29 +154,32 @@ export const BlogPostBySlug = () => {
 
   React.useEffect(() => {
     window.scrollTo(0, 0);
-    // First check defaultPosts immediately
-    const defaultMatch = defaultPosts.find(p => getPostSlug(p.title) === slug);
-    if (defaultMatch) {
-      setPost(defaultMatch);
-      setLoading(false);
-      return;
-    }
-    // Check cache first
+    // Check cache first for instant render
     try {
       const cached = localStorage.getItem('cachedBlogs');
       if (cached) {
-        const match = JSON.parse(cached).find((p: any) => getPostSlug(p.title) === slug);
+        const match = JSON.parse(cached).find((p: any) => getPostSlug(p) === slug);
         if (match) { setPost(match); setLoading(false); return; }
       }
     } catch {}
-    // Then check firebase blogs
+    // Fetch Firebase blogs (Firebase-added blogs take priority over defaults)
     getFirebaseBlogs()
       .then(blogs => {
-        const match = blogs.find((p: any) => getPostSlug(p.title) === slug);
-        if (match) setPost(match);
+        const firebaseMatch = blogs.find((p: any) => getPostSlug(p) === slug);
+        if (firebaseMatch) {
+          setPost(firebaseMatch);
+        } else {
+          // Fallback to defaultPosts
+          const defaultMatch = defaultPosts.find(p => getPostSlug(p) === slug);
+          if (defaultMatch) setPost(defaultMatch);
+        }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        const defaultMatch = defaultPosts.find(p => getPostSlug(p) === slug);
+        if (defaultMatch) setPost(defaultMatch);
+        setLoading(false);
+      });
   }, [slug]);
 
   if (loading) return (
@@ -207,7 +215,7 @@ const BlogPage = () => {
     const path = location.pathname;
     if (path.startsWith('/blog/')) {
       const slug = path.replace('/blog/', '');
-      const match = defaultPosts.find(p => getPostSlug(p.title) === slug);
+      const match = defaultPosts.find(p => getPostSlug(p) === slug);
       if (match) setSelectedPost(match);
     }
 
@@ -224,7 +232,7 @@ const BlogPage = () => {
         const currentPath = location.pathname;
         if (currentPath.startsWith('/blog/')) {
           const slug = currentPath.replace('/blog/', '');
-          const firebaseMatch = blogs.find((p: any) => getPostSlug(p.title) === slug);
+          const firebaseMatch = blogs.find((p: any) => getPostSlug(p) === slug);
           if (firebaseMatch) setSelectedPost(firebaseMatch);
         }
       })
@@ -235,7 +243,7 @@ const BlogPage = () => {
   React.useEffect(() => {
     if (selectedPost) {
       document.title = `${selectedPost.title} | NextGen SEO Blog`;
-      navigate(`/blog/${getPostSlug(selectedPost.title)}`);
+      navigate(`/blog/${getPostSlug(selectedPost)}`);
       window.scrollTo(0, 0);
     } else {
       document.title = 'Blog | SEO Insights & Strategies | NextGen SEO';
@@ -244,7 +252,9 @@ const BlogPage = () => {
   }, [selectedPost]);
 
   const allPosts = [...customBlogs, ...defaultPosts];
-  const categories = ['All', ...Array.from(new Set(allPosts.map(p => p.category)))];
+  const categories = ['All', ...Array.from(new Set(allPosts.map(p => p.category.trim()))).filter((cat, _, arr) =>
+    !arr.some(other => other !== cat && other.toLowerCase() === cat.toLowerCase())
+  )];
   let filteredPosts = selectedCategory === 'All' ? allPosts : allPosts.filter(p => p.category === selectedCategory);
 
   if (searchQuery.trim()) {
@@ -315,7 +325,7 @@ const BlogPage = () => {
         {filteredPosts.map((p, i) => (
           <a
             key={i}
-            href={`/blog/${getPostSlug(p.title)}`}
+            href={`/blog/${getPostSlug(p)}`}
             onClick={(e) => {
               if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
               e.preventDefault();
@@ -331,7 +341,7 @@ const BlogPage = () => {
                 height="900"
                 loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                onError={(e: any) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                onError={(e: any) => { (e.target as HTMLImageElement).style.opacity = '0'; }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
               <div className="absolute top-3 left-3 sm:top-4 sm:left-4 px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/80 to-pink-500/80 backdrop-blur-sm text-white text-[10px] sm:text-xs font-black uppercase">

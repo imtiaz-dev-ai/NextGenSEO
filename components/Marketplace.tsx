@@ -109,10 +109,10 @@ const Marketplace: React.FC = () => {
           Inventory refreshed today
         </div>
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter mb-5 leading-[0.95]">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Buy backlinks with full transparency</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Buy Backlinks, priced like a real order book.</span>
         </h1>
         <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
-          Filter by authority, niche and traffic. Pay a fixed price, track the placement, and get proof it went live.{' '}
+          Buy backlinks with full transparency — filter by authority, niche and traffic. Pay a fixed price, track the placement, and get proof it went live.{' '}
           <span className="text-white font-bold">No bidding, no guesswork.</span>
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
