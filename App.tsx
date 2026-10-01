@@ -41,6 +41,34 @@ const PageLoader = () => (
   </div>
 );
 
+// Always start at the top: on reload and on every route change.
+const ScrollReset = ({ route }: { route: string }) => {
+  const jump = React.useCallback(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
+  // Route change -> scroll to top once new content renders.
+  useEffect(() => {
+    jump();
+    const t = setTimeout(jump, 60);
+    return () => clearTimeout(t);
+  }, [route, jump]);
+
+  // Mount -> keep re-asserting while lazy chunks expand the document height.
+  useEffect(() => {
+    try {
+      if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    } catch { /* no-op */ }
+    jump();
+    const timers = [100, 300, 700].map(t => setTimeout(jump, t));
+    return () => timers.forEach(clearTimeout);
+  }, [jump]);
+
+  return null;
+};
+
 import {
   PencilIcon, LinkIcon, CogIcon, SparklesIcon, TagIcon, DocumentIcon,
   ArrowsIcon, CheckIcon, BoltIcon, CodeIcon, ServerIcon, LockIcon,
@@ -774,6 +802,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <div className="min-h-screen selection:bg-purple-500/30 relative">
+        <ScrollReset route={currentRoute} />
         <Suspense fallback={null}>
           <ParticleBackground />
           <ScrollProgress />
@@ -803,9 +832,9 @@ const App: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-10">
             {/* Logo & About */}
             <div className="lg:col-span-1">
-              <button className="flex items-center gap-2 mb-4 group cursor-pointer" onClick={() => { setCurrentRoute(AppRoute.HOME); }}>
-                <img src="/pics/logo .webp" alt="NextGen SEO" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform" />
-                <span className="text-lg font-black tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
+              <button className="flex items-center gap-3 mb-4 group cursor-pointer" onClick={() => { setCurrentRoute(AppRoute.HOME); }}>
+                <img src="/pics/logo .webp" alt="NextGen SEO" className="w-14 h-14 object-contain shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="text-lg font-black tracking-normal whitespace-nowrap text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
               </button>
               <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xs">Premium SEO agency founded by <span className="text-white font-semibold">Tayyab Mehmood</span>. Building the future of search visibility.</p>
               <div className="flex gap-2">

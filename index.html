@@ -64,23 +64,30 @@
     </style>
     <!-- DNS Prefetch -->
     <script>
-        try {
-            if ('scrollRestoration' in history) {
-                history.scrollRestoration = 'manual';
-            }
-            window.addEventListener('pageshow', function (event) {
-                if (event.persisted) {
-                    window.scrollTo(0, 0);
+        // Force the page to always start at the top.
+        // Runs at parse time so the browser's scroll restoration never wins.
+        (function () {
+            var jump = function () {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            };
+            try {
+                if ('scrollRestoration' in history) {
+                    history.scrollRestoration = 'manual';
                 }
-            });
-            window.addEventListener('load', function () {
-                setTimeout(function () {
-                    window.scrollTo(0, 0);
-                    document.documentElement.scrollTop = 0;
-                    document.body.scrollTop = 0;
-                }, 0);
-            }, { once: true });
-        } catch (error) {}
+                // Strip any hash that would jump the page down.
+                if (window.location.hash) {
+                    history.replaceState(null, '', window.location.pathname + window.location.search);
+                }
+                jump();
+                // Re-assert while React mounts and content grows.
+                document.addEventListener('DOMContentLoaded', jump);
+                window.addEventListener('load', jump);
+                window.addEventListener('pageshow', function (e) { if (e.persisted) jump(); });
+                [0, 50, 150, 400, 900].forEach(function (t) { setTimeout(jump, t); });
+            } catch (e) { /* no-op */ }
+        })();
     </script>
     <link rel="dns-prefetch" href="https://images.unsplash.com">
     <link rel="dns-prefetch" href="https://firestore.googleapis.com">

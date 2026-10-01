@@ -1,9 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { AppRoute } from '../types';
 import { askOpenAI, serperSearch, serperKeywords, runPageSpeed } from '../utils/api';
+import {
+  MagnifyingGlassIcon, TagIcon, DocumentIcon, ChartIcon, SparklesIcon,
+  GlobeIcon, RocketIcon,
+} from '../utils/icons';
 
 interface ToolShellProps {
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   desc: string;
   children: React.ReactNode;
@@ -15,7 +19,9 @@ const ToolShell: React.FC<ToolShellProps> = ({ icon, title, desc, children, setC
     {/* Header */}
     <div className="text-center mb-12">
       <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 mb-6">
-        <span className="text-2xl">{icon}</span>
+        <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+          {icon}
+        </span>
         <span className="text-xs font-black uppercase tracking-widest text-purple-400">Free Tool</span>
       </div>
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 tracking-tight">
@@ -153,7 +159,7 @@ export const SEOAuditTool: React.FC<{ setCurrentRoute: (r: AppRoute) => void }> 
   const ratingColor = (r: string) => (r === 'good' ? 'text-emerald-400' : r === 'needs-work' ? 'text-amber-400' : 'text-red-400');
 
   return (
-    <ToolShell icon="🔍" title="Free SEO Audit" desc="Enter your website URL to get a technical SEO health check. Run a live Google PageSpeed test or a fast offline check." setCurrentRoute={setCurrentRoute}>
+    <ToolShell icon={<MagnifyingGlassIcon className="w-4 h-4 text-white" />} title="Free SEO Audit" desc="Enter your website URL to get a technical SEO health check. Run a live Google PageSpeed test or a fast offline check." setCurrentRoute={setCurrentRoute}>
       {!result ? (
         <div className="max-w-xl mx-auto text-center">
           <Label htmlFor="audit-url">Your Website URL</Label>
@@ -165,11 +171,11 @@ export const SEOAuditTool: React.FC<{ setCurrentRoute: (r: AppRoute) => void }> 
           </div>
 
           <div className="flex items-center justify-center gap-3 mt-5">
-            <button onClick={() => setLiveMode(true)} className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
-              🌐 Live Google Data
+            <button onClick={() => setLiveMode(true)} className={`flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all ${liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
+              <GlobeIcon className="w-3.5 h-3.5" /> Live Google Data
             </button>
-            <button onClick={() => setLiveMode(false)} className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${!liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
-              ⚡ Instant Check
+            <button onClick={() => setLiveMode(false)} className={`flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all ${!liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
+              <RocketIcon className="w-3.5 h-3.5" /> Instant Check
             </button>
           </div>
           <p className="text-xs text-slate-500 mt-4">
@@ -197,7 +203,7 @@ export const SEOAuditTool: React.FC<{ setCurrentRoute: (r: AppRoute) => void }> 
           {/* Core Web Vitals — live Google data */}
           {result.vitals && result.vitals.length > 0 && (
             <div className="mb-8">
-              <div className="text-xs font-black uppercase tracking-wider text-purple-400 mb-3">📊 Core Web Vitals (Mobile)</div>
+              <div className="text-xs font-black uppercase tracking-wider text-purple-400 mb-3">Core Web Vitals (Mobile)</div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {result.vitals.map((v, i) => (
                   <div key={i} className="p-4 rounded-xl bg-slate-900/60 border border-white/10">
@@ -213,7 +219,11 @@ export const SEOAuditTool: React.FC<{ setCurrentRoute: (r: AppRoute) => void }> 
           <div className="grid sm:grid-cols-2 gap-3">
             {result.items.map((item, i) => (
               <div key={i} className={`flex items-start gap-3 p-4 rounded-xl border ${item.ok ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
-                <span className="text-lg flex-shrink-0">{item.ok ? '✅' : '❌'}</span>
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${item.ok ? 'bg-emerald-500/20' : 'bg-red-500/20'}`}>
+                  {item.ok
+                    ? <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    : <svg className="w-3 h-3 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>}
+                </span>
                 <div className="min-w-0">
                   <div className="text-sm font-black text-white">{item.label}</div>
                   <div className="text-xs text-slate-400 mt-0.5">{item.detail}</div>
@@ -365,7 +375,7 @@ export const KeywordLabTool: React.FC<{ setCurrentRoute: (r: AppRoute) => void }
   };
 
   return (
-    <ToolShell icon="🔑" title="Semantic Keyword Lab" desc="Discover semantic keyword clusters and high-opportunity search terms. Get real search volume data or instant offline estimates." setCurrentRoute={setCurrentRoute}>
+    <ToolShell icon={<TagIcon className="w-4 h-4 text-white" />} title="Semantic Keyword Lab" desc="Discover semantic keyword clusters and high-opportunity search terms. Get real search volume data or instant offline estimates." setCurrentRoute={setCurrentRoute}>
       <div className="max-w-xl mx-auto">
         <Label htmlFor="kw-seed">Seed Keyword</Label>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -376,11 +386,11 @@ export const KeywordLabTool: React.FC<{ setCurrentRoute: (r: AppRoute) => void }
         </div>
 
         <div className="flex items-center justify-center gap-3 mt-5">
-          <button onClick={() => setLiveMode(true)} className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
-            🌐 Real Search Volume
+          <button onClick={() => setLiveMode(true)} className={`flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all ${liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
+            <GlobeIcon className="w-3.5 h-3.5" /> Real Search Volume
           </button>
-          <button onClick={() => setLiveMode(false)} className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${!liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
-            ⚡ Instant Estimates
+          <button onClick={() => setLiveMode(false)} className={`flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all ${!liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
+            <RocketIcon className="w-3.5 h-3.5" /> Instant Estimates
           </button>
         </div>
       </div>
@@ -514,7 +524,7 @@ Rules:
   };
 
   return (
-    <ToolShell icon="✍️" title="AI Content Writer" desc="Generate SEO-optimized content drafts with tone control, structure, and natural keyword placement." setCurrentRoute={setCurrentRoute}>
+    <ToolShell icon={<DocumentIcon className="w-4 h-4 text-white" />} title="AI Content Writer" desc="Generate SEO-optimized content drafts with tone control, structure, and natural keyword placement." setCurrentRoute={setCurrentRoute}>
       <div className="grid md:grid-cols-3 gap-4 mb-6">
         <div className="md:col-span-3">
           <Label htmlFor="cw-keyword">Target Keyword</Label>
@@ -669,7 +679,7 @@ export const CompetitorIntelTool: React.FC<{ setCurrentRoute: (r: AppRoute) => v
   };
 
   return (
-    <ToolShell icon="🎯" title="Competitor Intel" desc="See who actually ranks for your niche, reverse-engineer their strategy, and find the content gaps to attack." setCurrentRoute={setCurrentRoute}>
+    <ToolShell icon={<ChartIcon className="w-4 h-4 text-white" />} title="Competitor Intel" desc="See who actually ranks for your niche, reverse-engineer their strategy, and find the content gaps to attack." setCurrentRoute={setCurrentRoute}>
       <div className="max-w-xl mx-auto">
         <Label htmlFor="ci-niche">Your Niche or Industry</Label>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -680,11 +690,11 @@ export const CompetitorIntelTool: React.FC<{ setCurrentRoute: (r: AppRoute) => v
         </div>
 
         <div className="flex items-center justify-center gap-3 mt-5">
-          <button onClick={() => setLiveMode(true)} className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
-            🌐 Live Competitors
+          <button onClick={() => setLiveMode(true)} className={`flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all ${liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
+            <GlobeIcon className="w-3.5 h-3.5" /> Live Competitors
           </button>
-          <button onClick={() => setLiveMode(false)} className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${!liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
-            ⚡ Sample Data
+          <button onClick={() => setLiveMode(false)} className={`flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-lg transition-all ${!liveMode ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white'}`}>
+            <RocketIcon className="w-3.5 h-3.5" /> Sample Data
           </button>
         </div>
       </div>
@@ -724,7 +734,7 @@ export const CompetitorIntelTool: React.FC<{ setCurrentRoute: (r: AppRoute) => v
 
           {gap && (
             <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30">
-              <div className="text-xs font-black uppercase tracking-wider text-purple-400 mb-3">🎯 Content Gap Found</div>
+              <div className="text-xs font-black uppercase tracking-wider text-purple-400 mb-3">Content Gap Found</div>
               <div className="space-y-2 text-sm">
                 <p className="text-slate-300"><span className="text-white font-bold">Opportunity:</span> {gap.opportunity}</p>
                 <p className="text-slate-300"><span className="text-white font-bold">Traffic Potential:</span> {gap.potential}</p>
@@ -807,10 +817,11 @@ Answer with practical, specific SEO advice. Use short paragraphs and bullet poin
   };
 
   return (
-    <ToolShell icon="🤖" title="AI Expert Chat" desc="Ask for SEO recommendations, audits, and on-the-fly strategy guidance." setCurrentRoute={setCurrentRoute}>
+    <ToolShell icon={<SparklesIcon className="w-4 h-4 text-white" />} title="AI Expert Chat" desc="Ask for SEO recommendations, audits, and on-the-fly strategy guidance." setCurrentRoute={setCurrentRoute}>
       <div className="flex items-center justify-between mb-4">
-        <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${aiLive ? 'bg-emerald-500/15 text-emerald-400' : 'bg-white/5 text-slate-500'}`}>
-          {aiLive ? '● Live AI' : '● Knowledge Base'}
+        <span className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${aiLive ? 'bg-emerald-500/15 text-emerald-400' : 'bg-white/5 text-slate-500'}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${aiLive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
+          {aiLive ? 'Live AI' : 'Knowledge Base'}
         </span>
       </div>
 

@@ -58,15 +58,15 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
       <a
         href="/"
         onClick={(e) => navAction(AppRoute.HOME, e)}
-        className="flex items-center gap-3 sm:gap-4 cursor-pointer group shrink-0"
+        className="flex items-center gap-3 sm:gap-4 md:gap-5 cursor-pointer group shrink-0 pr-2 xl:pr-4"
       >
-        <img src="/pics/logo .webp" alt="NextGen SEO Agency Logo" width="96" height="96" className="h-10 sm:h-12 md:h-14 w-10 sm:w-12 md:w-14 object-contain group-hover:scale-110 transition-all duration-300 filter drop-shadow-[0_0_12px_rgba(168,85,247,0.6)]" />
-        <span className="text-xs sm:text-sm md:text-base font-black tracking-tighter hidden sm:inline group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
-        <span className="text-xs font-black tracking-tighter sm:hidden">NG<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
+        <img src="/pics/logo .webp" alt="NextGen SEO Agency Logo" width="96" height="96" className="h-9 sm:h-11 md:h-12 w-9 sm:w-11 md:w-12 object-contain shrink-0 group-hover:scale-110 transition-all duration-300 filter drop-shadow-[0_0_12px_rgba(168,85,247,0.6)]" />
+        <span className="text-xs sm:text-sm md:text-base font-black tracking-normal whitespace-nowrap hidden sm:inline group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
+        <span className="text-xs font-black tracking-normal whitespace-nowrap sm:hidden">NG <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
       </a>
 
       {/* Desktop nav */}
-      <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+      <div className="hidden lg:flex items-center gap-4 xl:gap-6">
         <NavLink route={AppRoute.HOME} label="Home" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.HOME ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
 
         <div className="relative group/sub">
@@ -91,18 +91,18 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
           </button>
           <div className="absolute top-full left-0 pt-4 opacity-0 invisible group-hover/tools:opacity-100 group-hover/tools:visible transition-all duration-300">
             <div className="glass border border-white/10 w-60 rounded-2xl overflow-hidden shadow-2xl">
-              <NavLink route={AppRoute.TOOL_AUDIT} label="🔍  SEO Audit" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
-              <NavLink route={AppRoute.TOOL_KEYWORDS} label="🔑  Keyword Lab" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
-              <NavLink route={AppRoute.TOOL_WRITER} label="✍️  AI Content Writer" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
-              <NavLink route={AppRoute.TOOL_COMPETITOR} label="🎯  Competitor Intel" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
-              <NavLink route={AppRoute.TOOL_ASSISTANT} label="🤖  AI Expert Chat" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+              <NavLink route={AppRoute.TOOL_AUDIT} label="SEO Audit" className="nav-tool-item" />
+              <NavLink route={AppRoute.TOOL_KEYWORDS} label="Keyword Lab" className="nav-tool-item" />
+              <NavLink route={AppRoute.TOOL_WRITER} label="AI Content Writer" className="nav-tool-item" />
+              <NavLink route={AppRoute.TOOL_COMPETITOR} label="Competitor Intel" className="nav-tool-item" />
+              <NavLink route={AppRoute.TOOL_ASSISTANT} label="AI Expert Chat" className="nav-tool-item" />
             </div>
           </div>
         </div>
 
         <NavLink route={AppRoute.PRICING} label="Pricing" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.PRICING ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
-        <NavLink route={AppRoute.CASE_STUDIES} label="Cases" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.CASE_STUDIES ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
-        <NavLink route={AppRoute.COMMUNITY} label="Community" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.COMMUNITY ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
+        <NavLink route={AppRoute.CASE_STUDIES} label="Cases" className={`hidden xl:block text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.CASE_STUDIES ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
+        <NavLink route={AppRoute.COMMUNITY} label="Community" className={`hidden xl:block text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.COMMUNITY ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
         <NavLink route={AppRoute.BUY_BACKLINKS} label="Marketplace" className={`text-xs xl:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${currentRoute === AppRoute.BUY_BACKLINKS || currentRoute === AppRoute.MARKETPLACE ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`} />
 
         <div className="relative group/company">
@@ -112,8 +112,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
           </button>
           <div className="absolute top-full left-0 pt-4 opacity-0 invisible group-hover/company:opacity-100 group-hover/company:visible transition-all duration-300">
             <div className="glass border border-white/10 w-48 rounded-2xl overflow-hidden shadow-2xl">
-              <NavLink route={AppRoute.ABOUT} label="About Us" className="block w-full text-left px-5 py-4 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
-              <NavLink route={AppRoute.TEAM} label="Our Team" className="block w-full text-left px-5 py-4 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+              <NavLink route={AppRoute.ABOUT} label="About Us" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+              <NavLink route={AppRoute.TEAM} label="Our Team" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+              <NavLink route={AppRoute.CASE_STUDIES} label="Case Studies" className="xl:hidden block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+              <NavLink route={AppRoute.COMMUNITY} label="Community" className="xl:hidden block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
             </div>
           </div>
         </div>
@@ -151,11 +153,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
 
           <div className="pt-2 border-t border-white/5">
             <div className="text-[10px] uppercase font-black text-slate-500 px-4 pb-1 tracking-widest">Free Tools</div>
-            <NavLink route={AppRoute.TOOL_AUDIT} label="🔍  SEO Audit" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_AUDIT ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
-            <NavLink route={AppRoute.TOOL_KEYWORDS} label="🔑  Keyword Lab" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_KEYWORDS ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
-            <NavLink route={AppRoute.TOOL_WRITER} label="✍️  AI Content Writer" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_WRITER ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
-            <NavLink route={AppRoute.TOOL_COMPETITOR} label="🎯  Competitor Intel" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_COMPETITOR ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
-            <NavLink route={AppRoute.TOOL_ASSISTANT} label="🤖  AI Expert Chat" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_ASSISTANT ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
+            <NavLink route={AppRoute.TOOL_AUDIT} label="SEO Audit" className={`nav-tool-item !py-3 rounded-xl ${currentRoute === AppRoute.TOOL_AUDIT ? '!bg-purple-500/10 !text-purple-400' : ''}`} />
+            <NavLink route={AppRoute.TOOL_KEYWORDS} label="Keyword Lab" className={`nav-tool-item !py-3 rounded-xl ${currentRoute === AppRoute.TOOL_KEYWORDS ? '!bg-purple-500/10 !text-purple-400' : ''}`} />
+            <NavLink route={AppRoute.TOOL_WRITER} label="AI Content Writer" className={`nav-tool-item !py-3 rounded-xl ${currentRoute === AppRoute.TOOL_WRITER ? '!bg-purple-500/10 !text-purple-400' : ''}`} />
+            <NavLink route={AppRoute.TOOL_COMPETITOR} label="Competitor Intel" className={`nav-tool-item !py-3 rounded-xl ${currentRoute === AppRoute.TOOL_COMPETITOR ? '!bg-purple-500/10 !text-purple-400' : ''}`} />
+            <NavLink route={AppRoute.TOOL_ASSISTANT} label="AI Expert Chat" className={`nav-tool-item !py-3 rounded-xl ${currentRoute === AppRoute.TOOL_ASSISTANT ? '!bg-purple-500/10 !text-purple-400' : ''}`} />
           </div>
 
           <div className="pt-2 border-t border-white/5">
