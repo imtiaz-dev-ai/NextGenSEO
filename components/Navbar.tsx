@@ -41,7 +41,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
     if (e) e.preventDefault();
     setRoute(route);
     setMenuOpen(false);
-    window.scrollTo(0, 0);
   };
 
   const NavLink = ({ route, label, className }: { route: AppRoute; label: string; className?: string }) => (
@@ -81,6 +80,22 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
               <NavLink route={AppRoute.SERVICE_OFFPAGE} label="Off-Page SEO" className="block w-full text-left px-5 py-4 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
               <NavLink route={AppRoute.SERVICE_TECHNICAL} label="Technical SEO" className="block w-full text-left px-5 py-4 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
               <NavLink route={AppRoute.SERVICE_AI} label="AI-Powered SEO" className="block w-full text-left px-5 py-4 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+            </div>
+          </div>
+        </div>
+
+        <div className="relative group/tools">
+          <button className={`text-xs xl:text-sm font-bold uppercase tracking-wider flex items-center gap-1 transition-all hover:scale-105 ${currentRoute.startsWith('tool_') || currentRoute === AppRoute.FREE_AUDIT_PAGE ? 'text-purple-400' : 'text-slate-400 hover:text-white'}`}>
+            Free Tools
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          <div className="absolute top-full left-0 pt-4 opacity-0 invisible group-hover/tools:opacity-100 group-hover/tools:visible transition-all duration-300">
+            <div className="glass border border-white/10 w-60 rounded-2xl overflow-hidden shadow-2xl">
+              <NavLink route={AppRoute.TOOL_AUDIT} label="🔍  SEO Audit" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+              <NavLink route={AppRoute.TOOL_KEYWORDS} label="🔑  Keyword Lab" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+              <NavLink route={AppRoute.TOOL_WRITER} label="✍️  AI Content Writer" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+              <NavLink route={AppRoute.TOOL_COMPETITOR} label="🎯  Competitor Intel" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
+              <NavLink route={AppRoute.TOOL_ASSISTANT} label="🤖  AI Expert Chat" className="block w-full text-left px-5 py-3.5 text-xs font-bold uppercase text-slate-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all" />
             </div>
           </div>
         </div>
@@ -132,6 +147,15 @@ const Navbar: React.FC<NavbarProps> = ({ currentRoute, setRoute }) => {
             <NavLink route={AppRoute.SERVICE_OFFPAGE} label="Off-Page & PR" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.SERVICE_OFFPAGE ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
             <NavLink route={AppRoute.SERVICE_TECHNICAL} label="Technical SEO" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.SERVICE_TECHNICAL ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
             <NavLink route={AppRoute.SERVICE_AI} label="AI Solutions" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.SERVICE_AI ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
+          </div>
+
+          <div className="pt-2 border-t border-white/5">
+            <div className="text-[10px] uppercase font-black text-slate-500 px-4 pb-1 tracking-widest">Free Tools</div>
+            <NavLink route={AppRoute.TOOL_AUDIT} label="🔍  SEO Audit" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_AUDIT ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
+            <NavLink route={AppRoute.TOOL_KEYWORDS} label="🔑  Keyword Lab" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_KEYWORDS ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
+            <NavLink route={AppRoute.TOOL_WRITER} label="✍️  AI Content Writer" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_WRITER ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
+            <NavLink route={AppRoute.TOOL_COMPETITOR} label="🎯  Competitor Intel" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_COMPETITOR ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
+            <NavLink route={AppRoute.TOOL_ASSISTANT} label="🤖  AI Expert Chat" className={`block font-bold uppercase px-4 py-3 text-sm rounded-xl transition-colors ${currentRoute === AppRoute.TOOL_ASSISTANT ? 'text-purple-400 bg-purple-500/10' : 'text-slate-300 hover:text-white hover:bg-white/5'}`} />
           </div>
 
           <div className="pt-2 border-t border-white/5">

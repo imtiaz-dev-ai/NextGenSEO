@@ -5,10 +5,75 @@
 /* Base Styles */
 
 body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #0a0118 0%, #020617 50%, #0a0118 100%);
+    font-family: 'Inter', system-ui, -apple-system, Arial, sans-serif;
+    background: #020617;
     color: #f8fafc;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    contain: layout style paint;
+}
+
+/* Performance: GPU acceleration for animated elements */
+.animate-in,
+.fade-in,
+.animate-float,
+.animate-glow,
+.animate-scroll,
+.animate-morph,
+.animate-float-3d,
+.animate-pulse-ring,
+.holographic,
+.animate-orbit,
+.animate-orbit-slow,
+.animate-orbit-reverse,
+.animate-scroll-bounce,
+.animate-zoom-3d,
+.gradient-border-animated,
+.score-ring,
+.progress-bar-animated,
+.badge-bounce,
+.skeleton,
+.whatsapp-pulse,
+.typewriter-cursor::after {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Performance: Reduce paint operations */
+.glass,
+.glass-premium {
+    contain: layout style;
+}
+
+/* Performance: Optimize scrolling */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    /* Prevent browser from restoring scroll position on reload */
+    overflow-anchor: none;
+}
+
+/* Performance: Prevent layout shift */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Performance: Optimize animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 .glass {

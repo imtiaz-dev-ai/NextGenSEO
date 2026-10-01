@@ -76,7 +76,7 @@ export default defineConfig(({ mode }) => {
         chunkSizeWarningLimit: 500,
         reportCompressedSize: false,
         cssCodeSplit: true,
-        assetsInlineLimit: 8192, // inline small assets as base64
+        assetsInlineLimit: 8192,
         target: 'es2020',
         cssMinify: true,
       },

@@ -1,7 +1,7 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, signInAnonymously, type Auth } from "firebase/auth";
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, type Firestore } from "firebase/firestore";
-import { getStorage, ref as storageRef, uploadString, getDownloadURL, type FirebaseStorage } from "firebase/storage";
+import { getStorage, ref as storageRef, uploadString, uploadBytesResumable, getDownloadURL, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -17,10 +17,12 @@ let _auth: Auth | null = null;
 let _db: Firestore | null = null;
 let _storage: FirebaseStorage | null = null;
 
-const getApp = () => {
+export const getFirebaseApp = () => {
   if (!_app) _app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
   return _app;
 };
+
+const getApp = getFirebaseApp;
 
 export const auth = new Proxy({} as Auth, { get: (_, prop) => (getAuth(getApp()) as any)[prop] });
 export const db = new Proxy({} as Firestore, { get: (_, prop) => (getFirestore(getApp()) as any)[prop] });
@@ -50,17 +52,82 @@ const saveLocalData = (key: string, data: any) => {
   }
 };
 
-// Upload base64 image to Firebase Storage and return download URL
-const uploadImageToStorage = async (base64: string, path: string): Promise<string> => {
-  try {
-    const app = getApp();
-    const sRef = storageRef(getStorage(app), path);
-    await uploadString(sRef, base64, 'data_url');
-    return await getDownloadURL(sRef);
-  } catch (e) {
-    console.error('uploadImageToStorage error:', e);
-    return '';
+const normalizeImageUrl = (value?: string) => {
+  if (!value) return '';
+  const trimmed = String(value).trim();
+  if (!trimmed) return '';
+  if (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('data:image/') ||
+    trimmed.startsWith('blob:')
+  ) {
+    return trimmed;
   }
+  return '';
+};
+
+const uploadImageToStorage = async (base64: string, path: string): Promise<string> => {
+  const app = getApp();
+  const sRef = storageRef(getStorage(app), path);
+  await uploadString(sRef, base64, 'data_url');
+  return await getDownloadURL(sRef);
+};
+
+const hasImage = (record: any) => typeof record?.image === 'string' && Boolean(record.image.trim());
+
+export const uploadFileToStorage = async (file: File, folder: string, onProgress?: (p: number) => void): Promise<string> => {
+  await waitForAuth();
+  if (!file || !file.type.startsWith('image/')) {
+    throw new Error('Only image files are allowed.');
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error('Image is too large. Maximum size is 10MB.');
+  }
+
+  const app = getApp();
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+  const path = `${folder}/${Date.now()}-${Math.random().toString(16).slice(2)}.${ext}`;
+  const sRef = storageRef(getStorage(app), path);
+
+  return await new Promise<string>((resolve, reject) => {
+    const task = uploadBytesResumable(sRef, file);
+    let settled = false;
+    const timeoutId = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      task.cancel();
+      reject(new Error('Firebase Storage upload timed out. Enable Cloud Storage and create the project bucket in Firebase Console, then retry.'));
+    }, 30000);
+
+    const fail = (error: unknown) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
+      const message = error instanceof Error ? error.message : 'Unknown Storage error.';
+      reject(new Error(`Firebase Storage upload failed: ${message}`));
+    };
+
+    task.on(
+      'state_changed',
+      (snap) => {
+        const progress = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+        onProgress?.(progress);
+      },
+      fail,
+      async () => {
+        try {
+          const downloadUrl = await getDownloadURL(task.snapshot.ref);
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutId);
+          resolve(downloadUrl);
+        } catch (error) {
+          fail(error);
+        }
+      }
+    );
+  });
 };
 
 // Blog functions
@@ -68,7 +135,7 @@ export const saveBlogToFirebase = async (blog: any) => {
   try {
     await waitForAuth();
     const app = getApp();
-    const clean = { ...blog };
+    const clean = { ...blog, image: normalizeImageUrl(blog?.image) };
     if (clean.image?.startsWith('data:image')) {
       clean.image = await uploadImageToStorage(clean.image, `blogs/${Date.now()}.jpg`);
     }
@@ -76,8 +143,9 @@ export const saveBlogToFirebase = async (blog: any) => {
     return ref.id;
   } catch (e) {
     console.error('saveBlogToFirebase error:', e);
+    if (hasImage(blog)) throw e;
     const blogs = getLocalData("customBlogs");
-    const newBlog = { ...blog, id: Date.now().toString(), createdAt: new Date().toISOString() };
+    const newBlog = { ...blog, image: normalizeImageUrl(blog?.image), id: Date.now().toString(), createdAt: new Date().toISOString() };
     blogs.push(newBlog);
     saveLocalData("customBlogs", blogs);
     return newBlog.id;
@@ -107,6 +175,7 @@ export const updateBlogInFirebase = async (blogId: string, updates: any) => {
     await updateDoc(doc(getFirestore(app), "blogPosts", blogId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
     console.error('updateBlogInFirebase error:', e);
+    if (hasImage(updates)) throw e;
     const blogs = getLocalData("customBlogs");
     const idx = blogs.findIndex((b: any) => b.id === blogId);
     if (idx > -1) {
@@ -141,6 +210,7 @@ export const saveCaseToFirebase = async (caseStudy: any) => {
     return ref.id;
   } catch (e) {
     console.error('saveCaseToFirebase error:', e);
+    if (hasImage(caseStudy)) throw e;
     const cases = getLocalData("customCases");
     const newCase = { ...caseStudy, id: Date.now().toString(), createdAt: new Date().toISOString() };
     cases.push(newCase);
@@ -170,6 +240,7 @@ export const updateCaseInFirebase = async (caseId: string, updates: any) => {
     }
     await updateDoc(doc(getFirestore(app), "caseStudies", caseId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
+    if (hasImage(updates)) throw e;
     const cases = getLocalData("customCases");
     const idx = cases.findIndex((c: any) => c.id === caseId);
     if (idx > -1) {
@@ -203,6 +274,7 @@ export const saveTeamToFirebase = async (member: any) => {
     return ref.id;
   } catch (e) {
     console.error('saveTeamToFirebase error:', e);
+    if (hasImage(member)) throw e;
     const team = getLocalData("customTeam");
     const newMember = { ...member, id: Date.now().toString(), createdAt: new Date().toISOString() };
     team.push(newMember);
@@ -232,6 +304,7 @@ export const updateTeamInFirebase = async (memberId: string, updates: any) => {
     }
     await updateDoc(doc(getFirestore(app), "teamMembers", memberId), { ...clean, updatedAt: serverTimestamp() });
   } catch (e) {
+    if (hasImage(updates)) throw e;
     const team = getLocalData("customTeam");
     const idx = team.findIndex((m: any) => m.id === memberId);
     if (idx > -1) {

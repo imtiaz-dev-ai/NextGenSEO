@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { saveBlogToFirebase, getBlogsFromFirebase, updateBlogInFirebase, deleteBlogFromFirebase, saveCaseToFirebase, getCasesFromFirebase, updateCaseInFirebase, deleteCaseFromFirebase, saveTeamToFirebase, getTeamFromFirebase, updateTeamInFirebase, deleteTeamFromFirebase, getChatMessagesFromFirebase, deleteChatMessageFromFirebase, saveMarketplaceListingToFirebase, getMarketplaceListingsFromFirebase, updateMarketplaceListingInFirebase, deleteMarketplaceListingFromFirebase } from '../utils/firebase';
+import { saveBlogToFirebase, getBlogsFromFirebase, updateBlogInFirebase, deleteBlogFromFirebase, saveCaseToFirebase, getCasesFromFirebase, updateCaseInFirebase, deleteCaseFromFirebase, saveTeamToFirebase, getTeamFromFirebase, updateTeamInFirebase, deleteTeamFromFirebase, getChatMessagesFromFirebase, deleteChatMessageFromFirebase, saveMarketplaceListingToFirebase, getMarketplaceListingsFromFirebase, updateMarketplaceListingInFirebase, deleteMarketplaceListingFromFirebase, uploadFileToStorage } from '../utils/firebase';
 
 interface ChatMessage {
   id: string;
@@ -43,39 +43,17 @@ interface TeamMember {
   twitter?: string;
 }
 
-import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { initializeApp, getApps } from 'firebase/app';
 
-const uploadFileToStorage = (file: File, folder: string, onProgress: (p: number) => void): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const firebaseConfig = {
-      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    };
-    const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-    const storage = getStorage(app);
-    const ext = file.name.split('.').pop() || 'jpg';
-    const path = `${folder}/${Date.now()}.${ext}`;
-    const sRef = storageRef(storage, path);
-    const task = uploadBytesResumable(sRef, file);
-    task.on('state_changed',
-      snap => onProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
-      reject,
-      () => getDownloadURL(task.snapshot.ref).then(resolve).catch(reject)
-    );
-  });
-};
-
-const ImageUploadField = ({ image, onImageChange, onImageRemove, label, folder = 'blogs', aspect = 'landscape' }: { image: string; onImageChange: (img: string) => void; onImageRemove: () => void; label: string; folder?: string; aspect?: string }) => {
+const ImageUploadField = ({ image, onImageChange, onImageRemove, label, folder = 'blogs', aspect = 'landscape', onUploadStateChange }: { image: string; onImageChange: (img: string) => void; onImageRemove: () => void; label: string; folder?: string; aspect?: string; onUploadStateChange?: (uploading: boolean) => void }) => {
   const [urlInput, setUrlInput] = React.useState('');
   const [mode, setMode] = React.useState<'upload' | 'url'>('upload');
   const [uploading, setUploading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [error, setError] = React.useState('');
+
+  React.useEffect(() => {
+    onUploadStateChange?.(uploading);
+  }, [uploading, onUploadStateChange]);
 
   const handleUrl = () => {
     if (urlInput.trim()) { onImageChange(urlInput.trim()); setUrlInput(''); }
@@ -259,6 +237,7 @@ const AdminPanel: React.FC = () => {
   const [showBlogForm, setShowBlogForm] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
   const [blogImage, setBlogImage] = useState<string>('');
+  const [blogImageUploading, setBlogImageUploading] = useState(false);
   const [blogForm, setBlogForm] = useState({
     title: '',
     excerpt: '',
@@ -419,6 +398,7 @@ const AdminPanel: React.FC = () => {
 
   const saveBlog = async () => {
     if (!blogForm.title || !blogForm.content) { alert('Title and content required!'); return; }
+    if (blogImageUploading) { alert('Please wait for the blog image upload to finish.'); return; }
     const finalSlug = (blogForm as any).slug?.trim() || toSlug(blogForm.title);
     const otherSlugs = blogs.filter(b => b.id !== editingBlog?.id).map((b: any) => b.slug || toSlug(b.title));
     if (otherSlugs.includes(finalSlug)) { alert(`Slug "${finalSlug}" is already in use. Please choose another.`); return; }
@@ -433,6 +413,7 @@ const AdminPanel: React.FC = () => {
       }
       setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', readTime: '5 min', slug: '', image: '' });
       setBlogImage('');
+      setBlogImageUploading(false);
       setShowBlogForm(false);
       setEditingBlog(null);
       alert('Blog saved!');
@@ -760,6 +741,7 @@ const AdminPanel: React.FC = () => {
                     onImageRemove={() => {setBlogImage(''); setBlogForm({...blogForm, image: ''});}}
                     label="Featured Image"
                     folder="blogs"
+                    onUploadStateChange={setBlogImageUploading}
                   />
                   <div className="flex gap-3 pt-4">
                     <button onClick={saveBlog} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save Blog</button>

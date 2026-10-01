@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, lazy, Suspense, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -8,6 +8,10 @@ const ScrollProgress = lazy(() => import('./components/ScrollProgress'));
 const ParticleBackground = lazy(() => import('./components/ParticleBackground'));
 const FloatingActionButton = lazy(() => import('./components/FloatingActionButton'));
 import { ThemeProvider } from './components/ThemeToggle';
+import {
+  SEOAuditTool, KeywordLabTool, ContentWriterTool,
+  CompetitorIntelTool, AIExpertChatTool
+} from './components/Tools';
 import { AppRoute } from './types';
 
 const Testimonials = lazy(() => import('./components/Testimonials'));
@@ -26,7 +30,17 @@ const LinkBuildingServices = lazy(() => import('./components/LinkBuildingService
 const AnimatedStats = lazy(() => import('./components/AnimatedStats'));
 const Community = lazy(() => import('./components/Community'));
 
-const PageLoader = () => null;
+const PageLoader = () => (
+  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#020617]">
+    <div className="relative">
+      <div className="w-12 h-12 rounded-full border-2 border-purple-500/30 border-t-purple-500 animate-spin"></div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse"></div>
+      </div>
+    </div>
+  </div>
+);
+
 import {
   PencilIcon, LinkIcon, CogIcon, SparklesIcon, TagIcon, DocumentIcon,
   ArrowsIcon, CheckIcon, BoltIcon, CodeIcon, ServerIcon, LockIcon,
@@ -34,11 +48,96 @@ import {
   LightbulbIcon, MegaphoneIcon, ChartIcon, GlobeIcon, PhotoIcon,
   UsersIcon, QueueIcon, CursorIcon, PhoneIcon
 } from './utils/icons';
-const SvgIcon = ({ path, className = "w-5 h-5" }: { path: string; className?: string }) => (
+const SvgIcon = React.memo(({ path, className = "w-5 h-5" }: { path: string; className?: string }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d={path} /></svg>
-);
+));
 
-const ServicePage = ({ title, description, features, benefits, route, setRoute, icon }: any) => (
+const SERVICE_ONPAGE_FEATURES = [
+  { icon: 'tag', title: "Keyword Optimization Strategy", desc: "AI-driven semantic keyword placement and search intent alignment." },
+  { icon: 'document', title: "Meta Tags & Title Tags", desc: "CTR-focused title and meta description optimization for Google." },
+  { icon: 'arrows', title: "Internal Linking Strategy", desc: "Building powerful site silos to distribute authority and improve rankings." },
+  { icon: 'check', title: "On-Page SEO Audit", desc: "Complete analysis and improvement of page-level SEO factors." },
+  { icon: 'queue', title: "Heading Structure Optimization", desc: "H1-H6 hierarchy implementation for better crawling and rankings." },
+  { icon: 'cursor', title: "User Experience & SEO", desc: "Matching content intent with user behavior for higher rankings and conversions." }
+];
+
+const SERVICE_OFFPAGE_FEATURES = [
+  { icon: 'link', title: "Professional Link Building", desc: "Quality-vetted backlinks from Tier 1 industry authoritative websites." },
+  { icon: 'megaphone', title: "Digital PR & Outreach", desc: "Earning brand mentions and backlinks from high-authority news outlets." },
+  { icon: 'chart', title: "Backlink Gap Analysis", desc: "Analyzing competitor backlink profiles and reclaiming lost link equity." },
+  { icon: 'globe', title: "Social Media & SEO", desc: "Amplifying content reach across social networks for domain authority." },
+  { icon: 'photo', title: "Content Assets for Links", desc: "Creating linkable infographics, case studies, and data resources." },
+  { icon: 'users', title: "Competitor Link Strategy", desc: "Reverse-engineering and beating competitor link profiles." }
+];
+
+const SERVICE_TECHNICAL_FEATURES = [
+  { icon: 'bolt', title: "Core Web Vitals Optimization", desc: "LCP, CLS, and FID optimization for Google's ranking factors." },
+  { icon: 'code', title: "JavaScript & SEO", desc: "Ensuring dynamic and React content is properly rendered and indexed by Google." },
+  { icon: 'server', title: "Crawl Budget & Indexation", desc: "Directing search bot crawlers to your most valuable pages efficiently." },
+  { icon: 'lock', title: "HTTPS & Security", desc: "SSL certificates and server-side security protocols for trust ranking." },
+  { icon: 'magnifying-glass', title: "Schema Markup Implementation", desc: "Advanced JSON-LD structured data for Rich Snippets and SERP enhancements." },
+  { icon: 'phone', title: "Mobile SEO & Responsiveness", desc: "Mobile-first indexing compliance and flawless responsive design." }
+];
+
+const SERVICE_AI_FEATURES = [
+  { icon: 'beaker', title: "Predictive Analytics", desc: "Forecasting seasonal search shifts with AI." },
+  { icon: 'map', title: "Semantic Mapping", desc: "Mapping topic clusters using NLP logic." },
+  { icon: 'rocket', title: "Automated Insights", desc: "Real-time auditing of millions of data points." },
+  { icon: 'chip', title: "AI Content Studio", desc: "Generating high-authority drafts for scale." },
+  { icon: 'chart', title: "SERP Simulations", desc: "Testing ranking changes in a sandbox environment." },
+  { icon: 'lightbulb', title: "Personalized Outreach", desc: "AI-enhanced communication for better link success." }
+];
+
+const ICON_MAP: Record<string, React.ReactNode> = {
+  'tag': <TagIcon className="w-8 h-8 text-purple-400" />,
+  'document': <DocumentIcon className="w-8 h-8 text-purple-400" />,
+  'arrows': <ArrowsIcon className="w-8 h-8 text-purple-400" />,
+  'check': <CheckIcon className="w-8 h-8 text-purple-400" />,
+  'queue': <QueueIcon className="w-8 h-8 text-purple-400" />,
+  'cursor': <CursorIcon className="w-8 h-8 text-purple-400" />,
+  'link': <LinkIcon className="w-8 h-8 text-purple-400" />,
+  'megaphone': <MegaphoneIcon className="w-8 h-8 text-purple-400" />,
+  'chart': <ChartIcon className="w-8 h-8 text-purple-400" />,
+  'globe': <GlobeIcon className="w-8 h-8 text-purple-400" />,
+  'photo': <PhotoIcon className="w-8 h-8 text-purple-400" />,
+  'users': <UsersIcon className="w-8 h-8 text-purple-400" />,
+  'bolt': <BoltIcon className="w-8 h-8 text-purple-400" />,
+  'code': <CodeIcon className="w-8 h-8 text-purple-400" />,
+  'server': <ServerIcon className="w-8 h-8 text-purple-400" />,
+  'lock': <LockIcon className="w-8 h-8 text-purple-400" />,
+  'magnifying-glass': <MagnifyingGlassIcon className="w-8 h-8 text-purple-400" />,
+  'phone': <PhoneIcon className="w-8 h-8 text-purple-400" />,
+  'beaker': <BeakerIcon className="w-8 h-8 text-purple-400" />,
+  'map': <MapIcon className="w-8 h-8 text-purple-400" />,
+  'rocket': <RocketIcon className="w-8 h-8 text-purple-400" />,
+  'chip': <ChipIcon className="w-8 h-8 text-purple-400" />,
+  'lightbulb': <LightbulbIcon className="w-8 h-8 text-purple-400" />,
+};
+
+const SAMPLE_CASES = [
+  { id: "case1", client: "EcoShop Online", industry: "E-commerce", challenge: "New online store with zero organic traffic and no backlinks", trafficGrowth: "+720%", keywordsRanked: "+540", revenueIncrease: "+680%", duration: "9 months", image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&q=80", color: "emerald" },
+  { id: "case2", client: "LegalPro Services", industry: "Legal Services", challenge: "High competition in legal niche, poor local SEO rankings", trafficGrowth: "+490%", keywordsRanked: "+360", revenueIncrease: "+520%", duration: "8 months", image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80", color: "blue" },
+  { id: "case3", client: "TravelHub Agency", industry: "Travel & Tourism", challenge: "Seasonal traffic drops, weak content strategy, low engagement", trafficGrowth: "+580%", keywordsRanked: "+410", revenueIncrease: "+640%", duration: "7 months", image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80", color: "cyan" },
+  { id: "case4", client: "MediCare Plus", industry: "Healthcare", challenge: "Strict compliance requirements, low domain authority, poor mobile SEO", trafficGrowth: "+650%", keywordsRanked: "+480", revenueIncrease: "+710%", duration: "10 months", image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80", color: "pink" },
+  { id: "case5", client: "TechStartup Pro", industry: "SaaS Technology", challenge: "Zero brand awareness, competing with established players, no organic presence", trafficGrowth: "+890%", keywordsRanked: "+620", revenueIncrease: "+850%", duration: "12 months", image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80", color: "purple" },
+  { id: "case6", client: "FoodieHub Restaurant", industry: "Food & Hospitality", challenge: "Poor local visibility, not showing in Google Maps, low online orders", trafficGrowth: "+760%", keywordsRanked: "+510", revenueIncrease: "+820%", duration: "6 months", image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80", color: "emerald" }
+];
+
+const SAMPLE_TEAM_MEMBERS = [
+  { id: "team1", name: "Sarah Johnson", role: "Content Strategist", bio: "Expert in SEO content creation with 8+ years experience in digital marketing", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80", linkedin: "https://linkedin.com", twitter: "https://twitter.com" },
+  { id: "team2", name: "David Chen", role: "Technical SEO Lead", bio: "Specializes in Core Web Vitals optimization and technical audits", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80", linkedin: "https://linkedin.com", twitter: "" },
+  { id: "team3", name: "Emily Rodriguez", role: "Link Building Manager", bio: "Built 10,000+ high-quality backlinks for Fortune 500 companies", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80", linkedin: "https://linkedin.com", twitter: "https://twitter.com" }
+];
+
+const SAMPLE_MARKETPLACE_LISTINGS = [
+  { id: 'ml1', domain: 'techcrunch.com', dr: 92, traffic: '180K', niche: 'Technology', price: 850 },
+  { id: 'ml2', domain: 'healthline.com', dr: 88, traffic: '220K', niche: 'Health', price: 750 },
+  { id: 'ml3', domain: 'forbes.com', dr: 94, traffic: '310K', niche: 'Finance', price: 1200 },
+  { id: 'ml4', domain: 'hubspot.com', dr: 85, traffic: '95K', niche: 'Marketing', price: 650 },
+  { id: 'ml5', domain: 'shopify.com', dr: 91, traffic: '140K', niche: 'E-commerce', price: 900 },
+];
+
+const ServicePage = React.memo(({ title, description, features, benefits, route, setRoute, icon }: any) => (
   <div className="pt-20 sm:pt-24 pb-12 sm:pb-20 px-4 sm:px-6 max-w-6xl mx-auto">
     <div className="mb-12 sm:mb-20 animate-in fade-in duration-700">
       <div className="flex flex-col lg:flex-row gap-8 sm:gap-12 items-center">
@@ -65,7 +164,7 @@ const ServicePage = ({ title, description, features, benefits, route, setRoute, 
       {features.map((f: any, i: number) => (
         <div key={i} className="glass p-4 sm:p-8 rounded-xl sm:rounded-3xl border-white/5 hover:border-purple-500/30 transition-all hover:-translate-y-2 group hover-lift">
           <div className="w-10 h-10 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-6 group-hover:scale-110 transition-transform">
-            {f.icon}
+            {ICON_MAP[f.icon] || <TagIcon className="w-8 h-8 text-purple-400" />}
           </div>
           <h3 className="text-sm sm:text-xl font-bold mb-2 sm:mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-colors leading-tight">{f.title}</h3>
           <p className="text-slate-400 leading-relaxed text-xs sm:text-sm hidden sm:block">{f.desc}</p>
@@ -76,12 +175,12 @@ const ServicePage = ({ title, description, features, benefits, route, setRoute, 
       <h2 className="text-2xl sm:text-3xl font-black mb-4 sm:mb-6">Drive Real Growth with NextGen SEO</h2>
       <p className="text-slate-400 mb-6 sm:mb-10 max-w-2xl mx-auto text-sm sm:text-base">{benefits}</p>
       <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4">
-        <button onClick={() => { setRoute(AppRoute.CONTACT); window.scrollTo(0, 0); }} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-8 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg shadow-xl shadow-purple-500/20 transition-all w-full sm:w-auto">Start Your Project</button>
-        <button onClick={() => { setRoute(AppRoute.CONTACT); window.scrollTo(0, 0); }} className="glass px-8 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg hover:bg-white/5 transition-all w-full sm:w-auto">Get a Consultation</button>
+        <button onClick={() => { setRoute(AppRoute.CONTACT); }} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-8 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg shadow-xl shadow-purple-500/20 transition-all w-full sm:w-auto">Start Your Project</button>
+        <button onClick={() => { setRoute(AppRoute.CONTACT); }} className="glass px-8 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg hover:bg-white/5 transition-all w-full sm:w-auto">Get a Consultation</button>
       </div>
     </div>
   </div>
-);
+));
 
 const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => void }) => (
   <div className="pt-24 pb-20 px-4 sm:px-6 max-w-7xl mx-auto">
@@ -206,7 +305,7 @@ const AboutPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) => 
     <div className="glass p-6 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl md:rounded-[3rem] border-purple-500/20 bg-purple-500/[0.02] text-center">
       <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-4 sm:mb-6">Ready to Transform Your Business?</h2>
       <p className="text-slate-400 mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto text-sm sm:text-base md:text-lg px-4">Join 200+ companies that trust NextGen SEO for their organic growth strategy.</p>
-      <button onClick={() => { setCurrentRoute(AppRoute.CONTACT); window.scrollTo(0, 0); }} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 sm:px-8 md:px-10 lg:px-12 py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base md:text-lg lg:text-xl shadow-xl shadow-purple-500/20 transition-all">Get Started Today</button>
+      <button onClick={() => { setCurrentRoute(AppRoute.CONTACT); }} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 sm:px-8 md:px-10 lg:px-12 py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base md:text-lg lg:text-xl shadow-xl shadow-purple-500/20 transition-all">Get Started Today</button>
     </div>
   </div>
 );
@@ -233,7 +332,7 @@ const ContactPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) =
         <div className="text-center mb-10 sm:mb-16">
           <div className="inline-block px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-4 sm:mb-6">Get In Touch</div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black mb-4 sm:mb-6">Contact NextGen SEO Agency — <span className="gradient-text">Get a Free SEO Consultation</span></h1>
-          <p className="text-slate-400 text-xs sm:text-sm md:text-base max-w-3xl mx-auto leading-relaxed">Connect with Tayyab Mehmood's expert SEO team to discuss affordable SEO services, professional link building, and local SEO strategies for your business. Whether you need <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_ONPAGE); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">on-page SEO</button>, <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_TECHNICAL); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">technical SEO</button>, or <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_OFFPAGE); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">link building services</button>, we're here to help you rank higher on Google.</p>
+          <p className="text-slate-400 text-xs sm:text-sm md:text-base max-w-3xl mx-auto leading-relaxed">Connect with Tayyab Mehmood's expert SEO team to discuss affordable SEO services, professional link building, and local SEO strategies for your business. Whether you need <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_ONPAGE); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">on-page SEO</button>, <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_TECHNICAL); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">technical SEO</button>, or <button onClick={() => { setCurrentRoute(AppRoute.SERVICE_OFFPAGE); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">link building services</button>, we're here to help you rank higher on Google.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 sm:mb-14 text-center">
@@ -252,7 +351,7 @@ const ContactPage = ({ setCurrentRoute }: { setCurrentRoute: (route: AppRoute) =
         </div>
 
         <p className="text-slate-400 text-sm sm:text-base max-w-3xl mx-auto mb-10 leading-relaxed text-center">
-          Not sure which service is right for you? Browse our <button onClick={() => { setCurrentRoute(AppRoute.PRICING); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">SEO pricing packages</button> or read our <button onClick={() => { setCurrentRoute(AppRoute.CASE_STUDIES); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">SEO case studies</button> to see real results. You can also <button onClick={() => { setCurrentRoute(AppRoute.ABOUT); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">learn more about our agency</button> and <button onClick={() => { setCurrentRoute(AppRoute.TEAM); window.scrollTo(0,0); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">meet our expert team</button> before reaching out.
+          Not sure which service is right for you? Browse our <button onClick={() => { setCurrentRoute(AppRoute.PRICING); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">SEO pricing packages</button> or read our <button onClick={() => { setCurrentRoute(AppRoute.CASE_STUDIES); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">SEO case studies</button> to see real results. You can also <button onClick={() => { setCurrentRoute(AppRoute.ABOUT); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">learn more about our agency</button> and <button onClick={() => { setCurrentRoute(AppRoute.TEAM); }} className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition-colors">meet our expert team</button> before reaching out.
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12">
@@ -398,139 +497,24 @@ const App: React.FC = () => {
 
   const [currentRoute, setCurrentRouteState] = useState<AppRoute>(() => pathToRoute(location.pathname));
 
-  const setCurrentRoute = (route: AppRoute) => {
+  const setCurrentRoute = useCallback((route: AppRoute) => {
     setCurrentRouteState(route);
     navigate(route === AppRoute.HOME ? '/' : `/${route}`);
-    window.scrollTo(0, 0);
-  };
+  }, [navigate]);
 
   // Initialize sample data on first load
   React.useEffect(() => {
-    const sampleCases = [
-      {
-        id: "case1",
-        client: "EcoShop Online",
-        industry: "E-commerce",
-        challenge: "New online store with zero organic traffic and no backlinks",
-        trafficGrowth: "+720%",
-        keywordsRanked: "+540",
-        revenueIncrease: "+680%",
-        duration: "9 months",
-        image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&q=80",
-        color: "emerald"
-      },
-      {
-        id: "case2",
-        client: "LegalPro Services",
-        industry: "Legal Services",
-        challenge: "High competition in legal niche, poor local SEO rankings",
-        trafficGrowth: "+490%",
-        keywordsRanked: "+360",
-        revenueIncrease: "+520%",
-        duration: "8 months",
-        image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80",
-        color: "blue"
-      },
-      {
-        id: "case3",
-        client: "TravelHub Agency",
-        industry: "Travel & Tourism",
-        challenge: "Seasonal traffic drops, weak content strategy, low engagement",
-        trafficGrowth: "+580%",
-        keywordsRanked: "+410",
-        revenueIncrease: "+640%",
-        duration: "7 months",
-        image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80",
-        color: "cyan"
-      },
-      {
-        id: "case4",
-        client: "MediCare Plus",
-        industry: "Healthcare",
-        challenge: "Strict compliance requirements, low domain authority, poor mobile SEO",
-        trafficGrowth: "+650%",
-        keywordsRanked: "+480",
-        revenueIncrease: "+710%",
-        duration: "10 months",
-        image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
-        color: "pink"
-      },
-      {
-        id: "case5",
-        client: "TechStartup Pro",
-        industry: "SaaS Technology",
-        challenge: "Zero brand awareness, competing with established players, no organic presence",
-        trafficGrowth: "+890%",
-        keywordsRanked: "+620",
-        revenueIncrease: "+850%",
-        duration: "12 months",
-        image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80",
-        color: "purple"
-      },
-      {
-        id: "case6",
-        client: "FoodieHub Restaurant",
-        industry: "Food & Hospitality",
-        challenge: "Poor local visibility, not showing in Google Maps, low online orders",
-        trafficGrowth: "+760%",
-        keywordsRanked: "+510",
-        revenueIncrease: "+820%",
-        duration: "6 months",
-        image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
-        color: "emerald"
-      }
-    ];
-
-    const sampleTeamMembers = [
-      {
-        id: "team1",
-        name: "Sarah Johnson",
-        role: "Content Strategist",
-        bio: "Expert in SEO content creation with 8+ years experience in digital marketing",
-        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
-        linkedin: "https://linkedin.com",
-        twitter: "https://twitter.com"
-      },
-      {
-        id: "team2",
-        name: "David Chen",
-        role: "Technical SEO Lead",
-        bio: "Specializes in Core Web Vitals optimization and technical audits",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
-        linkedin: "https://linkedin.com",
-        twitter: ""
-      },
-      {
-        id: "team3",
-        name: "Emily Rodriguez",
-        role: "Link Building Manager",
-        bio: "Built 10,000+ high-quality backlinks for Fortune 500 companies",
-        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80",
-        linkedin: "https://linkedin.com",
-        twitter: "https://twitter.com"
-      }
-    ];
-
-    // Initialize sample data if not exists
     const initData = () => {
       const existingCases = localStorage.getItem('caseStudies');
       if (!existingCases || JSON.parse(existingCases).length < 6) {
-        localStorage.setItem('caseStudies', JSON.stringify(sampleCases));
+        localStorage.setItem('caseStudies', JSON.stringify(SAMPLE_CASES));
       }
       if (!localStorage.getItem('teamMembers')) {
-        localStorage.setItem('teamMembers', JSON.stringify(sampleTeamMembers));
+        localStorage.setItem('teamMembers', JSON.stringify(SAMPLE_TEAM_MEMBERS));
       }
-      // Marketplace sample listings
       const existingListings = localStorage.getItem('marketplaceListings');
       if (!existingListings || JSON.parse(existingListings).length === 0) {
-        const sampleListings = [
-          { id: 'ml1', domain: 'techcrunch.com', dr: 92, traffic: '180K', niche: 'Technology', price: 850 },
-          { id: 'ml2', domain: 'healthline.com', dr: 88, traffic: '220K', niche: 'Health', price: 750 },
-          { id: 'ml3', domain: 'forbes.com', dr: 94, traffic: '310K', niche: 'Finance', price: 1200 },
-          { id: 'ml4', domain: 'hubspot.com', dr: 85, traffic: '95K', niche: 'Marketing', price: 650 },
-          { id: 'ml5', domain: 'shopify.com', dr: 91, traffic: '140K', niche: 'E-commerce', price: 900 },
-        ];
-        localStorage.setItem('marketplaceListings', JSON.stringify(sampleListings));
+        localStorage.setItem('marketplaceListings', JSON.stringify(SAMPLE_MARKETPLACE_LISTINGS));
       }
     };
     if ('requestIdleCallback' in window) {
@@ -556,7 +540,6 @@ const App: React.FC = () => {
   // Sync route when browser back/forward is used
   React.useEffect(() => {
     setCurrentRouteState(pathToRoute(location.pathname));
-    window.scrollTo(0, 0);
   }, [location.pathname]);
 
   // Update page title when route changes
@@ -576,6 +559,13 @@ const App: React.FC = () => {
       [AppRoute.ADMIN]: 'Admin Panel | NextGen SEO',
       [AppRoute.MARKETPLACE]: 'Backlink Marketplace | Buy High-DA Backlinks | NextGen SEO',
       [AppRoute.BUY_BACKLINKS]: 'Buy Backlinks | High-Authority Link Building | NextGen SEO',
+      [AppRoute.TOOL_AUDIT]: 'Free SEO Audit Tool — Instant Website Health Check | NextGen SEO',
+      [AppRoute.TOOL_KEYWORDS]: 'Free Keyword Research Tool — Semantic Keyword Lab | NextGen SEO',
+      [AppRoute.TOOL_WRITER]: 'Free AI SEO Content Writer — Generate Optimized Drafts | NextGen SEO',
+      [AppRoute.TOOL_COMPETITOR]: 'Free Competitor Analysis Tool — SEO Intel | NextGen SEO',
+      [AppRoute.TOOL_ASSISTANT]: 'Free AI SEO Expert Chat — Instant SEO Answers | NextGen SEO',
+      [AppRoute.FREE_AUDIT_PAGE]: 'Free Professional SEO Audit — Get Your Growth Plan | NextGen SEO',
+      [AppRoute.COMMUNITY]: 'SEO Community — Connect, Share & Grow | NextGen SEO',
     };
     const routeDescriptions: Record<string, string> = {
       [AppRoute.HOME]: 'NextGen SEO Agency by Tayyab Mehmood. Professional SEO services, expert link building, affordable SEO packages. Get 300%+ organic traffic growth.',
@@ -591,6 +581,13 @@ const App: React.FC = () => {
       [AppRoute.SERVICE_AI]: 'AI-powered SEO strategies. Predictive analytics, semantic mapping, and automated SEO insights.',
       [AppRoute.MARKETPLACE]: 'Browse and buy high-DA backlinks from top authority sites. Transparent pricing, real metrics.',
       [AppRoute.BUY_BACKLINKS]: 'Buy high-authority backlinks for your website. Vetted sites, real traffic, white-hat link building.',
+      [AppRoute.TOOL_AUDIT]: 'Free instant SEO audit. Check your website technical health score and get prioritized SEO fixes in seconds.',
+      [AppRoute.TOOL_KEYWORDS]: 'Free semantic keyword research tool. Discover keyword clusters, search volume, difficulty, and ranking opportunities.',
+      [AppRoute.TOOL_WRITER]: 'Free AI SEO content writer. Generate optimized content drafts with tone control and keyword placement.',
+      [AppRoute.TOOL_COMPETITOR]: 'Free competitor analysis tool. Reverse-engineer rival backlink profiles and find content gaps to exploit.',
+      [AppRoute.TOOL_ASSISTANT]: 'Free AI SEO expert assistant. Get instant answers on SEO strategy, link building, and technical fixes.',
+      [AppRoute.FREE_AUDIT_PAGE]: 'Get a free professional SEO audit of your website. Technical health, keyword gaps, and actionable growth plan.',
+      [AppRoute.COMMUNITY]: 'Join the NextGen SEO community. Connect with founders, share strategies, and grow your organic traffic.',
     };
     const routeCanonicals: Record<string, string> = {
       [AppRoute.HOME]: 'https://nextgenseo.pro/',
@@ -606,6 +603,13 @@ const App: React.FC = () => {
       [AppRoute.SERVICE_AI]: 'https://nextgenseo.pro/service_ai',
       [AppRoute.MARKETPLACE]: 'https://nextgenseo.pro/marketplace',
       [AppRoute.BUY_BACKLINKS]: 'https://nextgenseo.pro/buy-backlinks',
+      [AppRoute.TOOL_AUDIT]: 'https://nextgenseo.pro/tool_audit',
+      [AppRoute.TOOL_KEYWORDS]: 'https://nextgenseo.pro/tool_keywords',
+      [AppRoute.TOOL_WRITER]: 'https://nextgenseo.pro/tool_writer',
+      [AppRoute.TOOL_COMPETITOR]: 'https://nextgenseo.pro/tool_competitor',
+      [AppRoute.TOOL_ASSISTANT]: 'https://nextgenseo.pro/tool_assistant',
+      [AppRoute.FREE_AUDIT_PAGE]: 'https://nextgenseo.pro/free_audit_page',
+      [AppRoute.COMMUNITY]: 'https://nextgenseo.pro/community',
     };
     document.title = routeTitles[currentRoute] || 'NextGen SEO Agency';
     const desc = routeDescriptions[currentRoute];
@@ -630,19 +634,23 @@ const App: React.FC = () => {
     if (ogUrl) ogUrl.setAttribute('content', canonicalUrl);
   }, [currentRoute]);
 
-  const ToolPage = ({ title, desc }: { title: string; desc: string }) => (
-    <div className="pt-24 pb-20 px-6 max-w-4xl mx-auto">
+  const ToolPage = React.memo(({ title, desc }: { title: string; desc: string }) => (
+    <div className="pt-28 pb-20 px-4 sm:px-6 max-w-4xl mx-auto">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-black mb-4">{title}</h1>
-        <p className="text-slate-400 max-w-2xl mx-auto">{desc}</p>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 mb-6">
+          <span className="text-xs font-black uppercase tracking-widest text-purple-400">Coming Soon</span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">{title}</h1>
+        <p className="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">{desc}</p>
       </div>
-      <div className="glass p-8 rounded-2xl">
-        <p className="text-slate-300">This is a lightweight interface for the tool. You can wire up APIs and interactive UI here.</p>
+      <div className="glass p-8 rounded-2xl text-center">
+        <p className="text-slate-300">This tool is being upgraded. In the meantime, our experts can run it for you manually.</p>
+        <button onClick={() => { setCurrentRoute(AppRoute.CONTACT); }} className="mt-6 bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-3 rounded-xl font-black text-sm transition-all hover:scale-105">Request This Analysis</button>
       </div>
     </div>
-  );
+  ));
 
-  const renderContent = () => {
+  const renderContent = useMemo(() => {
     switch (currentRoute) {
       case AppRoute.HOME: return (
         <>
@@ -675,14 +683,7 @@ const App: React.FC = () => {
           icon={<PencilIcon className="w-12 h-12 text-white" />}
           title="On-Page SEO Optimization" 
           description="Transform your content into a high-performance ranking machine with our professional semantic optimization frameworks. Advanced keyword placement, meta tag optimization, and content strategy for Google dominance."
-          features={[
-            { icon: <TagIcon className="w-8 h-8 text-purple-400" />, title: "Keyword Optimization Strategy", desc: "AI-driven semantic keyword placement and search intent alignment." },
-            { icon: <DocumentIcon className="w-8 h-8 text-purple-400" />, title: "Meta Tags & Title Tags", desc: "CTR-focused title and meta description optimization for Google." },
-            { icon: <ArrowsIcon className="w-8 h-8 text-purple-400" />, title: "Internal Linking Strategy", desc: "Building powerful site silos to distribute authority and improve rankings." },
-            { icon: <CheckIcon className="w-8 h-8 text-purple-400" />, title: "On-Page SEO Audit", desc: "Complete analysis and improvement of page-level SEO factors." },
-            { icon: <QueueIcon className="w-8 h-8 text-purple-400" />, title: "Heading Structure Optimization", desc: "H1-H6 hierarchy implementation for better crawling and rankings." },
-            { icon: <CursorIcon className="w-8 h-8 text-purple-400" />, title: "User Experience & SEO", desc: "Matching content intent with user behavior for higher rankings and conversions." }
-          ]}
+          features={SERVICE_ONPAGE_FEATURES}
           benefits="Join hundreds of businesses that saw a 300% increase in organic traffic and Google rankings through on-page SEO mastery."
           route={currentRoute}
           setRoute={setCurrentRoute}
@@ -693,14 +694,7 @@ const App: React.FC = () => {
           icon={<LinkIcon className="w-12 h-12 text-white" />}
           title="Off-Page SEO & Link Building" 
           description="Build high-authority digital ecosystems and professional backlink profiles that establish your brand as a market leader. Expert link building from high-authority sites and digital PR strategies."
-          features={[
-            { icon: <LinkIcon className="w-8 h-8 text-purple-400" />, title: "Professional Link Building", desc: "Quality-vetted backlinks from Tier 1 industry authoritative websites." },
-            { icon: <MegaphoneIcon className="w-8 h-8 text-purple-400" />, title: "Digital PR & Outreach", desc: "Earning brand mentions and backlinks from high-authority news outlets." },
-            { icon: <ChartIcon className="w-8 h-8 text-purple-400" />, title: "Backlink Gap Analysis", desc: "Analyzing competitor backlink profiles and reclaiming lost link equity." },
-            { icon: <GlobeIcon className="w-8 h-8 text-purple-400" />, title: "Social Media & SEO", desc: "Amplifying content reach across social networks for domain authority." },
-            { icon: <PhotoIcon className="w-8 h-8 text-purple-400" />, title: "Content Assets for Links", desc: "Creating linkable infographics, case studies, and data resources." },
-            { icon: <UsersIcon className="w-8 h-8 text-purple-400" />, title: "Competitor Link Strategy", desc: "Reverse-engineering and beating competitor link profiles." }
-          ]}
+          features={SERVICE_OFFPAGE_FEATURES}
           benefits="NextGen SEO's off-page and link building team secures quality backlinks and placements that your competitors cannot reach."
           route={currentRoute}
           setRoute={setCurrentRoute}
@@ -711,14 +705,7 @@ const App: React.FC = () => {
           icon={<CogIcon className="w-12 h-12 text-white" />}
           title="Technical SEO & Site Performance" 
           description="Fix the foundation with our comprehensive technical SEO deep-scans that eliminate barriers between your site and Google's index. Core Web Vitals optimization, schema markup, and crawlability improvements."
-          features={[
-            { icon: <BoltIcon className="w-8 h-8 text-purple-400" />, title: "Core Web Vitals Optimization", desc: "LCP, CLS, and FID optimization for Google's ranking factors." },
-            { icon: <CodeIcon className="w-8 h-8 text-purple-400" />, title: "JavaScript & SEO", desc: "Ensuring dynamic and React content is properly rendered and indexed by Google." },
-            { icon: <ServerIcon className="w-8 h-8 text-purple-400" />, title: "Crawl Budget & Indexation", desc: "Directing search bot crawlers to your most valuable pages efficiently." },
-            { icon: <LockIcon className="w-8 h-8 text-purple-400" />, title: "HTTPS & Security", desc: "SSL certificates and server-side security protocols for trust ranking." },
-            { icon: <MagnifyingGlassIcon className="w-8 h-8 text-purple-400" />, title: "Schema Markup Implementation", desc: "Advanced JSON-LD structured data for Rich Snippets and SERP enhancements." },
-            { icon: <PhoneIcon className="w-8 h-8 text-purple-400" />, title: "Mobile SEO & Responsiveness", desc: "Mobile-first indexing compliance and flawless responsive design." }
-          ]}
+          features={SERVICE_TECHNICAL_FEATURES}
           benefits="Technical SEO excellence is the minimum requirement for modern Google rankings. We ensure you never fall behind competitors."
           route={currentRoute}
           setRoute={setCurrentRoute}
@@ -729,33 +716,27 @@ const App: React.FC = () => {
           icon={<SparklesIcon className="w-12 h-12 text-white" />}
           title="AI-Powered SEO" 
           description="The future is now. We use advanced AI models to predict search trends before they happen."
-          features={[
-            { icon: <BeakerIcon className="w-8 h-8 text-purple-400" />, title: "Predictive Analytics", desc: "Forecasting seasonal search shifts with AI." },
-            { icon: <MapIcon className="w-8 h-8 text-purple-400" />, title: "Semantic Mapping", desc: "Mapping topic clusters using NLP logic." },
-            { icon: <RocketIcon className="w-8 h-8 text-purple-400" />, title: "Automated Insights", desc: "Real-time auditing of millions of data points." },
-            { icon: <ChipIcon className="w-8 h-8 text-purple-400" />, title: "AI Content Studio", desc: "Generating high-authority drafts for scale." },
-            { icon: <ChartIcon className="w-8 h-8 text-purple-400" />, title: "SERP Simulations", desc: "Testing ranking changes in a sandbox environment." },
-            { icon: <LightbulbIcon className="w-8 h-8 text-purple-400" />, title: "Personalized Outreach", desc: "AI-enhanced communication for better link success." }
-          ]}
+          features={SERVICE_AI_FEATURES}
           benefits="Leverage the same technology as Silicon Valley giants with NextGen's AI SEO Suite."
           route={currentRoute}
           setRoute={setCurrentRoute}
         />
       );
 
-        // AI Tools
-        case AppRoute.TOOL_AUDIT: return <ToolPage title="AI SEO Audit" desc="Run an automated site audit powered by our AI pipeline to surface critical SEO issues and prioritized fixes." />;
-        case AppRoute.TOOL_KEYWORDS: return <ToolPage title="Semantic Keyword Lab" desc="Explore semantic keyword clusters and discover high-opportunity search terms." />;
-        case AppRoute.TOOL_WRITER: return <ToolPage title="AI Content Writer" desc="Generate SEO-optimized content drafts with tone, structure, and keyword guidance." />;
-        case AppRoute.TOOL_COMPETITOR: return <ToolPage title="Competitor Intel" desc="Reverse-engineer competitor strategies, backlink profiles, and top-performing content." />;
-        case AppRoute.TOOL_ASSISTANT: return <ToolPage title="AI Expert Chat" desc="Ask the AI Expert Chat for recommendations, audits, and on-the-fly strategy guidance." />;
+        // AI Tools — real functional tools
+        case AppRoute.TOOL_AUDIT: return <SEOAuditTool setCurrentRoute={setCurrentRoute} />;
+        case AppRoute.TOOL_KEYWORDS: return <KeywordLabTool setCurrentRoute={setCurrentRoute} />;
+        case AppRoute.TOOL_WRITER: return <ContentWriterTool setCurrentRoute={setCurrentRoute} />;
+        case AppRoute.TOOL_COMPETITOR: return <CompetitorIntelTool setCurrentRoute={setCurrentRoute} />;
+        case AppRoute.TOOL_ASSISTANT: return <AIExpertChatTool setCurrentRoute={setCurrentRoute} />;
+        case AppRoute.FREE_AUDIT_PAGE: return <SEOAuditTool setCurrentRoute={setCurrentRoute} />;
 
       // Corporate
       case AppRoute.ABOUT: return <AboutPage setCurrentRoute={setCurrentRoute} />;
       case AppRoute.TEAM: return (
         <div className="pt-24 pb-20 px-6 max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <div className="inline-block px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-6">Our Team</div>
+            <div className="inline-block px-6 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/30 text-purple-400 text-xs font-black uppercase mb-6">Our Team</div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6">Meet The <span className="gradient-text">Experts</span></h1>
             <p className="text-sm sm:text-base text-slate-400 max-w-3xl mx-auto leading-relaxed">A diverse team of SEO specialists, content strategists, and technical experts united by one goal: your success.</p>
           </div>
@@ -769,7 +750,7 @@ const App: React.FC = () => {
       );
       case AppRoute.BLOG: return <BlogPageNew />;
       case AppRoute.CONTACT: return <ContactPage setCurrentRoute={setCurrentRoute} />;
-      case AppRoute.PRICING: return <Pricing onContact={() => { setCurrentRoute(AppRoute.CONTACT); window.scrollTo(0, 0); }} />;
+      case AppRoute.PRICING: return <Pricing onContact={() => { setCurrentRoute(AppRoute.CONTACT); }} />;
       case AppRoute.CASE_STUDIES: return <CaseStudies />;
       case AppRoute.ADMIN: return <AdminPanel />;
       case AppRoute.MARKETPLACE:
@@ -788,37 +769,41 @@ const App: React.FC = () => {
 
       default: return <Hero onStart={setCurrentRoute} />;
     }
-  };
+  }, [currentRoute, setCurrentRoute]);
 
   return (
     <ThemeProvider>
       <div className="min-h-screen selection:bg-purple-500/30 relative">
-        <ParticleBackground />
-        <ScrollProgress />
+        <Suspense fallback={null}>
+          <ParticleBackground />
+          <ScrollProgress />
+        </Suspense>
         <Navbar currentRoute={currentRoute} setRoute={setCurrentRoute} />
         <main className="pt-20 sm:pt-24 min-h-screen relative z-10">
-          <Suspense fallback={null}>
+          <Suspense fallback={<PageLoader />}>
           <Routes>
-            <Route path="/" element={renderContent()} />
+            <Route path="/" element={renderContent} />
             {Object.values(AppRoute).filter(r => r !== AppRoute.HOME).map(route => (
-              <Route path={`/${route}`} element={renderContent()} key={route} />
+              <Route path={`/${route}`} element={renderContent} />
             ))}
             <Route path="/blog/:slug" element={<BlogPostBySlug />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </Suspense>
         </main>
-        <FloatingActionButton />
+        <Suspense fallback={null}>
+          <FloatingActionButton />
+        </Suspense>
 
       <footer className="border-t border-white/5 py-8 px-4 sm:px-6 mt-10 relative overflow-hidden bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-900">
         <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-pink-500/5 to-transparent pointer-events-none" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] opacity-30" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-[120px] opacity-30" />
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-10">
             {/* Logo & About */}
             <div className="lg:col-span-1">
-              <button className="flex items-center gap-2 mb-4 group cursor-pointer" onClick={() => { setCurrentRoute(AppRoute.HOME); window.scrollTo(0, 0); }}>
+              <button className="flex items-center gap-2 mb-4 group cursor-pointer" onClick={() => { setCurrentRoute(AppRoute.HOME); }}>
                 <img src="/pics/logo .webp" alt="NextGen SEO" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform" />
                 <span className="text-lg font-black tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
               </button>
@@ -837,38 +822,67 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Links — 3 cols on all screens */}
-            <div className="lg:col-span-3 grid grid-cols-3 gap-4">
+            {/* Links — 4 cols */}
+            <div className="lg:col-span-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               {/* Services */}
               <div>
                 <h4 className="font-black mb-3 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Services</h4>
                 <ul className="space-y-2 text-white text-sm">
-                  <li><a href={`#${AppRoute.SERVICE_ONPAGE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_ONPAGE); window.scrollTo(0,0); }} className="hover:text-purple-400 transition-colors">On-Page SEO</a></li>
-                  <li><a href={`#${AppRoute.SERVICE_OFFPAGE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_OFFPAGE); window.scrollTo(0,0); }} className="hover:text-purple-400 transition-colors">Off-Page &amp; PR</a></li>
-                  <li><a href={`#${AppRoute.SERVICE_TECHNICAL}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_TECHNICAL); window.scrollTo(0,0); }} className="hover:text-purple-400 transition-colors">Technical SEO</a></li>
-                  <li><a href={`#${AppRoute.SERVICE_AI}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_AI); window.scrollTo(0,0); }} className="hover:text-purple-400 transition-colors">AI Solutions</a></li>
+                  <li><a href={`#${AppRoute.SERVICE_ONPAGE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_ONPAGE); }} className="hover:text-purple-400 transition-colors">On-Page SEO</a></li>
+                  <li><a href={`#${AppRoute.SERVICE_OFFPAGE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_OFFPAGE); }} className="hover:text-purple-400 transition-colors">Off-Page &amp; PR</a></li>
+                  <li><a href={`#${AppRoute.SERVICE_TECHNICAL}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_TECHNICAL); }} className="hover:text-purple-400 transition-colors">Technical SEO</a></li>
+                  <li><a href={`#${AppRoute.SERVICE_AI}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_AI); }} className="hover:text-purple-400 transition-colors">AI Solutions</a></li>
+                  <li><a href={`/${AppRoute.MARKETPLACE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.MARKETPLACE); }} className="hover:text-purple-400 transition-colors">Marketplace</a></li>
+                  <li><a href={`/${AppRoute.BUY_BACKLINKS}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.BUY_BACKLINKS); }} className="hover:text-purple-400 transition-colors">Buy Backlinks</a></li>
                 </ul>
               </div>
               {/* Company */}
               <div>
                 <h4 className="font-black mb-3 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Company</h4>
                 <ul className="space-y-2 text-white text-sm">
-                  <li><a href="/" onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.HOME); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-colors">Home</a></li>
-                  <li><a href={`/${AppRoute.ABOUT}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.ABOUT); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-colors">About Us</a></li>
-                  <li><a href={`/${AppRoute.TEAM}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.TEAM); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-colors">Our Team</a></li>
-                  <li><a href={`/${AppRoute.BLOG}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.BLOG); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-colors">Blog</a></li>
-                  <li><a href={`/${AppRoute.CONTACT}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.CONTACT); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-colors">Contact</a></li>
+                  <li><a href="/" onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.HOME); }} className="hover:text-amber-400 transition-colors">Home</a></li>
+                  <li><a href={`/${AppRoute.ABOUT}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.ABOUT); }} className="hover:text-amber-400 transition-colors">About Us</a></li>
+                  <li><a href={`/${AppRoute.TEAM}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.TEAM); }} className="hover:text-amber-400 transition-colors">Our Team</a></li>
+                  <li><a href={`/${AppRoute.BLOG}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.BLOG); }} className="hover:text-amber-400 transition-colors">Blog</a></li>
+                  <li><a href={`/${AppRoute.CONTACT}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.CONTACT); }} className="hover:text-amber-400 transition-colors">Contact</a></li>
+                  <li><a href={`/${AppRoute.PRICING}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.PRICING); }} className="hover:text-amber-400 transition-colors">Pricing</a></li>
+                  <li><a href={`/${AppRoute.CASE_STUDIES}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.CASE_STUDIES); }} className="hover:text-amber-400 transition-colors">Case Studies</a></li>
                 </ul>
               </div>
-              {/* Resources */}
+              {/* Contact */}
               <div>
-                <h4 className="font-black mb-3 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Resources</h4>
+                <h4 className="font-black mb-3 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Contact</h4>
                 <ul className="space-y-2 text-white text-sm">
-                  <li><a href={`/${AppRoute.PRICING}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.PRICING); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-colors">Pricing</a></li>
-                  <li><a href={`/${AppRoute.CASE_STUDIES}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.CASE_STUDIES); window.scrollTo(0,0); }} className="hover:text-amber-400 transition-colors">Case Studies</a></li>
-                  <li><a href="mailto:nextgenseotool@gmail.com" className="hover:text-amber-400 transition-colors">Email Us</a></li>
-                  <li><a href="tel:+923480440402" className="hover:text-amber-400 transition-colors">Call Us</a></li>
-
+                  <li><a href="https://wa.me/923480440402" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 transition-colors">WhatsApp</a></li>
+                  <li><a href="mailto:tayyab@nextgenseo.pro" className="hover:text-blue-400 transition-colors">Email</a></li>
+                  <li><a href="tel:+923480440402" className="hover:text-purple-400 transition-colors">Call Us</a></li>
+                  <li><a href="mailto:nextgenseotool@gmail.com" className="hover:text-blue-400 transition-colors">Support Email</a></li>
+                </ul>
+              </div>
+              {/* Social & Reviews */}
+              <div>
+                <h4 className="font-black mb-3 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Connect</h4>
+                <ul className="space-y-2 text-white text-sm">
+                  <li><a href="https://www.linkedin.com/company/nextgenseo-official/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">LinkedIn (Company)</a></li>
+                  <li><a href="https://www.linkedin.com/in/tayyab-mehmood-seo/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">LinkedIn (Tayyab)</a></li>
+                  <li><a href="https://x.com/next_genseo" target="_blank" rel="noopener noreferrer" className="hover:text-sky-400 transition-colors">Twitter / X</a></li>
+                  <li><a href="https://www.instagram.com/next.genseo/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-400 transition-colors">Instagram (Company)</a></li>
+                  <li><a href="https://www.instagram.com/tayyab_backlinks" target="_blank" rel="noopener noreferrer" className="hover:text-pink-400 transition-colors">Instagram (Tayyab)</a></li>
+                  <li><a href="https://clutch.co/profile/nextgen-seo-0" target="_blank" rel="noopener noreferrer" className="hover:text-amber-400 transition-colors">Clutch Reviews</a></li>
+                  <li><a href="https://www.designrush.com/agency/profile/next-gen-seo#reviews" target="_blank" rel="noopener noreferrer" className="hover:text-red-400 transition-colors">DesignRush</a></li>
+                </ul>
+              </div>
+              {/* Free Tools */}
+              <div>
+                <h4 className="font-black mb-3 uppercase tracking-wider text-xs text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Free Tools</h4>
+                <ul className="space-y-2 text-white text-sm">
+                  <li><a href={`/${AppRoute.TOOL_AUDIT}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.TOOL_AUDIT); }} className="hover:text-purple-400 transition-colors">SEO Audit</a></li>
+                  <li><a href={`/${AppRoute.TOOL_KEYWORDS}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.TOOL_KEYWORDS); }} className="hover:text-purple-400 transition-colors">Keyword Lab</a></li>
+                  <li><a href={`/${AppRoute.TOOL_WRITER}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.TOOL_WRITER); }} className="hover:text-purple-400 transition-colors">AI Content Writer</a></li>
+                  <li><a href={`/${AppRoute.TOOL_COMPETITOR}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.TOOL_COMPETITOR); }} className="hover:text-purple-400 transition-colors">Competitor Intel</a></li>
+                  <li><a href={`/${AppRoute.TOOL_ASSISTANT}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.TOOL_ASSISTANT); }} className="hover:text-purple-400 transition-colors">AI Expert Chat</a></li>
+                  <li><a href={`/${AppRoute.COMMUNITY}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.COMMUNITY); }} className="hover:text-purple-400 transition-colors">Community</a></li>
+                  <li><a href={`/${AppRoute.FREE_AUDIT_PAGE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.FREE_AUDIT_PAGE); }} className="hover:text-purple-400 transition-colors">Free SEO Audit</a></li>
                 </ul>
               </div>
             </div>

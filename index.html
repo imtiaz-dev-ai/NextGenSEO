@@ -44,13 +44,44 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/pics/favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/pics/favicon.png">
     <link rel="shortcut icon" href="/pics/favicon.png">
-    <!-- Fonts - optimized -->
+    <!-- Fonts - optimized with preconnect + display=swap -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet"></noscript>
-    <!-- Styles handled by Vite via index.tsx -->
+    <!-- Critical CSS inline for instant render -->
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',system-ui,-apple-system,Arial,sans-serif;background:#020617;color:#f8fafc;overflow-x:hidden;min-height:100vh}
+        #root{min-height:100vh}
+        .glass{background:rgba(15,23,42,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+        .gradient-text{background:linear-gradient(135deg,#a855f7 0%,#ec4899 50%,#06b6d4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        @keyframes fade-in{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+        .animate-in,.fade-in{animation:fade-in .8s ease-out}
+        @media(max-width:768px){.glass{backdrop-filter:none;background:rgba(15,23,42,.92)}}
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+    </style>
     <!-- DNS Prefetch -->
+    <script>
+        try {
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+            }
+            window.addEventListener('pageshow', function (event) {
+                if (event.persisted) {
+                    window.scrollTo(0, 0);
+                }
+            });
+            window.addEventListener('load', function () {
+                setTimeout(function () {
+                    window.scrollTo(0, 0);
+                    document.documentElement.scrollTop = 0;
+                    document.body.scrollTop = 0;
+                }, 0);
+            }, { once: true });
+        } catch (error) {}
+    </script>
     <link rel="dns-prefetch" href="https://images.unsplash.com">
     <link rel="dns-prefetch" href="https://firestore.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">

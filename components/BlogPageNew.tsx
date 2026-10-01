@@ -76,7 +76,6 @@ export const defaultPosts = [
 const BlogPostPage = ({ post, onBack }: { post: any; onBack: () => void }) => {
   React.useEffect(() => {
     document.title = `${post.title} | NextGen SEO Blog`;
-    window.scrollTo(0, 0);
   }, [post]);
 
   return (
@@ -103,7 +102,11 @@ const BlogPostPage = ({ post, onBack }: { post: any; onBack: () => void }) => {
             decoding="async"
             className="w-full object-cover block"
             style={{ aspectRatio: '16/9' }}
-            onError={(e: any) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
+            onError={(e: any) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+              if (target.parentElement) target.parentElement.style.display = 'none';
+            }}
           />
         </div>
       )}
@@ -153,7 +156,6 @@ export const BlogPostBySlug = () => {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    window.scrollTo(0, 0);
     // Check cache first for instant render
     try {
       const cached = localStorage.getItem('cachedBlogs');
@@ -209,8 +211,6 @@ const BlogPage = () => {
 
   // Load Firebase blogs + check URL for deep link
   React.useEffect(() => {
-    window.scrollTo(0, 0);
-
     // Check deep link immediately with defaultPosts
     const path = location.pathname;
     if (path.startsWith('/blog/')) {
@@ -244,7 +244,6 @@ const BlogPage = () => {
     if (selectedPost) {
       document.title = `${selectedPost.title} | NextGen SEO Blog`;
       navigate(`/blog/${getPostSlug(selectedPost)}`);
-      window.scrollTo(0, 0);
     } else {
       document.title = 'Blog | SEO Insights & Strategies | NextGen SEO';
       if (location.pathname !== '/blog') navigate('/blog');
