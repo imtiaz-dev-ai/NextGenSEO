@@ -7,8 +7,16 @@ const ParticleBackground: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Disable on mobile for performance
-    if (window.innerWidth < 768) {
+    // Respect the OS-level motion preference — a full-screen rAF loop that
+    // never stops is the single biggest scroll-jank source on this page.
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      canvas.style.display = 'none';
+      return;
+    }
+
+    // Disable on mobile and on small viewports for performance
+    if (window.innerWidth < 1024) {
       canvas.style.display = 'none';
       return;
     }
@@ -23,7 +31,7 @@ const ParticleBackground: React.FC = () => {
     setCanvasSize();
 
     const particles: Array<{ x: number; y: number; vx: number; vy: number; size: number; }> = [];
-    const particleCount = 25;
+    const particleCount = 18;
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -36,10 +44,13 @@ const ParticleBackground: React.FC = () => {
 
     let animationId: number;
     let frame = 0;
+    let running = true;
+
     const animate = () => {
+      if (!running) return;
       animationId = requestAnimationFrame(animate);
       frame++;
-      if (frame % 2 !== 0) return; // skip every other frame = 30fps
+      if (frame % 3 !== 0) return; // ~20fps is plenty for a subtle background
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const len = particles.length;
@@ -74,14 +85,28 @@ const ParticleBackground: React.FC = () => {
 
     animate();
 
+    // Stop burning CPU while the tab is in the background.
+    const handleVisibility = () => {
+      if (document.hidden) {
+        running = false;
+        cancelAnimationFrame(animationId);
+      } else if (!running) {
+        running = true;
+        animate();
+      }
+    };
+
     const handleResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
 
+    document.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('resize', handleResize, { passive: true });
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('resize', handleResize);
+      running = false;
       cancelAnimationFrame(animationId);
     };
   }, []);

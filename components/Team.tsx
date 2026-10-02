@@ -17,7 +17,8 @@ const Team = () => {
   const [customMembers, setCustomMembers] = React.useState<any[]>([]);
   
   React.useEffect(() => {
-    import('../utils/firebase').then(m => m.getTeamFromFirebase()).then(setCustomMembers).catch(() => {
+    import('../utils/data').then(m => m.getTeamFromSupabase()).then(setCustomMembers).catch(error => {
+      console.error('Could not load team members from Supabase:', error);
       const saved = localStorage.getItem('teamMembers');
       if (saved) setCustomMembers(JSON.parse(saved));
     });

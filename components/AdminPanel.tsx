@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { saveBlogToFirebase, getBlogsFromFirebase, updateBlogInFirebase, deleteBlogFromFirebase, saveCaseToFirebase, getCasesFromFirebase, updateCaseInFirebase, deleteCaseFromFirebase, saveTeamToFirebase, getTeamFromFirebase, updateTeamInFirebase, deleteTeamFromFirebase, getChatMessagesFromFirebase, deleteChatMessageFromFirebase, saveMarketplaceListingToFirebase, getMarketplaceListingsFromFirebase, updateMarketplaceListingInFirebase, deleteMarketplaceListingFromFirebase, uploadFileToStorage } from '../utils/firebase';
+import { saveBlogToSupabase, getBlogsFromSupabase, updateBlogInSupabase, deleteBlogFromSupabase, saveCaseToSupabase, getCasesFromSupabase, updateCaseInSupabase, deleteCaseFromSupabase, saveTeamToSupabase, getTeamFromSupabase, updateTeamInSupabase, deleteTeamFromSupabase, getChatMessagesFromSupabase, deleteChatMessageFromSupabase, saveMarketplaceListingToSupabase, getMarketplaceListingsFromSupabase, updateMarketplaceListingInSupabase, deleteMarketplaceListingFromSupabase, uploadFileToStorage, hasAdminSession, signInAdmin, signOutAdmin } from '../utils/data';
 
 interface ChatMessage {
   id: string;
@@ -69,7 +69,7 @@ const ImageUploadField = ({ image, onImageChange, onImageRemove, label, folder =
       const url = await uploadFileToStorage(file, folder, setProgress);
       onImageChange(url);
     } catch (e: any) {
-      setError('Upload failed: ' + (e?.message || 'Check Firebase Storage rules'));
+      setError('Upload failed: ' + (e?.message || 'Check Supabase Storage configuration'));
     }
     setUploading(false);
   };
@@ -219,6 +219,7 @@ const AdminPanel: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
   const [activeTab, setActiveTab] = useState<'dashboard' | 'messages' | 'blogs' | 'cases' | 'team' | 'marketplace' | 'redirects'>('dashboard');
   const [redirects, setRedirects] = useState<{id: string; from: string; to: string}[]>(() => {
     try { return JSON.parse(localStorage.getItem('siteRedirects') || '[]'); } catch { return []; }
@@ -278,19 +279,22 @@ const AdminPanel: React.FC = () => {
     twitter: ''
   });
 
-  const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || 'nextgenadmin';
-  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'NextGen@2025';
-
   useEffect(() => {
-    const loggedIn = localStorage.getItem('adminLoggedIn');
-    if (loggedIn === 'true') {
-      setIsLoggedIn(true);
-      loadChatMessages();
-      loadBlogs();
-      loadCases();
-      loadTeam();
-      loadListings();
-    }
+    let mounted = true;
+    hasAdminSession()
+      .then(loggedIn => {
+        if (!mounted || !loggedIn) return;
+        setIsLoggedIn(true);
+        loadChatMessages();
+        loadBlogs();
+        loadCases();
+        loadTeam();
+        loadListings();
+      })
+      .catch(error => {
+        console.error('Could not restore admin session:', error);
+      });
+    return () => { mounted = false; };
   }, []);
 
   useEffect(() => {
@@ -318,7 +322,7 @@ const AdminPanel: React.FC = () => {
 
   const loadChatMessages = async () => {
     try {
-      const messages = await getChatMessagesFromFirebase();
+      const messages = await getChatMessagesFromSupabase();
       setChatMessages(messages);
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -327,7 +331,7 @@ const AdminPanel: React.FC = () => {
 
   const loadBlogs = async () => {
     try {
-      const savedBlogs = await getBlogsFromFirebase();
+      const savedBlogs = await getBlogsFromSupabase();
       setBlogs(savedBlogs);
     } catch (error) {
       console.error('Error loading blogs:', error);
@@ -336,7 +340,7 @@ const AdminPanel: React.FC = () => {
 
   const loadCases = async () => {
     try {
-      const savedCases = await getCasesFromFirebase();
+      const savedCases = await getCasesFromSupabase();
       setCases(savedCases);
     } catch (error) {
       console.error('Error loading cases:', error);
@@ -345,10 +349,10 @@ const AdminPanel: React.FC = () => {
 
   const loadListings = async () => {
     try {
-      let data = await getMarketplaceListingsFromFirebase();
+      let data = await getMarketplaceListingsFromSupabase();
       if (!data || data.length === 0) {
         await new Promise(r => setTimeout(r, 1500));
-        data = await getMarketplaceListingsFromFirebase();
+        data = await getMarketplaceListingsFromSupabase();
       }
       setListings(data as MarketplaceListing[]);
     } catch (error) {
@@ -358,41 +362,46 @@ const AdminPanel: React.FC = () => {
 
   const loadTeam = async () => {
     try {
-      const savedTeam = await getTeamFromFirebase();
+      const savedTeam = await getTeamFromSupabase();
       setTeamMembers(savedTeam);
     } catch (error) {
       console.error('Error loading team:', error);
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    setLoginError('');
+    try {
+      await signInAdmin(username, password);
       setIsLoggedIn(true);
-      localStorage.setItem('adminLoggedIn', 'true');
       loadChatMessages();
       loadBlogs();
       loadCases();
       loadTeam();
       loadListings();
-    } else {
-      alert('Invalid credentials!');
+    } catch (error: any) {
+      setLoginError(error.message || 'Login failed.');
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await signOutAdmin();
+    } catch (error: any) {
+      console.error('Could not sign out from Supabase:', error);
+    }
     setIsLoggedIn(false);
-    localStorage.removeItem('adminLoggedIn');
     setUsername('');
     setPassword('');
   };
 
   const deleteMessage = async (id: string) => {
     try {
-      await deleteChatMessageFromFirebase(id);
+      await deleteChatMessageFromSupabase(id);
       setChatMessages(chatMessages.filter(m => m.id !== id));
-    } catch (error) {
-      alert('Error deleting message');
+    } catch (error: any) {
+      alert('Error deleting message: ' + error.message);
     }
   };
 
@@ -405,10 +414,10 @@ const AdminPanel: React.FC = () => {
     try {
       const blogData = { ...blogForm, slug: finalSlug, readTime: (blogForm as any).readTime || '5 min', date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) };
       if (editingBlog) {
-        await updateBlogInFirebase(editingBlog.id, blogData);
+        await updateBlogInSupabase(editingBlog.id, blogData);
         setBlogs(blogs.map(b => b.id === editingBlog.id ? { ...blogData, id: editingBlog.id } : b));
       } else {
-        const docId = await saveBlogToFirebase(blogData);
+        const docId = await saveBlogToSupabase(blogData);
         setBlogs([...blogs, { ...blogData, id: docId }]);
       }
       setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', readTime: '5 min', slug: '', image: '' });
@@ -430,10 +439,10 @@ const AdminPanel: React.FC = () => {
   const deleteBlog = async (id: string) => {
     if (confirm('Delete this blog?')) {
       try {
-        await deleteBlogFromFirebase(id);
+        await deleteBlogFromSupabase(id);
         setBlogs(blogs.filter(b => b.id !== id));
-      } catch (error) {
-        alert('Error');
+      } catch (error: any) {
+        alert('Error deleting blog: ' + error.message);
       }
     }
   };
@@ -446,10 +455,10 @@ const AdminPanel: React.FC = () => {
     try {
       const caseData = { ...caseForm, slug: finalSlug };
       if (editingCase) {
-        await updateCaseInFirebase(editingCase.id, caseData);
+        await updateCaseInSupabase(editingCase.id, caseData);
         setCases(cases.map(c => c.id === editingCase.id ? { ...caseData, id: editingCase.id } : c));
       } else {
-        const docId = await saveCaseToFirebase(caseData);
+        const docId = await saveCaseToSupabase(caseData);
         setCases([...cases, { ...caseData, id: docId }]);
       }
       setCaseForm({ client: '', industry: '', challenge: '', trafficGrowth: '', keywordsRanked: '', revenueIncrease: '', duration: '', slug: '', image: '', color: 'purple' });
@@ -468,10 +477,10 @@ const AdminPanel: React.FC = () => {
   const deleteCase = async (id: string) => {
     if (confirm('Delete this case?')) {
       try {
-        await deleteCaseFromFirebase(id);
+        await deleteCaseFromSupabase(id);
         setCases(cases.filter(c => c.id !== id));
-      } catch (error) {
-        alert('Error');
+      } catch (error: any) {
+        alert('Error deleting case study: ' + error.message);
       }
     }
   };
@@ -484,10 +493,10 @@ const AdminPanel: React.FC = () => {
     try {
       const teamData = { ...teamForm, slug: finalSlug };
       if (editingTeam) {
-        await updateTeamInFirebase(editingTeam.id, teamData);
+        await updateTeamInSupabase(editingTeam.id, teamData);
         setTeamMembers(teamMembers.map(t => t.id === editingTeam.id ? { ...teamData, id: editingTeam.id } : t));
       } else {
-        const docId = await saveTeamToFirebase(teamData);
+        const docId = await saveTeamToSupabase(teamData);
         setTeamMembers([...teamMembers, { ...teamData, id: docId }]);
       }
       setTeamForm({ name: '', role: '', slug: '', bio: '', image: '', linkedin: '', twitter: '' });
@@ -506,10 +515,10 @@ const AdminPanel: React.FC = () => {
   const deleteTeam = async (id: string) => {
     if (confirm('Delete this member?')) {
       try {
-        await deleteTeamFromFirebase(id);
+        await deleteTeamFromSupabase(id);
         setTeamMembers(teamMembers.filter(t => t.id !== id));
-      } catch (error) {
-        alert('Error');
+      } catch (error: any) {
+        alert('Error deleting team member: ' + error.message);
       }
     }
   };
@@ -526,11 +535,13 @@ const AdminPanel: React.FC = () => {
             <input
               type="text"
               placeholder="Username"
+              autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-6 py-3 mb-4 focus:ring-2 focus:ring-purple-500/50 focus:outline-none text-white placeholder-slate-500"
               required
             />
+            {loginError && <p role="alert" className="text-red-400 text-sm mb-4">{loginError}</p>}
             <input
               type="password"
               placeholder="Password"
@@ -565,6 +576,10 @@ const AdminPanel: React.FC = () => {
           >
             Logout
           </button>
+        </div>
+
+        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 text-sm text-amber-200">
+          Save, edit, delete, and image upload require an account registered in Supabase Authentication and approved in the admin_users table. Published content and uploaded images are public.
         </div>
 
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2 flex-wrap">
@@ -928,15 +943,15 @@ const AdminPanel: React.FC = () => {
                       const data = { domain: listingForm.domain, dr: Number(listingForm.dr), traffic: listingForm.traffic, niche: listingForm.niche, price: Number(listingForm.price), turnaround: listingForm.turnaround, guestPost: listingForm.guestPost, linkInsertion: listingForm.linkInsertion };
                       try {
                         if (editingListing) {
-                          await updateMarketplaceListingInFirebase(editingListing.id, data);
+                          await updateMarketplaceListingInSupabase(editingListing.id, data);
                           setListings(listings.map(l => l.id === editingListing.id ? { ...data, id: editingListing.id } : l));
                         } else {
-                          const id = await saveMarketplaceListingToFirebase(data);
+                          const id = await saveMarketplaceListingToSupabase(data);
                           setListings([...listings, { ...data, id }]);
                         }
                         setShowListingForm(false); setEditingListing(null); setListingForm({ domain: '', dr: '', traffic: '', niche: '', price: '', turnaround: '', guestPost: true, linkInsertion: true });
-                        alert('Saved to Firebase!');
-                      } catch (e: any) { alert('Firebase Error: ' + (e?.message || JSON.stringify(e))); }
+                        alert('Saved to Supabase!');
+                      } catch (e: any) { alert('Supabase Error: ' + (e?.message || JSON.stringify(e))); }
                     }} className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-lg font-bold transition-all">Save</button>
                     <button onClick={() => { setShowListingForm(false); setEditingListing(null); }} className="glass px-8 py-3 rounded-lg font-bold">Cancel</button>
                   </div>
@@ -959,7 +974,7 @@ const AdminPanel: React.FC = () => {
                   <span className="text-emerald-400 font-bold">${l.price}</span>
                   <div className="flex gap-2">
                     <button onClick={() => { setEditingListing(l); setListingForm({ domain: l.domain, dr: String(l.dr), traffic: l.traffic, niche: l.niche, price: String(l.price), turnaround: l.turnaround || '', guestPost: l.guestPost ?? true, linkInsertion: l.linkInsertion ?? true }); setShowListingForm(true); }} className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Edit</button>
-                    <button onClick={async () => { if (confirm('Delete this listing?')) { await deleteMarketplaceListingFromFirebase(l.id); setListings(listings.filter(x => x.id !== l.id)); } }} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Delete</button>
+                    <button onClick={async () => { if (confirm('Delete this listing?')) { try { await deleteMarketplaceListingFromSupabase(l.id); setListings(listings.filter(x => x.id !== l.id)); } catch (error: any) { alert('Supabase Error: ' + error.message); } } }} className="bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 rounded-lg text-xs font-bold transition-all">Delete</button>
                   </div>
                 </div>
               ))}

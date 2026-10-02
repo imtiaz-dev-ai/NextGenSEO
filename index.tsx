@@ -19,3 +19,12 @@ root.render(
   </React.StrictMode>
 );
 
+// Service worker: makes repeat visits instant by serving from cache.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      /* registration is optional — ignore failures */
+    });
+  });
+}
+

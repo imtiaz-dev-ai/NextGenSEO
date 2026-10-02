@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCommunityPostsFromFirebase, saveCommunityPostToFirebase, likeCommunityPostInFirebase, addCommentToPostInFirebase } from '../utils/firebase';
+import { getCommunityPostsFromSupabase, saveCommunityPostToSupabase, likeCommunityPostInSupabase, addCommentToPostInSupabase } from '../utils/data';
 
 const TABS = ['Discussions', 'Resources', 'Members'] as const;
 type Tab = typeof TABS[number];
@@ -81,7 +81,7 @@ const Community: React.FC = () => {
   const userInitials = userName.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
 
   useEffect(() => {
-    getCommunityPostsFromFirebase().then((data: any) => {
+    getCommunityPostsFromSupabase().then((data: any) => {
       const sorted = [...data].sort((a:any,b:any) => {
         const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt||0);
         const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt||0);
@@ -89,16 +89,24 @@ const Community: React.FC = () => {
       });
       setPosts(sorted as Post[]);
       setLoading(false);
-    }).catch(()=>setLoading(false));
+    }).catch(error => {
+      console.error('Could not load community posts from Supabase:', error);
+      setLoading(false);
+    });
   }, []);
 
   const handleLike = async (post: Post) => {
     if (!joined) { alert('Join the community first!'); return; }
     const alreadyLiked = likedPosts[post.id];
     const newLikes = alreadyLiked ? post.likes - 1 : post.likes + 1;
-    setLikedPosts(prev => ({ ...prev, [post.id]: !alreadyLiked }));
-    setPosts(prev => prev.map(p => p.id === post.id ? { ...p, likes: newLikes } : p));
-    await likeCommunityPostInFirebase(post.id, newLikes);
+    try {
+      await likeCommunityPostInSupabase(post.id, newLikes);
+      setLikedPosts(prev => ({ ...prev, [post.id]: !alreadyLiked }));
+      setPosts(prev => prev.map(p => p.id === post.id ? { ...p, likes: newLikes } : p));
+    } catch (error) {
+      console.error('Could not update community likes:', error);
+      alert('Could not update the like. Please try again.');
+    }
   };
 
   const handleComment = async (post: Post) => {
@@ -107,22 +115,33 @@ const Community: React.FC = () => {
     if (!joined || !userName.trim()) { alert('Enter your name and join first!'); return; }
     const newComment: Comment = { name: userName.trim(), initials: userInitials, color: userColor, text, time: new Date().toISOString() };
     const updated = [...(post.comments || []), newComment];
-    setPosts(prev => prev.map(p => p.id === post.id ? { ...p, comments: updated } : p));
-    setCommentText(prev => ({ ...prev, [post.id]: '' }));
-    await addCommentToPostInFirebase(post.id, updated);
+    try {
+      await addCommentToPostInSupabase(post.id, updated);
+      setPosts(prev => prev.map(p => p.id === post.id ? { ...p, comments: updated } : p));
+      setCommentText(prev => ({ ...prev, [post.id]: '' }));
+    } catch (error) {
+      console.error('Could not add community comment:', error);
+      alert('Could not add the comment. Please try again.');
+    }
   };
 
   const handleNewPost = async () => {
     if (!newPost.title.trim() || !newPost.body.trim()) { alert('Title and body required!'); return; }
     if (!joined || !userName.trim()) { alert('Enter your name and join first!'); return; }
     setPosting(true);
-    const postData = { name: userName.trim(), initials: userInitials, color: userColor, title: newPost.title.trim(), body: newPost.body.trim(), tag: newPost.tag };
-    const id = await saveCommunityPostToFirebase(postData);
-    const created: Post = { ...postData, id, likes: 0, comments: [], createdAt: new Date().toISOString() };
-    setPosts(prev => [created, ...prev]);
-    setNewPost({ title:'', body:'', tag:'General' });
-    setShowPostForm(false);
-    setPosting(false);
+    try {
+      const postData = { name: userName.trim(), initials: userInitials, color: userColor, title: newPost.title.trim(), body: newPost.body.trim(), tag: newPost.tag };
+      const id = await saveCommunityPostToSupabase(postData);
+      const created: Post = { ...postData, id, likes: 0, comments: [], createdAt: new Date().toISOString() };
+      setPosts(prev => [created, ...prev]);
+      setNewPost({ title:'', body:'', tag:'General' });
+      setShowPostForm(false);
+    } catch (error) {
+      console.error('Could not create community post:', error);
+      alert('Could not publish the post. Please try again.');
+    } finally {
+      setPosting(false);
+    }
   };
 
   return (

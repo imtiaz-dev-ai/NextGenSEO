@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getMarketplaceListingsFromFirebase } from '../utils/firebase';
+import { getMarketplaceListingsFromSupabase } from '../utils/data';
 
 export interface MarketplaceListing {
   id: string;
@@ -25,9 +25,11 @@ const Marketplace: React.FC = () => {
     if (moreLoaded) return;
     setLoadingMore(true);
     try {
-      const data = await getMarketplaceListingsFromFirebase();
+      const data = await getMarketplaceListingsFromSupabase();
       if (data && data.length > 0) setExtraListings(data as MarketplaceListing[]);
-    } catch {}
+    } catch (error) {
+      console.error('Could not load marketplace listings from Supabase:', error);
+    }
     setLoadingMore(false);
     setMoreLoaded(true);
   };

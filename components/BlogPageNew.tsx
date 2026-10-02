@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-// Firebase lazily loaded — only when blog page actually needs custom blogs
-const getFirebaseBlogs = () => import('../utils/firebase').then(m => m.getBlogsFromFirebase());
+// Load blog data lazily, only when the blog page needs it.
+const getSupabaseBlogs = () => import('../utils/data').then(m => m.getBlogsFromSupabase());
 
 export const getPostSlug = (post: any) => {
   if (typeof post === 'string') return post.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -164,12 +164,12 @@ export const BlogPostBySlug = () => {
         if (match) { setPost(match); setLoading(false); return; }
       }
     } catch {}
-    // Fetch Firebase blogs (Firebase-added blogs take priority over defaults)
-    getFirebaseBlogs()
+    // Custom Supabase blogs take priority over defaults.
+    getSupabaseBlogs()
       .then(blogs => {
-        const firebaseMatch = blogs.find((p: any) => getPostSlug(p) === slug);
-        if (firebaseMatch) {
-          setPost(firebaseMatch);
+        const customMatch = blogs.find((p: any) => getPostSlug(p) === slug);
+        if (customMatch) {
+          setPost(customMatch);
         } else {
           // Fallback to defaultPosts
           const defaultMatch = defaultPosts.find(p => getPostSlug(p) === slug);
@@ -177,7 +177,8 @@ export const BlogPostBySlug = () => {
         }
         setLoading(false);
       })
-      .catch(() => {
+      .catch(error => {
+        console.error('Could not load the blog post from Supabase:', error);
         const defaultMatch = defaultPosts.find(p => getPostSlug(p) === slug);
         if (defaultMatch) setPost(defaultMatch);
         setLoading(false);
@@ -209,7 +210,7 @@ const BlogPage = () => {
   const [selectedPost, setSelectedPost] = React.useState<any>(null);
   const [searchQuery, setSearchQuery] = React.useState<string>('');
 
-  // Load Firebase blogs + check URL for deep link
+  // Load Supabase blogs + check URL for deep link
   React.useEffect(() => {
     // Check deep link immediately with defaultPosts
     const path = location.pathname;
@@ -219,24 +220,26 @@ const BlogPage = () => {
       if (match) setSelectedPost(match);
     }
 
-    // Load cached blogs instantly, then fetch fresh from Firebase
+    // Load cached blogs instantly, then fetch fresh from Supabase
     try {
       const cached = localStorage.getItem('cachedBlogs');
       if (cached) setCustomBlogs(JSON.parse(cached));
     } catch {}
 
-    getFirebaseBlogs()
+    getSupabaseBlogs()
       .then(blogs => {
         setCustomBlogs(blogs);
         try { localStorage.setItem('cachedBlogs', JSON.stringify(blogs)); } catch {}
         const currentPath = location.pathname;
         if (currentPath.startsWith('/blog/')) {
           const slug = currentPath.replace('/blog/', '');
-          const firebaseMatch = blogs.find((p: any) => getPostSlug(p) === slug);
-          if (firebaseMatch) setSelectedPost(firebaseMatch);
+          const customMatch = blogs.find((p: any) => getPostSlug(p) === slug);
+          if (customMatch) setSelectedPost(customMatch);
         }
       })
-      .catch(() => {});
+      .catch(error => {
+        console.error('Could not load blogs from Supabase:', error);
+      });
   }, []);
 
   // Update URL & title when post changes

@@ -18,9 +18,10 @@ const CaseStudies: React.FC = () => {
   const [customCases, setCustomCases] = React.useState<any[]>([]);
   
   React.useEffect(() => {
-    import('../utils/firebase').then(m => m.getCasesFromFirebase()).then(data => {
+    import('../utils/data').then(m => m.getCasesFromSupabase()).then(data => {
       if (data.length > 0) setCustomCases(data);
-    }).catch(() => {
+    }).catch(error => {
+      console.error('Could not load case studies from Supabase:', error);
       const saved = localStorage.getItem('caseStudies');
       if (saved) setCustomCases(JSON.parse(saved));
     });
