@@ -579,7 +579,7 @@ const AdminPanel: React.FC = () => {
         </div>
 
         <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 text-sm text-amber-200">
-          Save, edit, delete, and image upload require an account registered in Supabase Authentication and approved in the admin_users table. Published content and uploaded images are public.
+          Admin changes and image uploads use the server-configured username and password. Published content and uploaded images are public.
         </div>
 
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2 flex-wrap">

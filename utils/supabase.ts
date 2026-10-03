@@ -43,13 +43,17 @@ const mimeToExt = (mime: string) => {
   return map[mime?.toLowerCase()] || 'jpg';
 };
 
-/** Build a collision-resistant object key: `folder/1699999-ab12cd.jpg` */
-const buildKey = (folder: string, mimeOrExt: string) => {
-  const cleanFolder = (folder || 'misc').replace(/[^a-zA-Z0-9/_-]/g, '');
-  const ext = mimeOrExt.includes('/') ? mimeToExt(mimeOrExt) : mimeOrExt.replace(/[^a-z0-9]/gi, '');
-  const stamp = Date.now().toString(36);
-  const rand = Math.random().toString(36).slice(2, 8);
-  return `${cleanFolder}/${stamp}-${rand}.${ext}`;
+const createSignedUpload = async (folder: string, contentType: string) => {
+  const extension = mimeToExt(contentType);
+  const response = await fetch('/api/admin', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'signed-upload', folder, contentType, extension }),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || `Could not authorize image upload (${response.status}).`);
+  return result as { path: string; token: string; publicUrl: string };
 };
 
 export interface UploadResult {
@@ -80,29 +84,18 @@ export const uploadImage = async (
     throw new Error('Image is too large. Maximum size is 10MB.');
   }
 
-  const key = buildKey(folder, file.type);
-
-  // supabase-js v2 has no first-class progress callback on upload, so we emit
-  // a coarse progress signal (start/end) to keep the caller API compatible.
   onProgress?.(0);
-
-  const { error } = await client.storage.from(bucket).upload(key, file, {
+  const signed = await createSignedUpload(folder, file.type);
+  const { error } = await client.storage.from(bucket).uploadToSignedUrl(signed.path, signed.token, file, {
     cacheControl: '31536000',
-    upsert: false,
     contentType: file.type,
   });
 
   if (error) {
     throw new Error(`Supabase upload failed: ${error.message}`);
   }
-
-  const { data } = client.storage.from(bucket).getPublicUrl(key);
-  if (!data?.publicUrl) {
-    throw new Error('Supabase upload succeeded but no public URL was returned. Is the bucket public?');
-  }
-
   onProgress?.(100);
-  return data.publicUrl;
+  return signed.publicUrl;
 };
 
 /**
@@ -129,26 +122,17 @@ export const uploadBase64Image = async (dataUrl: string, folder: string): Promis
   const mime = match[1];
   const base64 = match[2];
 
-  const key = buildKey(folder, mime);
-
   const blob = base64ToBlob(base64, mime);
-
-  const { error } = await client.storage.from(bucket).upload(key, blob, {
+  const signed = await createSignedUpload(folder, mime);
+  const { error } = await client.storage.from(bucket).uploadToSignedUrl(signed.path, signed.token, blob, {
     cacheControl: '31536000',
-    upsert: false,
     contentType: mime,
   });
 
   if (error) {
     throw new Error(`Supabase upload failed: ${error.message}`);
   }
-
-  const { data } = client.storage.from(bucket).getPublicUrl(key);
-  if (!data?.publicUrl) {
-    throw new Error('Supabase upload succeeded but no public URL was returned. Is the bucket public?');
-  }
-
-  return data.publicUrl;
+  return signed.publicUrl;
 };
 
 /** Decode a base64 string into a Blob without relying on `atob` in all runtimes. */

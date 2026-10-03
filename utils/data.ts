@@ -19,6 +19,23 @@ const getCollection = (_name: CollectionName) => {
   return client.from('app_records');
 };
 
+const adminRequest = async <T>(action: string, method: 'GET' | 'POST', body?: Record<string, unknown>, query?: Record<string, string>): Promise<T> => {
+  const url = new URL('/api/admin', window.location.origin);
+  url.searchParams.set('action', action);
+  if (query) {
+    for (const [key, value] of Object.entries(query)) url.searchParams.set(key, value);
+  }
+  const response = await fetch(url, {
+    method,
+    credentials: 'same-origin',
+    headers: method === 'POST' ? { 'Content-Type': 'application/json' } : undefined,
+    body: method === 'POST' ? JSON.stringify({ action, ...body }) : undefined,
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || `Admin request failed (${response.status}).`);
+  return result as T;
+};
+
 const readCollection = async (name: CollectionName): Promise<DataRecord[]> => {
   const { data, error } = await getCollection(name)
     .select('id,data')
@@ -29,46 +46,27 @@ const readCollection = async (name: CollectionName): Promise<DataRecord[]> => {
   return (data || []).map(row => ({ ...row.data, id: row.id }));
 };
 
-const writeCollection = async (name: CollectionName, record: Record<string, any>): Promise<string> => {
-  const id = record.id || newId();
-  const { id: _recordId, ...data } = record;
-  const { error } = await getCollection(name).insert({
-    collection_name: name,
-    id,
-    data,
-  });
-  if (error) throw new Error(`Could not save ${name} to Supabase: ${error.message}`);
-  return id;
-};
-
-const updateCollection = async (name: CollectionName, id: string, updates: Record<string, any>) => {
-  const { id: _recordId, ...data } = updates;
-  const { data: updated, error } = await getCollection(name)
-    .update({ data, updated_at: new Date().toISOString() })
-    .eq('collection_name', name)
-    .eq('id', id)
-    .select('id')
-    .maybeSingle();
-  if (error) throw new Error(`Could not update ${name} in Supabase: ${error.message}`);
-  if (!updated) throw new Error(`Could not update ${name} in Supabase: record not found.`);
-};
-
-const deleteFromCollection = async (name: CollectionName, id: string) => {
-  const { data: deleted, error } = await getCollection(name)
-    .delete()
-    .eq('collection_name', name)
-    .eq('id', id)
-    .select('id')
-    .maybeSingle();
-  if (error) throw new Error(`Could not delete ${name} from Supabase: ${error.message}`);
-  if (!deleted) throw new Error(`Could not delete ${name} from Supabase: record not found.`);
-};
-
 const newId = () => {
   if (!globalThis.crypto?.randomUUID) {
     throw new Error('This browser cannot generate secure record IDs. Use a modern browser over HTTPS.');
   }
   return globalThis.crypto.randomUUID();
+};
+
+const writeCollection = async (name: CollectionName, record: Record<string, any>): Promise<string> => {
+  const result = await adminRequest<{ id: string }>('save', 'POST', {
+    collection: name,
+    record,
+  });
+  return result.id;
+};
+
+const updateCollection = async (name: CollectionName, id: string, updates: Record<string, any>) => {
+  await adminRequest('update', 'POST', { collection: name, id, updates });
+};
+
+const deleteFromCollection = async (name: CollectionName, id: string) => {
+  await adminRequest('delete', 'POST', { collection: name, id });
 };
 
 export const getBlogsFromSupabase = () => readCollection('blogPosts');
@@ -86,7 +84,10 @@ export const saveTeamToSupabase = (record: Record<string, any>) => writeCollecti
 export const updateTeamInSupabase = (id: string, updates: Record<string, any>) => updateCollection('teamMembers', id, updates);
 export const deleteTeamFromSupabase = (id: string) => deleteFromCollection('teamMembers', id);
 
-export const getChatMessagesFromSupabase = () => readCollection('chatMessages');
+export const getChatMessagesFromSupabase = async () => {
+  const result = await adminRequest<{ records: DataRecord[] }>('list', 'GET', undefined, { collection: 'chatMessages' });
+  return result.records;
+};
 export const saveChatMessageToSupabase = async (message: Record<string, any>): Promise<string> => {
   const id = newId();
   const { error } = await getCollection('chatMessages').insert({
@@ -166,50 +167,14 @@ export const uploadBlogImage = async (imageData: string): Promise<string> => {
 };
 
 export const signInAdmin = async (username: string, password: string) => {
-  const configuredUsername = import.meta.env.VITE_ADMIN_USERNAME as string | undefined;
-  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL as string | undefined;
-  if (!configuredUsername || !adminEmail) {
-    throw new Error('Set VITE_ADMIN_USERNAME and VITE_ADMIN_EMAIL in your app environment before admin login.');
-  }
-  if (username.trim().toLowerCase() !== configuredUsername.trim().toLowerCase()) {
-    throw new Error('Invalid username or password.');
-  }
-
-  const client = getSupabase();
-  if (!client) throw new Error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
-  const { data, error } = await client.auth.signInWithPassword({ email: adminEmail, password });
-  if (error) throw new Error(`Supabase login failed: ${error.message}`);
-
-  const { data: admin, error: adminError } = await client
-    .from('admin_users')
-    .select('user_id')
-    .eq('user_id', data.user.id)
-    .maybeSingle();
-  if (adminError || !admin) {
-    await client.auth.signOut();
-    throw new Error('This account is not authorized as an admin. Add it to the Supabase admin_users table first.');
-  }
+  await adminRequest('login', 'POST', { username, password });
 };
 
 export const hasAdminSession = async () => {
-  const client = getSupabase();
-  if (!client) return false;
-  const { data: { session }, error } = await client.auth.getSession();
-  if (error) throw new Error(`Could not check Supabase session: ${error.message}`);
-  if (!session) return false;
-
-  const { data: admin, error: adminError } = await client
-    .from('admin_users')
-    .select('user_id')
-    .eq('user_id', session.user.id)
-    .maybeSingle();
-  if (adminError) throw new Error(`Could not verify admin access: ${adminError.message}`);
-  return Boolean(admin);
+  const result = await adminRequest<{ authenticated: boolean }>('session', 'GET');
+  return result.authenticated;
 };
 
 export const signOutAdmin = async () => {
-  const client = getSupabase();
-  if (!client) return;
-  const { error } = await client.auth.signOut();
-  if (error) throw new Error(`Could not sign out: ${error.message}`);
+  await adminRequest('logout', 'POST');
 };
