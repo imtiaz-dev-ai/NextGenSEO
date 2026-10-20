@@ -618,7 +618,7 @@ const App: React.FC = () => {
       [AppRoute.COMMUNITY]: 'Join the NextGen SEO community. Connect with founders, share strategies, and grow your organic traffic.',
     };
     const routeCanonicals: Record<string, string> = {
-      [AppRoute.HOME]: 'https://nextgenseo.pro/',
+      [AppRoute.HOME]: 'https://nextgenseo.pro',
       [AppRoute.ABOUT]: 'https://nextgenseo.pro/about',
       [AppRoute.TEAM]: 'https://nextgenseo.pro/team',
       [AppRoute.BLOG]: 'https://nextgenseo.pro/blog',
@@ -781,10 +781,8 @@ const App: React.FC = () => {
       case AppRoute.PRICING: return <Pricing onContact={() => { setCurrentRoute(AppRoute.CONTACT); }} />;
       case AppRoute.CASE_STUDIES: return <CaseStudies />;
       case AppRoute.ADMIN: return <AdminPanel />;
-      case AppRoute.MARKETPLACE: {
-        navigate('/buy-backlinks', { replace: true });
-        return null;
-      }
+      case AppRoute.MARKETPLACE:
+        return <Navigate to="/buy-backlinks" replace />;
       case AppRoute.BUY_BACKLINKS: return (
         <div className="pt-24">
           <Suspense fallback={<PageLoader />}>
