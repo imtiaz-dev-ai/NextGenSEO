@@ -837,7 +837,7 @@ const App: React.FC = () => {
                 <img src="/pics/logo .webp" alt="NextGen SEO" className="w-14 h-14 object-contain shrink-0 group-hover:scale-110 transition-transform" />
                 <span className="text-lg font-black tracking-normal whitespace-nowrap text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
               </button>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xs">Premium SEO agency founded by <span className="text-white font-semibold">Tayyab Mehmood</span>. Building the future of search visibility.</p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xs">NextGen SEO is a premium link building agency offering high-authority guest posts and white-hat backlinks that strengthen your domain authority, boost rankings and drive long-term organic growth.</p>
               <div className="flex gap-2">
                 {[{ href: 'https://www.linkedin.com/company/nextgenseo-official/', label: 'LinkedIn', hover: 'hover:bg-blue-600' },
                   { href: 'https://x.com/next_genseo', label: 'Twitter', hover: 'hover:bg-sky-500' },
