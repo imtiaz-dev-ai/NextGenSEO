@@ -629,7 +629,7 @@ const App: React.FC = () => {
       [AppRoute.SERVICE_OFFPAGE]: 'https://nextgenseo.pro/service_offpage',
       [AppRoute.SERVICE_TECHNICAL]: 'https://nextgenseo.pro/service_technical',
       [AppRoute.SERVICE_AI]: 'https://nextgenseo.pro/service_ai',
-      [AppRoute.MARKETPLACE]: 'https://nextgenseo.pro/marketplace',
+      [AppRoute.MARKETPLACE]: 'https://nextgenseo.pro/buy-backlinks',
       [AppRoute.BUY_BACKLINKS]: 'https://nextgenseo.pro/buy-backlinks',
       [AppRoute.TOOL_AUDIT]: 'https://nextgenseo.pro/tool_audit',
       [AppRoute.TOOL_KEYWORDS]: 'https://nextgenseo.pro/tool_keywords',
@@ -781,7 +781,10 @@ const App: React.FC = () => {
       case AppRoute.PRICING: return <Pricing onContact={() => { setCurrentRoute(AppRoute.CONTACT); }} />;
       case AppRoute.CASE_STUDIES: return <CaseStudies />;
       case AppRoute.ADMIN: return <AdminPanel />;
-      case AppRoute.MARKETPLACE:
+      case AppRoute.MARKETPLACE: {
+        navigate('/buy-backlinks', { replace: true });
+        return null;
+      }
       case AppRoute.BUY_BACKLINKS: return (
         <div className="pt-24">
           <Suspense fallback={<PageLoader />}>

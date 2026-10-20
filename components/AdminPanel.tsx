@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { saveBlogToSupabase, getBlogsFromSupabase, updateBlogInSupabase, deleteBlogFromSupabase, saveCaseToSupabase, getCasesFromSupabase, updateCaseInSupabase, deleteCaseFromSupabase, saveTeamToSupabase, getTeamFromSupabase, updateTeamInSupabase, deleteTeamFromSupabase, getChatMessagesFromSupabase, deleteChatMessageFromSupabase, saveMarketplaceListingToSupabase, getMarketplaceListingsFromSupabase, updateMarketplaceListingInSupabase, deleteMarketplaceListingFromSupabase, uploadFileToStorage, hasAdminSession, signInAdmin, signOutAdmin } from '../utils/data';
+import { saveBlogToSupabase, getBlogsWithLegacyFallback, updateBlogInSupabase, deleteBlogFromSupabase, saveCaseToSupabase, getCasesFromSupabase, updateCaseInSupabase, deleteCaseFromSupabase, saveTeamToSupabase, getTeamFromSupabase, updateTeamInSupabase, deleteTeamFromSupabase, getChatMessagesFromSupabase, deleteChatMessageFromSupabase, saveMarketplaceListingToSupabase, getMarketplaceListingsFromSupabase, updateMarketplaceListingInSupabase, deleteMarketplaceListingFromSupabase, uploadFileToStorage, hasAdminSession, signInAdmin, signOutAdmin } from '../utils/data';
 
 interface ChatMessage {
   id: string;
@@ -331,7 +331,7 @@ const AdminPanel: React.FC = () => {
 
   const loadBlogs = async () => {
     try {
-      const savedBlogs = await getBlogsFromSupabase();
+      const savedBlogs = await getBlogsWithLegacyFallback();
       setBlogs(savedBlogs);
     } catch (error) {
       console.error('Error loading blogs:', error);
@@ -576,10 +576,6 @@ const AdminPanel: React.FC = () => {
           >
             Logout
           </button>
-        </div>
-
-        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 text-sm text-amber-200">
-          Admin changes and image uploads use the server-configured username and password. Published content and uploaded images are public.
         </div>
 
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2 flex-wrap">

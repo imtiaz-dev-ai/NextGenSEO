@@ -1,0 +1,8 @@
+
+{
+  "name": "NextGen SEO Agency",
+  "description": "A world-class professional SEO agency founded by Tayyab Meer. Featuring AI-powered SEO tools and high-authority search growth services.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

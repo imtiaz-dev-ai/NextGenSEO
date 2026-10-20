@@ -70,6 +70,60 @@ const deleteFromCollection = async (name: CollectionName, id: string) => {
 };
 
 export const getBlogsFromSupabase = () => readCollection('blogPosts');
+
+const cleanText = (value: unknown, fallback = ''): string => {
+  const text = typeof value === 'string' ? value.trim() : fallback;
+  return text || fallback;
+};
+
+const toSlug = (value: string) => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'post';
+
+const normalizeLegacyBlog = (record: Record<string, any>) => {
+  const title = cleanText(record?.title, 'Untitled post');
+  const content = typeof record?.content === 'string' ? record.content : '';
+  const excerpt = cleanText(record?.excerpt, content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 170));
+  const category = cleanText(record?.category, 'SEO');
+  const author = cleanText(record?.author, 'NextGen SEO');
+  const image = cleanText(record?.image, 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80');
+  const date = cleanText(record?.date, record?.createdAt?.toDate ? record.createdAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent');
+
+  return {
+    ...record,
+    id: cleanText(record?.id, record?.slug || toSlug(title)),
+    title,
+    category,
+    author,
+    excerpt,
+    content,
+    image,
+    date,
+    slug: cleanText(record?.slug, toSlug(title)),
+    readTime: cleanText(record?.readTime, '5 min'),
+  };
+};
+
+export const getLegacyBlogPosts = async (): Promise<DataRecord[]> => {
+  try {
+    const response = await fetch('/database.json', { cache: 'no-store' });
+    if (!response.ok) return [];
+    const payload = await response.json();
+    const records = payload?.blogPosts ? Object.values(payload.blogPosts) : Array.isArray(payload) ? payload : [];
+    return (records as Record<string, any>[]).map(record => normalizeLegacyBlog(record));
+  } catch {
+    return [];
+  }
+};
+
+export const getBlogsWithLegacyFallback = async (): Promise<DataRecord[]> => {
+  try {
+    const blogs = await getBlogsFromSupabase();
+    if (blogs.length > 0) return blogs;
+  } catch {
+    // Ignore Supabase issues and fall back to the legacy JSON dataset.
+  }
+  return getLegacyBlogPosts();
+};
+
 export const saveBlogToSupabase = (blog: Record<string, any>) => writeCollection('blogPosts', blog);
 export const updateBlogInSupabase = (id: string, updates: Record<string, any>) => updateCollection('blogPosts', id, updates);
 export const deleteBlogFromSupabase = (id: string) => deleteFromCollection('blogPosts', id);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-// Load blog data lazily, only when the blog page needs it.
-const getSupabaseBlogs = () => import('../utils/data').then(m => m.getBlogsFromSupabase());
+// Load blog data lazily, falling back to the legacy JSON dataset if Supabase is not configured.
+const getSupabaseBlogs = () => import('../utils/data').then(m => m.getBlogsWithLegacyFallback());
 
 export const getPostSlug = (post: any) => {
   if (typeof post === 'string') return post.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');

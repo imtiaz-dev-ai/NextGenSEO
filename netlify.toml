@@ -60,11 +60,18 @@
     Cache-Control = "public, max-age=2592000"
 
 [[redirects]]
+  from = "/marketplace"
+  to = "/buy-backlinks"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "https://www.nextgenseo.pro/*"
   to = "https://nextgenseo.pro/:splat"
   status = 301
   force = true
 
+# SPA fallback — serves prerendered index.html for each route
 [[redirects]]
   from = "/*"
   to = "/index.html"
