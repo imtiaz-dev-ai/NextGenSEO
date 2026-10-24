@@ -67,8 +67,10 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [
         react(),
-        compression({ algorithm: 'gzip', exclude: [/\.(png|jpg|jpeg|webp|gif|svg|ico)$/] }),
-        compression({ algorithm: 'brotliCompress', exclude: [/\.(png|jpg|jpeg|webp|gif|svg|ico)$/] }),
+        compression({
+          algorithms: ['gzip', 'brotliCompress'],
+          exclude: [/\.(png|jpg|jpeg|webp|gif|svg|ico)$/],
+        }),
         // Inject <link rel="preload"> for the entry chunks that the browser
         // would otherwise only discover after the entry JS has executed.
         isProduction && {
