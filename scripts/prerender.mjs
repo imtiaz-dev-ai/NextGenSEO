@@ -2,6 +2,7 @@
  * prerender.mjs — Complete static prerender for all routes + blog posts
  * Runs after `vite build`. Creates dist/{route}/index.html for every URL
  * so Googlebot sees unique title, description, canonical WITHOUT needing JS.
+ * Also fetches live blog posts from Supabase at build time.
  */
 
 import fs from 'fs';
@@ -9,6 +10,55 @@ import path from 'path';
 
 const DIST = path.resolve('dist');
 const base = fs.readFileSync(path.join(DIST, 'index.html'), 'utf-8');
+
+// ─── Load env vars from .env.local ───────────────────────────────────────────
+function loadEnv() {
+  const envPath = path.resolve('.env.local');
+  if (!fs.existsSync(envPath)) return {};
+  const env = {};
+  fs.readFileSync(envPath, 'utf-8').split('\n').forEach(line => {
+    const m = line.match(/^([^#=]+)=(.*)$/);
+    if (m) env[m[1].trim()] = m[2].trim();
+  });
+  return env;
+}
+
+const localEnv = loadEnv();
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || localEnv['VITE_SUPABASE_URL'] || 'https://bckkbkodjpotcjkfedds.supabase.co';
+const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || localEnv['VITE_SUPABASE_ANON_KEY'] || '';
+
+// ─── Fetch blog posts from Supabase at build time ────────────────────────────
+async function fetchSupabaseBlogPosts() {
+  if (!SUPABASE_KEY) {
+    console.log('⚠ VITE_SUPABASE_ANON_KEY not set — skipping Supabase blog fetch.');
+    return [];
+  }
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/app_records?collection_name=eq.blogPosts&select=id,data&order=created_at.desc`,
+      {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    if (!res.ok) {
+      console.log(`⚠ Supabase fetch failed: ${res.status}`);
+      return [];
+    }
+    const rows = await res.json();
+    return rows.map(row => ({ ...row.data, id: row.id }));
+  } catch (e) {
+    console.log(`⚠ Supabase fetch error: ${e.message}`);
+    return [];
+  }
+}
+
+function toSlug(title) {
+  return (title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'post';
+}
 
 // ─── All static routes ────────────────────────────────────────────────────────
 const routes = [
@@ -247,14 +297,14 @@ const blogPosts = [
 function patch(html, { title, description, canonical, ogImage = 'https://nextgenseo.pro/pics/logo.png', schema }) {
   let out = html
     .replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`)
-    .replace(/(<meta name="description" content=")[^"]*(")/,   `$1${description}$2`)
+    .replace(/(<meta name="description" content=")[^"]*(")/,   `$1${description.replace(/"/g, '&quot;')}$2`)
     .replace(/(<link rel="canonical" href=")[^"]*(")/,          `$1${canonical}$2`)
-    .replace(/(<meta property="og:title" content=")[^"]*(")/,   `$1${title}$2`)
-    .replace(/(<meta property="og:description" content=")[^"]*(")/,`$1${description}$2`)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/,   `$1${title.replace(/"/g, '&quot;')}$2`)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/,`$1${description.replace(/"/g, '&quot;')}$2`)
     .replace(/(<meta property="og:url" content=")[^"]*(")/,     `$1${canonical}$2`)
     .replace(/(<meta property="og:image" content=")[^"]*(")/,   `$1${ogImage}$2`)
-    .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${title}$2`)
-    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,`$1${description}$2`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${title.replace(/"/g, '&quot;')}$2`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,`$1${description.replace(/"/g, '&quot;')}$2`)
     .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${ogImage}$2`);
 
   // Inject extra schema if provided (before </head>)
@@ -315,7 +365,37 @@ for (const route of routes) {
 }
 
 // ─── Generate blog post pages ─────────────────────────────────────────────────
+const supabasePosts = await fetchSupabaseBlogPosts();
+
+// Merge: Supabase posts + hardcoded defaults (deduplicate by slug)
+const slugSeen = new Set();
+const allBlogPosts = [];
+
+// Supabase posts first (they take priority)
+for (const post of supabasePosts) {
+  const slug = post.slug || toSlug(post.title);
+  if (!slug || slugSeen.has(slug)) continue;
+  slugSeen.add(slug);
+  allBlogPosts.push({
+    slug,
+    title: `${post.title} | NextGen SEO Blog`,
+    description: post.excerpt || post.description || `${post.title} - Read on NextGen SEO Blog.`,
+    author: post.author || 'NextGen SEO',
+    date: post.date || post.createdAt || new Date().toISOString().split('T')[0],
+    image: post.image || 'https://nextgenseo.pro/pics/logo.png',
+  });
+}
+
+// Then hardcoded defaults
 for (const post of blogPosts) {
+  if (slugSeen.has(post.slug)) continue;
+  slugSeen.add(post.slug);
+  allBlogPosts.push(post);
+}
+
+console.log(`\n📝 Blog posts to prerender: ${allBlogPosts.length} (${supabasePosts.length} from Supabase + ${allBlogPosts.length - supabasePosts.length} defaults)`);
+
+for (const post of allBlogPosts) {
   const dir = path.join(DIST, 'blog', post.slug);
   fs.mkdirSync(dir, { recursive: true });
 
@@ -326,7 +406,7 @@ for (const post of blogPosts) {
     "description": post.description,
     "image": post.image,
     "author": { "@type": "Person", "name": post.author },
-    "publisher": { "@type": "Organization", "name": "NextGen SEO Agency", "url": "https://nextgenseo.pro" },
+    "publisher": { "@type": "Organization", "name": "NextGen SEO Agency", "url": "https://nextgenseo.pro", "logo": { "@type": "ImageObject", "url": "https://nextgenseo.pro/pics/logo.png" } },
     "datePublished": post.date,
     "url": `https://nextgenseo.pro/blog/${post.slug}`,
     "mainEntityOfPage": { "@type": "WebPage", "@id": `https://nextgenseo.pro/blog/${post.slug}` }
@@ -343,6 +423,23 @@ for (const post of blogPosts) {
   if (!html.includes('<noscript>')) {
     html = html.replace('<div id="root">', `${buildNoscript()}\n    <div id="root">`);
   }
+
+  // Inject article content into noscript for crawlers
+  const articleContent = post.content ? `
+    <article>
+      <h1>${post.title.replace(' | NextGen SEO Blog', '').replace(/"/g, '&quot;')}</h1>
+      <p><strong>By ${post.author}</strong> | ${post.date}</p>
+      ${post.content}
+    </article>
+  ` : `
+    <article>
+      <h1>${post.title.replace(' | NextGen SEO Blog', '').replace(/"/g, '&quot;')}</h1>
+      <p>${post.description.replace(/"/g, '&quot;')}</p>
+      <p>By ${post.author} | ${post.date}</p>
+    </article>
+  `;
+  
+  html = html.replace('</noscript>', `${articleContent}</noscript>`);
 
   fs.writeFileSync(path.join(dir, 'index.html'), html, 'utf-8');
   console.log(`✓ /blog/${post.slug}`);

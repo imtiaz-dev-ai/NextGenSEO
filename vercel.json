@@ -5,7 +5,11 @@
   "installCommand": "npm install",
   "framework": "vite",
   "rewrites": [
-    { "source": "/((?!api|assets|pics|favicon|robots|sitemap|privacy|schema).*)", "destination": "/index.html" }
+    { "source": "/((?!api|assets|pics|fonts|favicon|robots|sitemap|privacy|schema|google|sw\\.js|llms\\.txt|about|team|blog|contact|pricing|case_studies|service_|buy-backlinks|marketplace|free_audit_page|community|tool_|admin).*)", "destination": "/index.html" }
+  ],
+  "redirects": [
+    { "source": "/marketplace", "destination": "/buy-backlinks", "permanent": true },
+    { "source": "/marketplace/", "destination": "/buy-backlinks", "permanent": true }
   ],
   "headers": [
     {
