@@ -9,42 +9,42 @@ const LinkBuildingServices: React.FC = () => {
       title: 'High Authority Backlinks',
       icon: <HiOutlineLink className="w-6 h-6" />,
       items: [
-        'High Authority Backlinks',
-        'Guest Posting Outreach',
-        'Manual White Hat Links',
-        'Niche Relevant Links',
-        'Premium Blogger Outreach',
-        'Brand Authority Building',
-        'Google Friendly Strategy',
-        'Natural Link Growth',
+        'Editorial placements',
+        'Relevant publisher outreach',
+        'Manual prospecting',
+        'Niche-aligned mentions',
+        'Publisher quality checks',
+        'Unlinked brand mention recovery',
+        'Natural link acquisition',
+        'Campaign reporting',
       ]
     },
     {
       title: 'DR & Traffic Based Sites',
       icon: <HiOutlineChartBar className="w-6 h-6" />,
       items: [
-        'DR & Traffic Based Sites',
-        'Contextual Link Placement',
-        'SEO Safe Link Building',
-        'DoFollow Backlinks',
-        'High Authority Backlinks',
-        'Guest Posting Outreach',
-        'Manual White Hat Links',
-        'Niche Relevant Links',
+        'Organic traffic review',
+        'Audience and niche fit',
+        'Domain rating checks',
+        'Contextual placements',
+        'Followed link options',
+        'Publisher traffic checks',
+        'Editorial standards',
+        'Transparent site metrics',
       ]
     },
     {
       title: 'Premium Link Building',
       icon: <HiOutlineStar className="w-6 h-6" />,
       items: [
-        'Premium Blogger Outreach',
-        'Brand Authority Building',
-        'Google Friendly Strategy',
-        'Natural Link Growth',
-        'Contextual Link Placement',
-        'DR & Traffic Based Sites',
-        'SEO Safe Link Building',
-        'DoFollow Backlinks',
+        'Expert commentary outreach',
+        'Digital PR campaigns',
+        'Resource page placements',
+        'Broken link reclamation',
+        'Competitor gap review',
+        'Content-led campaigns',
+        'Industry publication features',
+        'Monthly placement reports',
       ]
     },
   ];
@@ -57,7 +57,7 @@ const LinkBuildingServices: React.FC = () => {
             Explore More <span className="gradient-text">Link Building Services</span>
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm md:text-base">
-            Professional white-hat link building strategies to strengthen search visibility
+            Earn relevant mentions from trusted sites to build authority and attract qualified visitors.
           </p>
         </div>
 
@@ -66,6 +66,8 @@ const LinkBuildingServices: React.FC = () => {
           {services.map((service, i) => (
             <button
               key={i}
+              type="button"
+              aria-pressed={activeTab === i}
               onClick={() => setActiveTab(i)}
               className={`px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-bold transition-all flex items-center gap-2 text-xs sm:text-sm ${
                 activeTab === i
@@ -81,131 +83,16 @@ const LinkBuildingServices: React.FC = () => {
         </div>
       </div>
 
-      {/* Service Rows */}
-      <div className="space-y-0">
-        {/* Row 1 */}
-        <div className="relative overflow-hidden w-full">
-          <div className="flex gap-4 animate-scroll-services p-6">
-            {services[activeTab].items.slice(0, 4).map((item, i) => (
-              <div key={i} className="flex-shrink-0 px-6 py-4 glass rounded-xl hover:border-cyan-400/50 transition-all cursor-pointer group min-w-max">
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                  </svg>
-                  <span className="font-bold text-slate-200 text-sm">{item}</span>
-                </div>
-              </div>
-            ))}
-            {services[activeTab].items.slice(0, 4).map((item, i) => (
-              <div key={`dup1-${i}`} className="flex-shrink-0 px-6 py-4 glass rounded-xl hover:border-cyan-400/50 transition-all cursor-pointer group min-w-max">
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                  </svg>
-                  <span className="font-bold text-slate-200 text-sm">{item}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Row 2 */}
-        <div className="relative overflow-hidden w-full py-6">
-          <div className="flex gap-4 animate-scroll-services-reverse">
-            {/* First set */}
-            {services[activeTab].items.slice(4, 8).map((item, i) => (
-              <div
-                key={i}
-                className="flex-shrink-0 px-6 py-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer group min-w-max"
-              >
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                  </svg>
-                  <span className="font-bold text-white text-sm">{item}</span>
-                </div>
-              </div>
-            ))}
-            
-            {/* Duplicate set */}
-            {services[activeTab].items.slice(4, 8).map((item, i) => (
-              <div
-                key={`dup2-${i}`}
-                className="flex-shrink-0 px-6 py-4 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer group min-w-max"
-              >
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                  </svg>
-                  <span className="font-bold text-white text-sm">{item}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Row 3 */}
-        <div className="relative overflow-hidden w-full">
-          <div className="flex gap-4 animate-scroll-services p-6">
-            {services[activeTab].items.slice(0, 4).map((item, i) => (
-              <div key={i} className="flex-shrink-0 px-6 py-4 glass rounded-xl hover:border-cyan-400/50 transition-all cursor-pointer group min-w-max">
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                  </svg>
-                  <span className="font-bold text-slate-200 text-sm">{item}</span>
-                </div>
-              </div>
-            ))}
-            {services[activeTab].items.slice(0, 4).map((item, i) => (
-              <div key={`dup3-${i}`} className="flex-shrink-0 px-6 py-4 glass rounded-xl hover:border-cyan-400/50 transition-all cursor-pointer group min-w-max">
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-                  </svg>
-                  <span className="font-bold text-slate-200 text-sm">{item}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes scroll-services {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-
-        @keyframes scroll-services-reverse {
-          0% {
-            transform: translateX(-50%);
-          }
-          100% {
-            transform: translateX(0);
-          }
-        }
-
-        .animate-scroll-services {
-          animation: scroll-services 12s linear infinite;
-        }
-
-        .animate-scroll-services:hover {
-          animation-play-state: paused;
-        }
-
-        .animate-scroll-services-reverse {
-          animation: scroll-services-reverse 12s linear infinite;
-        }
-
-        .animate-scroll-services-reverse:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-7xl mx-auto px-4 sm:px-6">
+        {services[activeTab].items.map((item) => (
+          <li key={item} className="glass px-5 py-4 rounded-xl border border-white/10 flex items-center gap-3 text-slate-200 text-sm font-semibold">
+            <svg className="w-5 h-5 text-cyan-400 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+            </svg>
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

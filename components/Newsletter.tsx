@@ -48,7 +48,7 @@ const Newsletter: React.FC = () => {
             Stay Ahead with <span className="gradient-text">Search Insights</span>
           </h3>
           <p className="text-slate-400 text-xs sm:text-sm md:text-base mb-6 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
-            Get weekly insights on keyword research, technical optimization, link building, and organic growth. Learn practical ways to improve your Google rankings and search visibility.
+            Get weekly insights on keyword research, technical optimization, and organic growth. Learn practical ways to improve your Google rankings and search visibility.
           </p>
           
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 max-w-xl mx-auto px-0">
@@ -71,7 +71,7 @@ const Newsletter: React.FC = () => {
           </form>
           
           <p className="text-slate-500 text-[10px] sm:text-xs mt-4 sm:mt-6">
-            Join 10,000+ subscribers. Unsubscribe anytime. Learn about keyword research, link building, and organic growth.
+            Join 10,000+ subscribers. Unsubscribe anytime for practical search and growth insights.
           </p>
         </div>
       </div>

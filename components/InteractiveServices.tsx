@@ -48,8 +48,8 @@ const InteractiveServices: React.FC = () => {
     },
     {
       icon: <HiOutlineLink className="w-8 h-8" />,
-      title: 'Premium Link Building',
-      desc: 'Professional white-hat link building and high-quality backlink acquisition from 10,000+ authority sites. Domain authority growth through ethical link building strategies.',
+      title: 'Premium Publisher Outreach',
+      desc: 'Earn high-quality placements on vetted authority sites through ethical outreach that strengthens domain authority and long-term visibility.',
       gradient: 'from-emerald-500 to-teal-500',
       stats: '10K+ Sites',
     },

@@ -27,7 +27,7 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
         </h1>
         
         <p className="text-[11px] sm:text-sm md:text-base lg:text-lg text-slate-400 max-w-4xl mx-auto mb-8 sm:mb-12 md:mb-14 leading-relaxed sm:leading-tight font-medium tracking-tight px-0">
-          SaaS SEO and link building that drives <span className="text-slate-100 font-bold">300%+ organic growth</span> — Stop buying low-quality links. Partner with an agency that turns <span className="text-slate-100 font-bold">search authority into pipeline revenue.</span>
+          SaaS growth fueled by search visibility and trusted mentions — achieve <span className="text-slate-100 font-bold">300%+ organic growth</span> without low-quality links. Partner with an agency that turns <span className="text-slate-100 font-bold">search authority into pipeline revenue.</span>
         </p>
 
         <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-14 md:mb-16 px-0">

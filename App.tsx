@@ -696,10 +696,10 @@ const App: React.FC = () => {
                 SaaS SEO brings technical health, useful content, and trusted links together. Start by understanding what potential customers search for, then match those questions to clear pages about your product, features, and solutions. Strong keyword research and search intent help each page serve a real need instead of repeating the same phrases.
               </p>
               <p className="text-slate-400 leading-relaxed mb-4">
-                A sound plan also checks whether search engines can crawl and index your site, and whether pages work well on mobile. Improve titles, headings, internal links, structured data, and page speed where they help people and search engines. Relevant, editorial link building can then support your site's authority over time.
+                A sound plan also checks whether search engines can crawl and index your site, and whether pages work well on mobile. Improve titles, headings, internal links, structured data, and page speed where they help people and search engines. Relevant editorial mentions can then strengthen your site's authority over time.
               </p>
               <p className="text-slate-400 leading-relaxed">
-                Measure progress with organic impressions, qualified visits, and conversions, then refine the plan as your product and market change. Explore our <a href="/service_onpage" className="text-purple-300 hover:text-purple-200 underline underline-offset-4">on-page SEO</a>, <a href="/service_technical" className="text-purple-300 hover:text-purple-200 underline underline-offset-4">technical SEO</a>, and <a href="/service_offpage" className="text-purple-300 hover:text-purple-200 underline underline-offset-4">link building</a> services.
+                Measure progress with organic impressions, qualified visits, and conversions, then refine the plan as your product and market change. Explore our <a href="/service_onpage" className="text-purple-300 hover:text-purple-200 underline underline-offset-4">on-page SEO</a>, <a href="/service_technical" className="text-purple-300 hover:text-purple-200 underline underline-offset-4">technical SEO</a>, and <a href="/service_offpage" className="text-purple-300 hover:text-purple-200 underline underline-offset-4">publisher outreach</a> services.
               </p>
             </div>
           </section>
@@ -853,7 +853,7 @@ const App: React.FC = () => {
                 <img src="/pics/logo .webp" alt="NextGen SEO" className="w-14 h-14 object-contain shrink-0 group-hover:scale-110 transition-transform" />
                 <span className="text-lg font-black tracking-normal whitespace-nowrap text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all">NextGen <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">SEO</span></span>
               </button>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xs">NextGen SEO is a premium link building agency offering high-authority guest posts and white-hat backlinks that strengthen your domain authority, boost rankings and drive long-term organic growth.</p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4 max-w-xs">NextGen SEO helps brands earn relevant guest post placements and white-hat backlinks that strengthen domain authority, improve rankings, and sustain long-term organic growth.</p>
               <div className="flex gap-2">
                 {[{ href: 'https://www.linkedin.com/company/nextgenseo-official/', label: 'LinkedIn', hover: 'hover:bg-blue-600' },
                   { href: 'https://x.com/next_genseo', label: 'Twitter', hover: 'hover:bg-sky-500' },
