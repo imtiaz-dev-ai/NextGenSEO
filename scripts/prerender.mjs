@@ -16,26 +16,38 @@ function loadEnv() {
   const envPath = path.resolve('.env.local');
   if (!fs.existsSync(envPath)) return {};
   const env = {};
-  fs.readFileSync(envPath, 'utf-8').split('\n').forEach(line => {
-    const m = line.match(/^([^#=]+)=(.*)$/);
-    if (m) env[m[1].trim()] = m[2].trim();
+  fs.readFileSync(envPath, 'utf-8').split(/\r?\n/).forEach(line => {
+    const m = line.replace(/^\uFEFF/, '').match(/^\s*(?:export\s+)?([^#=\s]+)\s*=\s*(.*?)\s*$/);
+    if (m) env[m[1]] = m[2].replace(/^(['"])(.*)\1$/, '$2');
   });
   return env;
 }
 
 const localEnv = loadEnv();
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || localEnv['VITE_SUPABASE_URL'] || 'https://bckkbkodjpotcjkfedds.supabase.co';
-const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || localEnv['VITE_SUPABASE_ANON_KEY'] || '';
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || localEnv.VITE_SUPABASE_URL || '';
+const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || localEnv.VITE_SUPABASE_ANON_KEY || '';
 
 // ─── Fetch blog posts from Supabase at build time ────────────────────────────
 async function fetchSupabaseBlogPosts() {
-  if (!SUPABASE_KEY) {
-    console.log('⚠ VITE_SUPABASE_ANON_KEY not set — skipping Supabase blog fetch.');
-    return [];
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    throw new Error(
+      'Blog prerender requires VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY. Set both in the build environment; production prerender does not use the legacy dataset.',
+    );
   }
+
+  let projectUrl;
+  try {
+    projectUrl = new URL(SUPABASE_URL);
+  } catch {
+    throw new Error('VITE_SUPABASE_URL must be a valid Supabase project URL.');
+  }
+  if (!['https:', 'http:'].includes(projectUrl.protocol)) {
+    throw new Error('VITE_SUPABASE_URL must use HTTPS.');
+  }
+
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/app_records?collection_name=eq.blogPosts&select=id,data&order=created_at.desc`,
+      new URL('/rest/v1/app_records?collection_name=eq.blogPosts&select=id,data&order=created_at.desc', projectUrl),
       {
         headers: {
           'apikey': SUPABASE_KEY,
@@ -45,14 +57,20 @@ async function fetchSupabaseBlogPosts() {
       }
     );
     if (!res.ok) {
-      console.log(`⚠ Supabase fetch failed: ${res.status}`);
-      return [];
+      const detail = (await res.text()).slice(0, 300).replace(/\s+/g, ' ').trim();
+      throw new Error(
+        `Supabase blog read failed with HTTP ${res.status}${detail ? `: ${detail}` : ''}. Check the Supabase URL/key and app_records SELECT grant/RLS policy.`,
+      );
     }
     const rows = await res.json();
+    if (!Array.isArray(rows) || rows.some(row => !row || typeof row.data !== 'object' || row.data === null)) {
+      throw new Error('Supabase blog read returned an unexpected response; expected app_records rows with JSON data.');
+    }
+    console.log(`✓ Supabase returned ${rows.length} blog record(s) for prerender.`);
     return rows.map(row => ({ ...row.data, id: row.id }));
-  } catch (e) {
-    console.log(`⚠ Supabase fetch error: ${e.message}`);
-    return [];
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('Supabase blog read failed')) throw error;
+    throw new Error(`Could not fetch blog posts from Supabase: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -63,15 +81,17 @@ function toSlug(title) {
 function isIndexablePost(post) {
   const status = String(post.status || '').toLowerCase();
   const robots = String(post.robots || '').toLowerCase();
-  const isFalse = value => value === false || String(value).toLowerCase() === 'false';
+  const isFalse = value => value === false || ['false', '0'].includes(String(value).toLowerCase());
+  const isTrue = value => value === true || ['true', '1'].includes(String(value).toLowerCase());
+  const hasRedirect = value => value != null && !['', 'false', '0'].includes(String(value).toLowerCase());
   return !isFalse(post.published)
     && !isFalse(post.isPublished)
     && !['draft', 'unpublished', 'archived', 'deleted'].includes(status)
-    && post.noindex !== true
-    && post.noIndex !== true
+    && !isTrue(post.noindex)
+    && !isTrue(post.noIndex)
     && !robots.includes('noindex')
-    && !post.redirect
-    && !post.redirectTo;
+    && !hasRedirect(post.redirect)
+    && !hasRedirect(post.redirectTo);
 }
 
 function toPlainText(value) {
@@ -114,17 +134,6 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-function readLegacyBlogPosts() {
-  const databasePath = path.join(DIST, 'database.json');
-  if (!fs.existsSync(databasePath)) return [];
-
-  const payload = JSON.parse(fs.readFileSync(databasePath, 'utf-8'));
-  const records = payload?.blogPosts
-    ? Object.values(payload.blogPosts)
-    : Array.isArray(payload) ? payload : [];
-  return records.filter(isIndexablePost);
 }
 
 function updateSitemap(posts) {
@@ -452,21 +461,25 @@ for (const route of routes) {
 
 // ─── Generate blog post pages ─────────────────────────────────────────────────
 const supabasePosts = (await fetchSupabaseBlogPosts()).filter(isIndexablePost);
-const legacyPosts = readLegacyBlogPosts();
+if (supabasePosts.length === 0) {
+  throw new Error('Supabase returned no published, indexable blog posts. Check the blog records and public SELECT RLS policy; refusing to build a sitemap without the expected content.');
+}
 
-// Merge: Supabase posts + hardcoded defaults (deduplicate by slug)
+// Supabase is the source of truth for generated blog pages and sitemap entries.
 const slugSeen = new Set();
 const allBlogPosts = [];
 
-// Supabase posts first (they take priority)
 for (const post of supabasePosts) {
+  if (typeof post.title !== 'string' || !post.title.trim()) {
+    throw new Error(`Supabase blog record ${post.id} has no title.`);
+  }
   const slug = post.slug || toSlug(post.title);
   if (!slug || slugSeen.has(slug)) continue;
   slugSeen.add(slug);
   allBlogPosts.push({
     ...post,
     slug,
-    title: `${post.title} | NextGen SEO Blog`,
+    title: `${post.title.replace(/\s*\|\s*NextGen SEO Blog\s*$/i, '')} | NextGen SEO Blog`,
     description: toMetaDescription(post),
     author: typeof post.author === 'string' ? post.author.trim() : '',
     date: toPublishedDate(post.date || post.createdAt),
@@ -474,35 +487,10 @@ for (const post of supabasePosts) {
   });
 }
 
-// Use the shipped legacy dataset when Supabase is unavailable or has no record.
-for (const post of legacyPosts) {
-  const slug = post.slug || toSlug(post.title);
-  if (!slug || slugSeen.has(slug)) continue;
-  slugSeen.add(slug);
-  allBlogPosts.push({
-    ...post,
-    slug,
-    title: `${post.title} | NextGen SEO Blog`,
-    description: toMetaDescription(post),
-    author: typeof post.author === 'string' ? post.author.trim() : '',
-    date: toPublishedDate(post.date || post.createdAt),
-    image: toPublicImage(post.image),
-  });
+if (allBlogPosts.length === 0) {
+  throw new Error('Supabase blog records did not contain any posts with unique slugs; refusing to build blog pages.');
 }
-
-// Then hardcoded defaults
-for (const post of blogPosts) {
-  if (slugSeen.has(post.slug)) continue;
-  slugSeen.add(post.slug);
-  allBlogPosts.push({
-    ...post,
-    description: toMetaDescription(post),
-    date: toPublishedDate(post.date),
-    image: toPublicImage(post.image),
-  });
-}
-
-console.log(`\n📝 Blog posts to prerender: ${allBlogPosts.length} (${supabasePosts.length} from Supabase, ${legacyPosts.length} from legacy data, plus defaults)`);
+console.log(`\n📝 Blog posts to prerender from Supabase: ${allBlogPosts.length}`);
 
 for (const post of allBlogPosts) {
   const dir = path.join(DIST, 'blog', post.slug);

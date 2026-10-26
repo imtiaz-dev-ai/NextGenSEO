@@ -50,6 +50,18 @@ create policy "Public can read app records"
       'marketplaceListings',
       'communityPosts'
     )
+    and (
+      collection_name <> 'blogPosts'
+      or (
+        lower(coalesce(data->>'published', 'true')) not in ('false', '0')
+        and lower(coalesce(data->>'isPublished', 'true')) not in ('false', '0')
+        and lower(coalesce(data->>'status', 'published')) not in ('draft', 'unpublished', 'archived', 'deleted')
+        and lower(coalesce(data->>'noindex', data->>'noIndex', 'false')) not in ('true', '1')
+        and position('noindex' in lower(coalesce(data->>'robots', ''))) = 0
+        and lower(coalesce(data->>'redirect', 'false')) in ('false', '0', '')
+        and lower(coalesce(data->>'redirectTo', '')) in ('false', '0', '')
+      )
+    )
   );
 
 drop policy if exists "Public can submit chat messages" on public.app_records;
