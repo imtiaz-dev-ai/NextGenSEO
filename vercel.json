@@ -8,6 +8,12 @@
     { "source": "/((?!api|assets|pics|fonts|favicon|robots|sitemap|privacy|schema|google|sw\\.js|llms\\.txt|about|team|blog|contact|pricing|case_studies|service_|buy-backlinks|marketplace|free_audit_page|community|tool_|admin).*)", "destination": "/index.html" }
   ],
   "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "nextgenseo.pro" }],
+      "destination": "https://www.nextgenseo.pro/:path*",
+      "permanent": true
+    },
     { "source": "/marketplace", "destination": "/buy-backlinks", "permanent": true },
     { "source": "/marketplace/", "destination": "/buy-backlinks", "permanent": true }
   ],
@@ -15,6 +21,7 @@
     {
       "source": "/(.*)",
       "headers": [
+        { "key": "X-Robots-Tag", "value": "index, follow" },
         { "key": "Vary", "value": "Accept-Encoding" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },

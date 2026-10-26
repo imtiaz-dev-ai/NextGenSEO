@@ -1,7 +1,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Robots-Tag = "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    X-Robots-Tag = "index, follow"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
@@ -60,35 +60,42 @@
   [headers.values]
     Cache-Control = "public, max-age=2592000"
 
-# 1. http → https
+# 1. http/non-www → https/www
 [[redirects]]
   from = "http://nextgenseo.pro/*"
-  to = "https://nextgenseo.pro/:splat"
+  to = "https://www.nextgenseo.pro/:splat"
   status = 301
   force = true
 
-# 2. www → non-www
+# 2. https/non-www → https/www
 [[redirects]]
-  from = "https://www.nextgenseo.pro/*"
-  to = "https://nextgenseo.pro/:splat"
+  from = "https://nextgenseo.pro/*"
+  to = "https://www.nextgenseo.pro/:splat"
   status = 301
   force = true
 
-# 3. marketplace → buy-backlinks
+# 3. http/www → https/www
+[[redirects]]
+  from = "http://www.nextgenseo.pro/*"
+  to = "https://www.nextgenseo.pro/:splat"
+  status = 301
+  force = true
+
+# 4. marketplace → buy-backlinks
 [[redirects]]
   from = "/marketplace"
   to = "/buy-backlinks"
   status = 301
   force = true
 
-# 4. Remove trailing slash (except root /)
+# 5. Remove trailing slash (except root /)
 [[redirects]]
   from = "/:path/"
   to = "/:path"
   status = 301
   force = true
 
-# 5. SPA fallback
+# 6. SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"

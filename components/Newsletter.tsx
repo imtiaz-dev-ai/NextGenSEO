@@ -45,10 +45,10 @@ const Newsletter: React.FC = () => {
             </svg>
           </div>
           <h3 className="text-lg sm:text-2xl md:text-3xl font-black mb-4 sm:mb-6">
-            Stay Ahead with <span className="gradient-text">Professional SEO Intelligence</span>
+            Stay Ahead with <span className="gradient-text">Search Insights</span>
           </h3>
           <p className="text-slate-400 text-xs sm:text-sm md:text-base mb-6 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
-            Get exclusive SEO insights, AI-powered keyword research strategies, technical SEO optimization tips, link building guides, and proven organic search strategies delivered weekly. Master Google ranking techniques and improve your search visibility.
+            Get weekly insights on keyword research, technical optimization, link building, and organic growth. Learn practical ways to improve your Google rankings and search visibility.
           </p>
           
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 max-w-xl mx-auto px-0">
@@ -71,7 +71,7 @@ const Newsletter: React.FC = () => {
           </form>
           
           <p className="text-slate-500 text-[10px] sm:text-xs mt-4 sm:mt-6">
-            Join 10,000+ SEO professionals. Unsubscribe anytime. Learn about keyword research, link building, and organic growth.
+            Join 10,000+ subscribers. Unsubscribe anytime. Learn about keyword research, link building, and organic growth.
           </p>
         </div>
       </div>

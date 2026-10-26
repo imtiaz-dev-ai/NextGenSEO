@@ -44,7 +44,7 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
           </button>
           <button
-            onClick={() => onStart(AppRoute.MARKETPLACE)}
+            onClick={() => onStart(AppRoute.BUY_BACKLINKS)}
             className="group w-full sm:w-auto glass px-5 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm md:text-base hover:bg-white/10 transition-all border border-white/10 hover:border-purple-500/40"
           >
             <span className="flex items-center justify-center gap-2">
@@ -67,7 +67,7 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
             <div className="flex text-yellow-400 text-sm">
               {'★★★★★'.split('').map((s, i) => <span key={i}>{s}</span>)}
             </div>
-            <span className="text-slate-300 text-xs sm:text-sm font-bold"><span className="text-white font-black">4.8/5</span> on SEO Reviews</span>
+            <span className="text-slate-300 text-xs sm:text-sm font-bold"><span className="text-white font-black">4.8/5</span> client rating</span>
           </div>
         </div>
 

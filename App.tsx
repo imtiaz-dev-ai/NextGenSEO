@@ -596,7 +596,7 @@ const App: React.FC = () => {
       [AppRoute.COMMUNITY]: 'SEO Community — Connect, Share & Grow | NextGen SEO',
     };
     const routeDescriptions: Record<string, string> = {
-      [AppRoute.HOME]: 'NextGen SEO Agency by Tayyab Mehmood. Professional SEO services, expert link building, affordable SEO packages. Get 300%+ organic traffic growth.',
+      [AppRoute.HOME]: 'Grow organic traffic by 300%+ with expert SEO services, link building, and affordable packages from NextGen SEO Agency by Tayyab Mehmood.',
       [AppRoute.ABOUT]: 'Learn about NextGen SEO Agency founded by Tayyab Mehmood. 10+ years of SEO expertise, 200+ happy clients, proven results.',
       [AppRoute.TEAM]: 'Meet the NextGen SEO expert team — link builders, SEO specialists, content strategists, and technical SEO experts.',
       [AppRoute.BLOG]: 'Expert SEO insights, link building strategies, and digital marketing tips from the NextGen SEO team.',
@@ -618,26 +618,26 @@ const App: React.FC = () => {
       [AppRoute.COMMUNITY]: 'Join the NextGen SEO community. Connect with founders, share strategies, and grow your organic traffic.',
     };
     const routeCanonicals: Record<string, string> = {
-      [AppRoute.HOME]: 'https://nextgenseo.pro',
-      [AppRoute.ABOUT]: 'https://nextgenseo.pro/about',
-      [AppRoute.TEAM]: 'https://nextgenseo.pro/team',
-      [AppRoute.BLOG]: 'https://nextgenseo.pro/blog',
-      [AppRoute.CONTACT]: 'https://nextgenseo.pro/contact',
-      [AppRoute.PRICING]: 'https://nextgenseo.pro/pricing',
-      [AppRoute.CASE_STUDIES]: 'https://nextgenseo.pro/case_studies',
-      [AppRoute.SERVICE_ONPAGE]: 'https://nextgenseo.pro/service_onpage',
-      [AppRoute.SERVICE_OFFPAGE]: 'https://nextgenseo.pro/service_offpage',
-      [AppRoute.SERVICE_TECHNICAL]: 'https://nextgenseo.pro/service_technical',
-      [AppRoute.SERVICE_AI]: 'https://nextgenseo.pro/service_ai',
-      [AppRoute.MARKETPLACE]: 'https://nextgenseo.pro/buy-backlinks',
-      [AppRoute.BUY_BACKLINKS]: 'https://nextgenseo.pro/buy-backlinks',
-      [AppRoute.TOOL_AUDIT]: 'https://nextgenseo.pro/tool_audit',
-      [AppRoute.TOOL_KEYWORDS]: 'https://nextgenseo.pro/tool_keywords',
-      [AppRoute.TOOL_WRITER]: 'https://nextgenseo.pro/tool_writer',
-      [AppRoute.TOOL_COMPETITOR]: 'https://nextgenseo.pro/tool_competitor',
-      [AppRoute.TOOL_ASSISTANT]: 'https://nextgenseo.pro/tool_assistant',
-      [AppRoute.FREE_AUDIT_PAGE]: 'https://nextgenseo.pro/free_audit_page',
-      [AppRoute.COMMUNITY]: 'https://nextgenseo.pro/community',
+      [AppRoute.HOME]: 'https://www.nextgenseo.pro',
+      [AppRoute.ABOUT]: 'https://www.nextgenseo.pro/about',
+      [AppRoute.TEAM]: 'https://www.nextgenseo.pro/team',
+      [AppRoute.BLOG]: 'https://www.nextgenseo.pro/blog',
+      [AppRoute.CONTACT]: 'https://www.nextgenseo.pro/contact',
+      [AppRoute.PRICING]: 'https://www.nextgenseo.pro/pricing',
+      [AppRoute.CASE_STUDIES]: 'https://www.nextgenseo.pro/case_studies',
+      [AppRoute.SERVICE_ONPAGE]: 'https://www.nextgenseo.pro/service_onpage',
+      [AppRoute.SERVICE_OFFPAGE]: 'https://www.nextgenseo.pro/service_offpage',
+      [AppRoute.SERVICE_TECHNICAL]: 'https://www.nextgenseo.pro/service_technical',
+      [AppRoute.SERVICE_AI]: 'https://www.nextgenseo.pro/service_ai',
+      [AppRoute.MARKETPLACE]: 'https://www.nextgenseo.pro/buy-backlinks',
+      [AppRoute.BUY_BACKLINKS]: 'https://www.nextgenseo.pro/buy-backlinks',
+      [AppRoute.TOOL_AUDIT]: 'https://www.nextgenseo.pro/tool_audit',
+      [AppRoute.TOOL_KEYWORDS]: 'https://www.nextgenseo.pro/tool_keywords',
+      [AppRoute.TOOL_WRITER]: 'https://www.nextgenseo.pro/tool_writer',
+      [AppRoute.TOOL_COMPETITOR]: 'https://www.nextgenseo.pro/tool_competitor',
+      [AppRoute.TOOL_ASSISTANT]: 'https://www.nextgenseo.pro/tool_assistant',
+      [AppRoute.FREE_AUDIT_PAGE]: 'https://www.nextgenseo.pro/free_audit_page',
+      [AppRoute.COMMUNITY]: 'https://www.nextgenseo.pro/community',
     };
     document.title = routeTitles[currentRoute] || 'NextGen SEO Agency';
     const desc = routeDescriptions[currentRoute];
@@ -655,7 +655,7 @@ const App: React.FC = () => {
       if (twDesc) twDesc.setAttribute('content', desc);
     }
     // Canonical URL update
-    const canonicalUrl = routeCanonicals[currentRoute] || `https://nextgenseo.pro/${currentRoute}`;
+    const canonicalUrl = routeCanonicals[currentRoute] || `https://www.nextgenseo.pro/${currentRoute}`;
     let canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) canonical.setAttribute('href', canonicalUrl);
     let ogUrl = document.querySelector('meta[property="og:url"]');
@@ -687,6 +687,22 @@ const App: React.FC = () => {
           <ScrollReveal>
             <InteractiveServices />
           </ScrollReveal>
+          <section className="py-12 sm:py-16 px-4 sm:px-6">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-black mb-4 text-center">
+                A Practical <span className="gradient-text">SEO Strategy for SaaS Growth</span>
+              </h2>
+              <p className="text-slate-400 leading-relaxed mb-4">
+                SaaS SEO brings technical health, useful content, and trusted links together. Start by understanding what potential customers search for, then match those questions to clear pages about your product, features, and solutions. Strong keyword research and search intent help each page serve a real need instead of repeating the same phrases.
+              </p>
+              <p className="text-slate-400 leading-relaxed mb-4">
+                A sound plan also checks whether search engines can crawl and index your site, and whether pages work well on mobile. Improve titles, headings, internal links, structured data, and page speed where they help people and search engines. Relevant, editorial link building can then support your site's authority over time.
+              </p>
+              <p className="text-slate-400 leading-relaxed">
+                Measure progress with organic impressions, qualified visits, and conversions, then refine the plan as your product and market change. Explore our <a href="/service_onpage" className="text-purple-300 hover:text-purple-200 underline underline-offset-4">on-page SEO</a>, <a href="/service_technical" className="text-purple-300 hover:text-purple-200 underline underline-offset-4">technical SEO</a>, and <a href="/service_offpage" className="text-purple-300 hover:text-purple-200 underline underline-offset-4">link building</a> services.
+              </p>
+            </div>
+          </section>
           <ScrollReveal delay={100}>
             <LinkBuildingServices />
           </ScrollReveal>
@@ -862,7 +878,7 @@ const App: React.FC = () => {
                   <li><a href={`#${AppRoute.SERVICE_OFFPAGE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_OFFPAGE); }} className="hover:text-purple-400 transition-colors">Off-Page &amp; PR</a></li>
                   <li><a href={`#${AppRoute.SERVICE_TECHNICAL}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_TECHNICAL); }} className="hover:text-purple-400 transition-colors">Technical SEO</a></li>
                   <li><a href={`#${AppRoute.SERVICE_AI}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.SERVICE_AI); }} className="hover:text-purple-400 transition-colors">AI Solutions</a></li>
-                  <li><a href={`/${AppRoute.MARKETPLACE}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.MARKETPLACE); }} className="hover:text-purple-400 transition-colors">Marketplace</a></li>
+                  <li><a href={`/${AppRoute.BUY_BACKLINKS}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.BUY_BACKLINKS); }} className="hover:text-purple-400 transition-colors">Marketplace</a></li>
                   <li><a href={`/${AppRoute.BUY_BACKLINKS}`} onClick={(e) => { e.preventDefault(); setCurrentRoute(AppRoute.BUY_BACKLINKS); }} className="hover:text-purple-400 transition-colors">Buy Backlinks</a></li>
                 </ul>
               </div>
@@ -944,4 +960,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-

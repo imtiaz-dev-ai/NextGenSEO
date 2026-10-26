@@ -24,7 +24,7 @@ const BeforeAfter: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 sm:mb-16 md:mb-20 px-0">
           <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">
-            The <span className="gradient-text">Transformation</span> - Real SEO Results
+            The <span className="gradient-text">Transformation</span> - Real Client Results
           </h2>
           <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 leading-relaxed">Real metrics from a proven 6-month professional SEO optimization campaign with keyword ranking improvements and organic traffic growth</p>
         </div>
@@ -55,7 +55,7 @@ const BeforeAfter: React.FC = () => {
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
               </svg>
-              After SEO Service
+              After the Campaign
             </button>
           </div>
 
@@ -114,7 +114,7 @@ const BeforeAfter: React.FC = () => {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
-                  NextGen SEO Results
+                  NextGen Results
                 </>
               )}
             </div>

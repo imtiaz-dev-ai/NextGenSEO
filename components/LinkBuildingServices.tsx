@@ -57,7 +57,7 @@ const LinkBuildingServices: React.FC = () => {
             Explore More <span className="gradient-text">Link Building Services</span>
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm md:text-base">
-            Professional white-hat link building strategies for maximum SEO impact
+            Professional white-hat link building strategies to strengthen search visibility
           </p>
         </div>
 

@@ -6,11 +6,11 @@ import React, { useState } from 'react';
 // Common SEO questions - ranking timelines, service guarantees, industry expertise, pricing
 const faqs = [
   {
-    q: "How long does it take to see professional SEO results and keyword rankings?",
+    q: "How long does it take to see results and improved keyword rankings?",
     a: "Typically, you'll start seeing improvements within 3-4 months. However, significant ranking changes and organic traffic growth usually occur between 6-12 months depending on competition, keywords targeted, and current site health. Our AI-powered approach accelerates results."
   },
   {
-    q: "What makes NextGen SEO different from other professional SEO agencies?",
+    q: "What makes NextGen different from other professional agencies?",
     a: "We combine 10+ years of proven SEO expertise with cutting-edge AI technology. Our founder Tayyab Mehmood has personally managed campaigns for Fortune 500 companies. We use proprietary AI tools for advanced keyword research, technical SEO audits, and link building strategy analysis."
   },
   {
@@ -18,11 +18,11 @@ const faqs = [
     a: "While we can't ethically guarantee specific rankings (no legitimate agency can), we do guarantee measurable improvements in organic traffic, keyword rankings, and domain authority. Our average client sees 300%+ organic traffic growth and 200+ new ranked keywords."
   },
   {
-    q: "What industries and niches do you specialize in for SEO services?",
+    q: "What industries and niches do you specialize in?",
     a: "We provide professional SEO services across all industries including SaaS, E-commerce, FinTech, Healthcare, Real Estate, and B2B services. Our AI-powered keyword research and technical SEO approach adapts to any market and niche."
   },
   {
-    q: "Are there long-term contracts or can I cancel my SEO service anytime?",
+    q: "Are there long-term contracts or can I cancel my plan anytime?",
     a: "We offer flexible month-to-month SEO packages. While we recommend at least 6 months for optimal results, you can cancel with 30 days notice. We're confident you'll want to continue once you see the organic growth and keyword ranking improvements."
   },
   {
@@ -40,9 +40,9 @@ const FAQ: React.FC = () => {
       <div className="max-w-4xl mx-auto px-0">
         <div className="text-center mb-12 sm:mb-16 md:mb-20 px-0">
           <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 sm:mb-6">
-            Frequently Asked <span className="gradient-text">Questions About SEO</span>
+            Frequently Asked <span className="gradient-text">Questions</span>
           </h2>
-          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 leading-relaxed">Everything you need to know about our professional SEO services and keyword ranking strategies</p>
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 leading-relaxed">Answers about our services, keyword growth, campaign timelines, and working together</p>
         </div>
 
         <div className="space-y-2 sm:space-y-4 px-0">
