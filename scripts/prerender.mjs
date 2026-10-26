@@ -60,6 +60,92 @@ function toSlug(title) {
   return (title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'post';
 }
 
+function isIndexablePost(post) {
+  const status = String(post.status || '').toLowerCase();
+  const robots = String(post.robots || '').toLowerCase();
+  const isFalse = value => value === false || String(value).toLowerCase() === 'false';
+  return !isFalse(post.published)
+    && !isFalse(post.isPublished)
+    && !['draft', 'unpublished', 'archived', 'deleted'].includes(status)
+    && post.noindex !== true
+    && post.noIndex !== true
+    && !robots.includes('noindex')
+    && !post.redirect
+    && !post.redirectTo;
+}
+
+function toPlainText(value) {
+  return String(value || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function toMetaDescription(post) {
+  const text = toPlainText(post.metaDescription || post.excerpt || post.description || post.content || post.title);
+  return text.length > 160 ? `${text.slice(0, 157).trimEnd()}...` : text;
+}
+
+function toPublishedDate(value) {
+  if (!value) return undefined;
+  if (typeof value === 'object' && typeof value._seconds === 'number') {
+    value = value._seconds * 1000;
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString().slice(0, 10);
+}
+
+function toPublicImage(value) {
+  if (typeof value === 'string' && /^https?:\/\//i.test(value)) return value;
+  if (typeof value === 'string' && value.startsWith('/')) return `https://www.nextgenseo.pro${value}`;
+  return 'https://www.nextgenseo.pro/pics/logo.png';
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function readLegacyBlogPosts() {
+  const databasePath = path.join(DIST, 'database.json');
+  if (!fs.existsSync(databasePath)) return [];
+
+  const payload = JSON.parse(fs.readFileSync(databasePath, 'utf-8'));
+  const records = payload?.blogPosts
+    ? Object.values(payload.blogPosts)
+    : Array.isArray(payload) ? payload : [];
+  return records.filter(isIndexablePost);
+}
+
+function updateSitemap(posts) {
+  const sitemapPath = path.join(DIST, 'sitemap.xml');
+  if (!fs.existsSync(sitemapPath)) {
+    console.warn('⚠ sitemap.xml is missing — blog sitemap entries were not generated.');
+    return;
+  }
+
+  let sitemap = fs.readFileSync(sitemapPath, 'utf-8');
+  sitemap = sitemap.replace(
+    /<url>\s*<loc>https:\/\/www\.nextgenseo\.pro\/blog\/[^<]+<\/loc>[\s\S]*?<\/url>/g,
+    '',
+  );
+  const blogUrls = posts.map(post =>
+    `  <url><loc>https://www.nextgenseo.pro/blog/${post.slug}</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>`,
+  ).join('\n');
+  sitemap = sitemap.replace('</urlset>', `${blogUrls}\n</urlset>`);
+  fs.writeFileSync(sitemapPath, sitemap, 'utf-8');
+}
+
 // ─── All static routes ────────────────────────────────────────────────────────
 const routes = [
   {
@@ -296,20 +382,20 @@ const blogPosts = [
 // ─── Patch function ───────────────────────────────────────────────────────────
 function patch(html, { title, description, canonical, ogImage = 'https://www.nextgenseo.pro/pics/logo.png', schema }) {
   let out = html
-    .replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`)
-    .replace(/(<meta name="description" content=")[^"]*(")/,   `$1${description.replace(/"/g, '&quot;')}$2`)
-    .replace(/(<link rel="canonical" href=")[^"]*(")/,          `$1${canonical}$2`)
-    .replace(/(<meta property="og:title" content=")[^"]*(")/,   `$1${title.replace(/"/g, '&quot;')}$2`)
-    .replace(/(<meta property="og:description" content=")[^"]*(")/,`$1${description.replace(/"/g, '&quot;')}$2`)
-    .replace(/(<meta property="og:url" content=")[^"]*(")/,     `$1${canonical}$2`)
-    .replace(/(<meta property="og:image" content=")[^"]*(")/,   `$1${ogImage}$2`)
-    .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${title.replace(/"/g, '&quot;')}$2`)
-    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,`$1${description.replace(/"/g, '&quot;')}$2`)
-    .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${ogImage}$2`);
+    .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*(")/,   `$1${escapeHtml(description)}$2`)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/,          `$1${escapeHtml(canonical)}$2`)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/,   `$1${escapeHtml(title)}$2`)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/,`$1${escapeHtml(description)}$2`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/,     `$1${escapeHtml(canonical)}$2`)
+    .replace(/(<meta property="og:image" content=")[^"]*(")/,   `$1${escapeHtml(ogImage)}$2`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(title)}$2`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,`$1${escapeHtml(description)}$2`)
+    .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(ogImage)}$2`);
 
   // Inject extra schema if provided (before </head>)
   if (schema) {
-    out = out.replace('</head>', `<script type="application/ld+json">${schema}</script>\n</head>`);
+    out = out.replace('</head>', `<script id="page-jsonld" type="application/ld+json">${schema.replace(/</g, '\\u003c')}</script>\n</head>`);
   }
 
   return out;
@@ -365,7 +451,8 @@ for (const route of routes) {
 }
 
 // ─── Generate blog post pages ─────────────────────────────────────────────────
-const supabasePosts = await fetchSupabaseBlogPosts();
+const supabasePosts = (await fetchSupabaseBlogPosts()).filter(isIndexablePost);
+const legacyPosts = readLegacyBlogPosts();
 
 // Merge: Supabase posts + hardcoded defaults (deduplicate by slug)
 const slugSeen = new Set();
@@ -377,12 +464,29 @@ for (const post of supabasePosts) {
   if (!slug || slugSeen.has(slug)) continue;
   slugSeen.add(slug);
   allBlogPosts.push({
+    ...post,
     slug,
     title: `${post.title} | NextGen SEO Blog`,
-    description: post.excerpt || post.description || `${post.title} - Read on NextGen SEO Blog.`,
-    author: post.author || 'NextGen SEO',
-    date: post.date || post.createdAt || new Date().toISOString().split('T')[0],
-    image: post.image || 'https://www.nextgenseo.pro/pics/logo.png',
+    description: toMetaDescription(post),
+    author: typeof post.author === 'string' ? post.author.trim() : '',
+    date: toPublishedDate(post.date || post.createdAt),
+    image: toPublicImage(post.image),
+  });
+}
+
+// Use the shipped legacy dataset when Supabase is unavailable or has no record.
+for (const post of legacyPosts) {
+  const slug = post.slug || toSlug(post.title);
+  if (!slug || slugSeen.has(slug)) continue;
+  slugSeen.add(slug);
+  allBlogPosts.push({
+    ...post,
+    slug,
+    title: `${post.title} | NextGen SEO Blog`,
+    description: toMetaDescription(post),
+    author: typeof post.author === 'string' ? post.author.trim() : '',
+    date: toPublishedDate(post.date || post.createdAt),
+    image: toPublicImage(post.image),
   });
 }
 
@@ -390,35 +494,42 @@ for (const post of supabasePosts) {
 for (const post of blogPosts) {
   if (slugSeen.has(post.slug)) continue;
   slugSeen.add(post.slug);
-  allBlogPosts.push(post);
+  allBlogPosts.push({
+    ...post,
+    description: toMetaDescription(post),
+    date: toPublishedDate(post.date),
+    image: toPublicImage(post.image),
+  });
 }
 
-console.log(`\n📝 Blog posts to prerender: ${allBlogPosts.length} (${supabasePosts.length} from Supabase + ${allBlogPosts.length - supabasePosts.length} defaults)`);
+console.log(`\n📝 Blog posts to prerender: ${allBlogPosts.length} (${supabasePosts.length} from Supabase, ${legacyPosts.length} from legacy data, plus defaults)`);
 
 for (const post of allBlogPosts) {
   const dir = path.join(DIST, 'blog', post.slug);
   fs.mkdirSync(dir, { recursive: true });
 
-  const schema = JSON.stringify({
+  const schema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": post.title.replace(' | NextGen SEO Blog', ''),
     "description": post.description,
     "image": post.image,
-    "author": { "@type": "Person", "name": post.author },
     "publisher": { "@type": "Organization", "name": "NextGen SEO Agency", "url": "https://www.nextgenseo.pro", "logo": { "@type": "ImageObject", "url": "https://www.nextgenseo.pro/pics/logo.png" } },
-    "datePublished": post.date,
     "url": `https://www.nextgenseo.pro/blog/${post.slug}`,
     "mainEntityOfPage": { "@type": "WebPage", "@id": `https://www.nextgenseo.pro/blog/${post.slug}` }
-  });
+  };
+  const publishedDate = toPublishedDate(post.date);
+  if (post.author) schema.author = { "@type": "Person", "name": post.author };
+  if (publishedDate) schema.datePublished = publishedDate;
 
   let html = patch(rootHtml, {
     title: post.title,
     description: post.description,
     canonical: `https://www.nextgenseo.pro/blog/${post.slug}`,
     ogImage: post.image,
-    schema,
+    schema: JSON.stringify(schema),
   });
+  html = html.replace('<meta property="og:type" content="website">', '<meta property="og:type" content="article">');
 
   if (!html.includes('<noscript>')) {
     html = html.replace('<div id="root">', `${buildNoscript()}\n    <div id="root">`);
@@ -427,15 +538,15 @@ for (const post of allBlogPosts) {
   // Inject article content into noscript for crawlers
   const articleContent = post.content ? `
     <article>
-      <h1>${post.title.replace(' | NextGen SEO Blog', '').replace(/"/g, '&quot;')}</h1>
-      <p><strong>By ${post.author}</strong> | ${post.date}</p>
+      <h1>${escapeHtml(post.title.replace(' | NextGen SEO Blog', ''))}</h1>
+      ${post.author || post.date ? `<p>${post.author ? `<strong>By ${escapeHtml(post.author)}</strong>` : ''}${post.author && post.date ? ' | ' : ''}${post.date ? escapeHtml(post.date) : ''}</p>` : ''}
       ${post.content}
     </article>
   ` : `
     <article>
-      <h1>${post.title.replace(' | NextGen SEO Blog', '').replace(/"/g, '&quot;')}</h1>
-      <p>${post.description.replace(/"/g, '&quot;')}</p>
-      <p>By ${post.author} | ${post.date}</p>
+      <h1>${escapeHtml(post.title.replace(' | NextGen SEO Blog', ''))}</h1>
+      <p>${escapeHtml(post.description)}</p>
+      ${post.author || post.date ? `<p>${post.author ? `By ${escapeHtml(post.author)}` : ''}${post.author && post.date ? ' | ' : ''}${post.date ? escapeHtml(post.date) : ''}</p>` : ''}
     </article>
   `;
   
@@ -445,5 +556,21 @@ for (const post of allBlogPosts) {
   console.log(`✓ /blog/${post.slug}`);
   count++;
 }
+
+// Add crawlable links to the prerendered listing for crawlers that do not run JavaScript.
+const blogListingPath = path.join(DIST, 'blog', 'index.html');
+if (fs.existsSync(blogListingPath)) {
+  let blogListing = fs.readFileSync(blogListingPath, 'utf-8');
+  const articleLinks = allBlogPosts.map(post =>
+    `<li><a href="/blog/${escapeHtml(post.slug)}">${escapeHtml(post.title.replace(' | NextGen SEO Blog', ''))}</a></li>`,
+  ).join('');
+  blogListing = blogListing.replace(
+    '</noscript>',
+    `<nav aria-label="Blog articles"><ul>${articleLinks}</ul></nav></noscript>`,
+  );
+  fs.writeFileSync(blogListingPath, blogListing, 'utf-8');
+}
+
+updateSitemap(allBlogPosts);
 
 console.log(`\n✅ Prerender complete — ${count} pages generated.\n`);
