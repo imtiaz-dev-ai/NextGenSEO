@@ -413,11 +413,14 @@ const AdminPanel: React.FC = () => {
     if (otherSlugs.includes(finalSlug)) { alert(`Slug "${finalSlug}" is already in use. Please choose another.`); return; }
     try {
       const blogData = { ...blogForm, slug: finalSlug, readTime: (blogForm as any).readTime || '5 min', date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) };
+      let deploymentStatus: { deploymentTriggered?: boolean; deploymentError?: string } | undefined;
       if (editingBlog) {
-        await updateBlogInSupabase(editingBlog.id, blogData);
+        deploymentStatus = await updateBlogInSupabase(editingBlog.id, blogData);
         setBlogs(blogs.map(b => b.id === editingBlog.id ? { ...blogData, id: editingBlog.id } : b));
       } else {
-        const docId = await saveBlogToSupabase(blogData);
+        const result = await saveBlogToSupabase(blogData);
+        deploymentStatus = result;
+        const docId = result.id;
         setBlogs([...blogs, { ...blogData, id: docId }]);
       }
       setBlogForm({ title: '', excerpt: '', content: '', category: '', author: '', readTime: '5 min', slug: '', image: '' });
@@ -425,7 +428,9 @@ const AdminPanel: React.FC = () => {
       setBlogImageUploading(false);
       setShowBlogForm(false);
       setEditingBlog(null);
-      alert('Blog saved!');
+      alert(deploymentStatus?.deploymentTriggered
+        ? 'Blog saved! Vercel deployment has started and will update the blog page and sitemap.'
+        : `Blog saved! ${deploymentStatus?.deploymentError || 'Automatic deployment status was not returned.'}`);
     } catch (error: any) { alert('Error: ' + error.message); }
   };
 
@@ -439,8 +444,11 @@ const AdminPanel: React.FC = () => {
   const deleteBlog = async (id: string) => {
     if (confirm('Delete this blog?')) {
       try {
-        await deleteBlogFromSupabase(id);
+        const deploymentStatus = await deleteBlogFromSupabase(id);
         setBlogs(blogs.filter(b => b.id !== id));
+        alert(deploymentStatus?.deploymentTriggered
+          ? 'Blog deleted! Vercel deployment has started and will update the sitemap.'
+          : `Blog deleted! ${deploymentStatus?.deploymentError || 'Automatic deployment status was not returned.'}`);
       } catch (error: any) {
         alert('Error deleting blog: ' + error.message);
       }

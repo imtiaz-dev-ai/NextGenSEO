@@ -11,6 +11,11 @@ type CollectionName =
 
 type DataRecord = Record<string, any> & { id: string };
 
+export interface BlogDeploymentStatus {
+  deploymentTriggered?: boolean;
+  deploymentError?: string;
+}
+
 const getCollection = (_name: CollectionName) => {
   const client = getSupabase();
   if (!client) {
@@ -53,21 +58,22 @@ const newId = () => {
   return globalThis.crypto.randomUUID();
 };
 
-const writeCollection = async (name: CollectionName, record: Record<string, any>): Promise<string> => {
-  const result = await adminRequest<{ id: string }>('save', 'POST', {
+const writeCollectionWithResult = (name: CollectionName, record: Record<string, any>) =>
+  adminRequest<{ id: string } & BlogDeploymentStatus>('save', 'POST', {
     collection: name,
     record,
   });
+
+const writeCollection = async (name: CollectionName, record: Record<string, any>): Promise<string> => {
+  const result = await writeCollectionWithResult(name, record);
   return result.id;
 };
 
-const updateCollection = async (name: CollectionName, id: string, updates: Record<string, any>) => {
-  await adminRequest('update', 'POST', { collection: name, id, updates });
-};
+const updateCollection = (name: CollectionName, id: string, updates: Record<string, any>) =>
+  adminRequest<BlogDeploymentStatus>('update', 'POST', { collection: name, id, updates });
 
-const deleteFromCollection = async (name: CollectionName, id: string) => {
-  await adminRequest('delete', 'POST', { collection: name, id });
-};
+const deleteFromCollection = (name: CollectionName, id: string) =>
+  adminRequest<BlogDeploymentStatus>('delete', 'POST', { collection: name, id });
 
 export const getBlogsFromSupabase = () => readCollection('blogPosts');
 
@@ -124,7 +130,7 @@ export const getBlogsWithLegacyFallback = async (): Promise<DataRecord[]> => {
   return getLegacyBlogPosts();
 };
 
-export const saveBlogToSupabase = (blog: Record<string, any>) => writeCollection('blogPosts', blog);
+export const saveBlogToSupabase = (blog: Record<string, any>) => writeCollectionWithResult('blogPosts', blog);
 export const updateBlogInSupabase = (id: string, updates: Record<string, any>) => updateCollection('blogPosts', id, updates);
 export const deleteBlogFromSupabase = (id: string) => deleteFromCollection('blogPosts', id);
 

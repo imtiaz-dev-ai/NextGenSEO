@@ -72,6 +72,45 @@ const getSupabaseAdmin = () => {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 };
 
+const triggerBlogDeployment = async () => {
+  const hookValue = process.env.VERCEL_DEPLOY_HOOK_URL;
+  if (!hookValue) {
+    return {
+      deploymentTriggered: false,
+      deploymentError: 'Blog was saved, but automatic deployment is not configured. Add VERCEL_DEPLOY_HOOK_URL in Vercel.',
+    };
+  }
+
+  let hookUrl;
+  try {
+    hookUrl = new URL(hookValue);
+  } catch {
+    return { deploymentTriggered: false, deploymentError: 'Blog was saved, but the Vercel Deploy Hook URL is invalid.' };
+  }
+
+  if (hookUrl.protocol !== 'https:' || hookUrl.hostname !== 'api.vercel.com' || !hookUrl.pathname.startsWith('/v1/integrations/deploy/')) {
+    return { deploymentTriggered: false, deploymentError: 'Blog was saved, but the Vercel Deploy Hook URL is invalid.' };
+  }
+
+  try {
+    const response = await fetch(hookUrl, { method: 'POST' });
+    if (!response.ok) {
+      console.error(`Vercel blog deployment hook failed with status ${response.status}.`);
+      return {
+        deploymentTriggered: false,
+        deploymentError: `Blog was saved, but Vercel could not start a deployment (HTTP ${response.status}).`,
+      };
+    }
+    return { deploymentTriggered: true };
+  } catch (error) {
+    console.error('Could not trigger Vercel blog deployment:', error);
+    return {
+      deploymentTriggered: false,
+      deploymentError: 'Blog was saved, but Vercel could not be reached to start a deployment.',
+    };
+  }
+};
+
 const sendError = (res, status, message) => res.status(status).json({ error: message });
 
 export default async function handler(req, res) {
@@ -143,7 +182,8 @@ export default async function handler(req, res) {
         data,
       });
       if (error) throw error;
-      return res.status(200).json({ id: recordId });
+      const deployment = collection === 'blogPosts' ? await triggerBlogDeployment() : {};
+      return res.status(200).json({ id: recordId, ...deployment });
     }
 
     if (action === 'update' && req.method === 'POST') {
@@ -159,7 +199,8 @@ export default async function handler(req, res) {
         .maybeSingle();
       if (error) throw error;
       if (!updated) return sendError(res, 404, 'Record not found.');
-      return res.status(200).json({ ok: true });
+      const deployment = collection === 'blogPosts' ? await triggerBlogDeployment() : {};
+      return res.status(200).json({ ok: true, ...deployment });
     }
 
     if (action === 'delete' && req.method === 'POST') {
@@ -172,7 +213,8 @@ export default async function handler(req, res) {
         .maybeSingle();
       if (error) throw error;
       if (!deleted) return sendError(res, 404, 'Record not found.');
-      return res.status(200).json({ ok: true });
+      const deployment = collection === 'blogPosts' ? await triggerBlogDeployment() : {};
+      return res.status(200).json({ ok: true, ...deployment });
     }
 
     if (action === 'signed-upload' && req.method === 'POST') {
