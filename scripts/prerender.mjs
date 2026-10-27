@@ -78,6 +78,14 @@ function toSlug(title) {
   return (title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'post';
 }
 
+function toBlogSeoTitle(title) {
+  const cleanTitle = String(title || '')
+    .trim()
+    .replace(/\s*\|\s*NextGen SEO(?: Agency)?(?: Blog)?\s*$/i, '')
+    .trim();
+  return `${cleanTitle} | NextGen SEO Blog`;
+}
+
 function isIndexablePost(post) {
   const status = String(post.status || '').toLowerCase();
   const robots = String(post.robots || '').toLowerCase();
@@ -479,7 +487,7 @@ for (const post of supabasePosts) {
   allBlogPosts.push({
     ...post,
     slug,
-    title: `${post.title.replace(/\s*\|\s*NextGen SEO Blog\s*$/i, '')} | NextGen SEO Blog`,
+    title: toBlogSeoTitle(post.title),
     description: toMetaDescription(post),
     author: typeof post.author === 'string' ? post.author.trim() : '',
     date: toPublishedDate(post.date || post.createdAt),
@@ -499,7 +507,7 @@ for (const post of allBlogPosts) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": post.title.replace(' | NextGen SEO Blog', ''),
+    "headline": post.title.replace(/ \| NextGen SEO Blog$/, ''),
     "description": post.description,
     "image": post.image,
     "publisher": { "@type": "Organization", "name": "NextGen SEO Agency", "url": "https://www.nextgenseo.pro", "logo": { "@type": "ImageObject", "url": "https://www.nextgenseo.pro/pics/logo.png" } },
@@ -526,13 +534,13 @@ for (const post of allBlogPosts) {
   // Inject article content into noscript for crawlers
   const articleContent = post.content ? `
     <article>
-      <h1>${escapeHtml(post.title.replace(' | NextGen SEO Blog', ''))}</h1>
+      <h1>${escapeHtml(post.title.replace(/ \| NextGen SEO Blog$/, ''))}</h1>
       ${post.author || post.date ? `<p>${post.author ? `<strong>By ${escapeHtml(post.author)}</strong>` : ''}${post.author && post.date ? ' | ' : ''}${post.date ? escapeHtml(post.date) : ''}</p>` : ''}
       ${post.content}
     </article>
   ` : `
     <article>
-      <h1>${escapeHtml(post.title.replace(' | NextGen SEO Blog', ''))}</h1>
+      <h1>${escapeHtml(post.title.replace(/ \| NextGen SEO Blog$/, ''))}</h1>
       <p>${escapeHtml(post.description)}</p>
       ${post.author || post.date ? `<p>${post.author ? `By ${escapeHtml(post.author)}` : ''}${post.author && post.date ? ' | ' : ''}${post.date ? escapeHtml(post.date) : ''}</p>` : ''}
     </article>
